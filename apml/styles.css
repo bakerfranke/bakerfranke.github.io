@@ -13,6 +13,7 @@ cond{
   border: solid 1px black;
   border-radius: 30px;
   padding: 1px 5px 1px 5px;
+  margin: 1px;
 }
 
 val{
