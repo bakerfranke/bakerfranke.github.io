@@ -1,0 +1,99 @@
+<html>
+<head>
+  <title>APML - The DIY AP markup language</title>
+  <link rel="stylsheet" href="styles.css">
+  <script
+  src="https://code.jquery.com/jquery-3.1.1.js"
+  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+  crossorigin="anonymous"></script>
+  <script type="text/javascript" src="apml.js"></script>
+</head>
+<body>
+<h2>
+Welcome to APBML - AP Block Markup Language
+</h2>
+<em>the DIY, roll-your-own ASCII-2-AP block code tool.</em><br>
+<hr>
+<div id="input" style="float: left; width: 200px">
+  Input: <code>[block], |val|, (cond),  2-spaces=tab, <- = arrow</code>  <br>
+  <hr>
+
+  <textarea id="code">
+  [a <- 7]
+  [b <- 5]
+  [DISPLAY | a |]
+  [ IF ( a <= 7)
+  {
+    [ a <- 6 ]
+  }
+  ELSE
+  {
+    [[IF ( a ≥ 10)
+  {
+    [ a <- 10 ]
+  }]]
+  }]
+  </textarea><br>
+  <button id="go">convert</button> <button id="loadSample">load sample</button>
+</div>
+
+<div id="htmlout" style="min-width: 210px; float: left; margin-left: 10px; margin-right: 10px;">
+ HTML Rendered<br>
+  font-size: <input type="range" min=6 max=40 value=12 style="width: 50px" id="fSize"><span id="fSizeout">12</span><br>
+  <hr>
+  <div id="liveout">
+  </div> 
+</div>
+
+<div id="htmlout" style="float: left; margin-right: 10px">
+  HTML to Copy:<br>
+  <textarea id="output"></textarea>
+</div>
+
+<div style="clear: both">
+ 
+</div>
+<hr>
+
+<h3> Intructions: </h3>
+
+<strong>What this is:</strong>
+<p>
+A hacked together janky string parser that lets you dictate how and where AP CSP-style blocks are drawn using only ASCII symbols.
+</p>
+<strong>What this is NOT:</strong>
+<p>
+This is NOT AP code parser, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.</p>
+<p>
+This will NOT even convert AP text code into block form.  Why? Because I'm too lazy to write a parser.</p>
+<p>It will NOT help you write valid AP-style block pseudocode. You can draw it wrong using this tool.
+</p>
+<strong>What problem does it solve?</strong>
+<p>
+Writing the text-based form of AP pseduocode is easy. Drawing the blocks is anoying so this helps you automate it to some degree.
+</p>
+
+<strong>How do I use it?</strong>
+<p>
+Think of it this way: this a weird hybris a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
+</p>
+<p>
+For now only 5.5 things are recognized.  Here's the list:
+</p>
+<ol>
+<li><code>[code]</code> -- Rounded Rectangle - used by most ap-style statements. e.g. <code>[a <- 7]</code></li>
+<li><code>(condition)</code> -- Oval - used by conditions and conditional expressions</li>
+<li><code>|value|</code> -- Square Rectangle - used for arguments and parameters</li>
+<li><code> &lt;- </code> -- Converts to left arrow symbol: &larr;</li> 
+<li>(2 spaces) -- use for indenting. Single spaces are ignored.</li>
+</ol>
+Half-thing: making blocks gray<br>
+<li><code>IF, REPEAT, PROCEDURE, FOR</code> -- The interpreter will recognize these keywords and make the block be shaded in gray.  <strong>You don't have to do anything to make the blocks gray.</strong>  It is done auto-magically.</li>
+
+
+
+
+
+
+</body>
+</html>
