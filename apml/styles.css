@@ -3,37 +3,37 @@ body{
   font-size: 12px;
   font-family: sans-serif;
 }
-
 textarea{
   width:150px;
   height: 250px;
 }
-
+#code{
+  font-family: monospace;
+}
 cond{
   border: solid 1px black;
   border-radius: 30px;
-  padding: 1px 5px 1px 5px;
-  margin: 1px;
+  padding: 2px 10px 2px 10px;
+  display: inline-block;
 }
-
 val{
   border: solid 1px black;
   border-radius: 0px;
-  margin-top: 5px;
-  padding: 0px 3px 0px 3px;
+  margin: 1px;
+  padding: 2px 3px 2px 3px;
+  display: inline-block;
 }
-
 bl{
   border: solid 1px black;
   border-radius: 5px;
   font-family: monospace;
-  padding: 3px 5px 3px 5px;
+  padding: 2px 5px 2px 5px;
   background-color: white;
   display: inline-block;
-  margin: 1px;
+  margin-top: 1px;
 }
 
 .dark{
-  background-color: #bbbbbb;
+  background-color: #dddddd;
   padding-top: 5px;
 }
