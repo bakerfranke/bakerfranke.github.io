@@ -55,13 +55,18 @@ function loadSample(){
 
 
 ////// EVENT HANDLERS //////
+$( document ).ready(function() {
+
+    console.log( "ready! adding event listeners" );
+    document.getElementById("code").addEventListener("input", convert);
+  document.getElementById("fSize").addEventListener("input", fontSize);
+});
+
 
 // click and oninput for convert
 $("#go").click(convert);
-document.getElementById("code").addEventListener("input", convert);
 
 $("#fSize").change(fontSize);
-document.getElementById("fSize").addEventListener("input", fontSize);
 
 $("#loadSample").click(loadSample);
 
