@@ -13,8 +13,10 @@ Welcome to APBML - AP Block Markup Language
 </h2>
 <em>the DIY, roll-your-own ASCII-2-AP block code tool.</em><br>
 <hr>
-<div id="input" style="float: left; width: 200px">
-  Input: <code>[block], |val|, (cond),  2-spaces=tab, <- = arrow</code>  <br>
+<div id="input" style="float: left; min-width: 200; max-width:500px;">
+
+  <strong>Input:</strong><br>
+  <code>[block], |val|, (cond),  <br>2-spaces=tab, <- = arrow</code>  <br>
   <hr>
 
   <textarea id="code">
@@ -37,16 +39,19 @@ Welcome to APBML - AP Block Markup Language
 </div>
 
 <div id="htmlout" style="min-width: 210px; float: left; margin-left: 10px; margin-right: 10px;">
- HTML Rendered<br>
+ <strong>Rendered Blocks</strong><br>
   font-size: <input type="range" min=6 max=40 value=12 style="width: 50px" id="fSize"><span id="fSizeout">12</span><br>
   <hr>
   <div id="liveout">
   </div> 
 </div>
 
-<div id="htmlout" style="float: left; margin-right: 10px">
-  HTML to Copy:<br>
-  <textarea id="output"></textarea>
+<div id="htmlout" style="float: left; margin-right: 10px; width: 200px;">
+  <strong>HTML to Copy:</strong><br>
+   
+    <hr>
+  <textarea id="output"></textarea><br>
+   (this HTML creates the blocks at left using this: <a href="styles.css">styles.css</a> stylesheet)
 </div>
 
 <div style="clear: both">
@@ -57,27 +62,38 @@ Welcome to APBML - AP Block Markup Language
 <h3> Intructions: </h3>
 
 <strong>What this is:</strong>
-<p>
-A hacked together janky string parser that lets you dictate how and where AP CSP-style blocks are drawn using only ASCII symbols.
-</p>
+  <p>
+    A hacked together janky string parser that lets you dictate how and where AP CSP-style blocks are drawn using only ASCII symbols.
+  </p>
+
 <strong>What this is NOT:</strong>
-<p>
-This is NOT AP code parser, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.</p>
-<p>
-This will NOT even convert AP text code into block form.  Why? Because I'm too lazy to write a parser.</p>
-<p>It will NOT help you write valid AP-style block pseudocode. You can draw it wrong using this tool.
-</p>
+  <p>
+    This is NOT AP code parser, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.
+  </p>
+  <p>
+    This will NOT even convert AP text code into block form.  Why? Because I'm too lazy to write a parser.
+  </p>
+  <p>
+    It will NOT help you write valid AP-style block pseudocode. You can draw it wrong using this tool.
+  </p>
+
 <strong>What problem does it solve?</strong>
-<p>
-Writing the text-based form of AP pseduocode is easy. Drawing the blocks is anoying so this helps you automate it to some degree.
-</p>
+  <p>
+  Writing the text-based form of AP pseduocode is easy. Drawing the blocks is anoying so this helps you automate it to some degree. With this tool you can quickly construct AP-style block code. 
+  </p>
+  <p> 
+    The main thing you might want is to screen-cap an image of the code for use on handouts, quizzes, etc. You can also easily copy out the HTML - the same code that is rendered on the screen - for use on your own site.  You'll need the <a href="styles.css">styles.css</a> file that accompanies it.  Yes, I made up my own arbitrary tags.  
+  </p>
 
 <strong>How do I use it?</strong>
 <p>
-Think of it this way: this a weird hybris a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
+  Think of it this way: this a weird hybrid a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
 </p>
+
+<img src="apml_example2.gif">
+
 <p>
-For now only 5.5 things are recognized.  Here's the list:
+  For now only 5.5 things are recognized.  Here's the list:
 </p>
 <ol>
 <li><code>[code]</code> -- Rounded Rectangle - used by most ap-style statements. e.g. <code>[a <- 7]</code></li>
