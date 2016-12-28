@@ -1,5 +1,9 @@
-var sampleCode = '[a <- 7]\n[b <- 5]\n[DISPLAY | a |]\n[ IF ( a ≤ 7)\n   [ a <- 6 ]\nELSE\n  [[IF ( a ≥ 10)\n   [ a <- 10 ]]]\n]\n\n[REPEAT 5 TIMES\n  [[DISPLAY |\"foo\"|]]\n]\n[REPEAT UNTIL (a ≤ 10)\n  [[DISPLAY |\"foo\"|]]\n]\n[FOR EACH item IN list\n  [[DISPLAY |item|]\n[IF (foo=blah)\n  [[DISPLAY |\"oy\"|]]\n]\n]]\n[PROCEDURE |a, b, c|\n  [[a <- 5]\n[IF (a = 5)\n  [[b <- a+b]]\n]]]\n[display]';
 
+var samples = {};
+samples.if = '[a <- [RANDOM |0,100|]]\n[b <- [INPUT]]\n[ IF ( a ≤ b)\n   [ a <- b ]\nELSE\n  [[IF ( b ≥ 100)\n   [ a <- b / a ]]]\n]\n[DISPLAY |a|]';
+samples.robot = '[MOVE_FORWARD]\n[REPEAT 4 TIMES\n   [[TURN_LEFT]\n[MOVE_FORWARD]]]';
+samples.foreach = '[FOR EACH item IN list\n  [[DISPLAY |item|]\n[IF (item = \"needle\")\n  [[DISPLAY |\"Found!\"|]]\n]\n]]';
+samples.procedure = '[PROCEDURE min |a, b, c|\n  [[min <- a]\n[IF (b < min)\n  [[min <- b]]\n]\n[IF (c < min)\n  [[min <- c]]]\n[RETURN |min|]\n'
 /*
 Conversions:  Find all occurances of a in text replace with b
 NOTE: order matters here
@@ -32,8 +36,8 @@ function convert(){
 
     input = input.replace(reg, convs[i].b);
   }
-  $("#output").text(input);
-  $("#liveout").html(input);
+  $("#htmlOut").text("<div id='APblocks'>\n"+input+"\n</div>");
+  $("#APblocks").html(input);
   console.log("input\n "+JSON.stringify($("#code").val()));
 }
 
@@ -41,39 +45,85 @@ function convert(){
 * Sets font size based on range slider #fSize
 */
 function fontSize(){
-   $("#liveout").css("font-size", $("#fSize").val()+'px');
+   $("#APblocks").css("font-size", $("#fSize").val()+'px');
    $("#fSizeout").html($("#fSize").val())
 }
 
 /*
 * Load sample from hard-coded global var
 */
-function loadSample(){
-  $("#code").val(sampleCode);
+function loadSample(key){
+  $("#code").val(samples[key]);
   convert();
 }
 
+
+/*
+* Save the "Saved Code" text area to local storage.
+*/
+function updateStorage(){
+  
+  var toSave = $("#savedCode").val();
+
+  if(toSave === ""){
+    alert("saving empty string")
+  }
+
+  localStorage.savedCode = toSave;
+
+
+};
 
 ////// EVENT HANDLERS //////
 $( document ).ready(function() {
 
     console.log( "ready! adding event listeners" );
     document.getElementById("code").addEventListener("input", convert);
-  document.getElementById("fSize").addEventListener("input", fontSize);
+    document.getElementById("fSize").addEventListener("input", fontSize);
+
+    //load saved code
+    if(localStorage.hasOwnProperty("savedCode")){
+      $("#savedCode").val(localStorage.savedCode.toString());
+    }
+
 });
 
 
 // click and oninput for convert
-$("#go").click(convert);
+$("#code").change(convert);
 
 $("#fSize").change(fontSize);
 
-$("#loadSample").click(loadSample);
+
+$("#updateSavedCode_btn").click(updateStorage);
+
+
+$("#saveInput").click(function(){
+
+  var newCode = $("#code").val();
+  var oldCode = $("#savedCode").val();
+  var d = new Date();
+  var dateStr = d.getMonth()+"."+d.getDay()+"."+d.getFullYear()+" @"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds();
+
+  $("#savedCode").val("--- "+dateStr+" ---\n\n"+newCode+"\n\n"+oldCode);
+
+  updateStorage();
+
+});
+
+$("#loadSample").change(function(e){
+  console.debug("menu change "+e);
+  loadSample($("#loadSample").val());
+})
+
+
+
+
 
 
 //// AT START ///
 
-loadSample();
+loadSample("if");
 convert();
 
 
