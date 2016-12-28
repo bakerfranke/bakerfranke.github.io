@@ -1,0 +1,33 @@
+#APblocks{
+  font-family: monospace;
+}
+
+cond{
+  border: solid 1px black;
+  border-radius: 30px;
+  padding: 1px 10px 1px 10px;
+  display: inline-block;
+}
+
+val{
+  border: solid 1px black;
+  border-radius: 0px;
+  margin: 1px;
+  padding: 2px 3px 2px 3px;
+  display: inline-block;
+}
+
+bl{
+  border: solid 1px black;
+  border-radius: 5px;
+  font-family: monospace;
+  padding: 2px 5px 2px 5px;
+  background-color: white;
+  display: inline-block;
+  margin-top: 1px;
+}
+
+.dark{
+  background-color: #dddddd;
+  padding-top: 5px;
+}

@@ -1,0 +1,28 @@
+body{
+  background-color: white;
+  font-size: 12px;
+  font-family: sans-serif;
+}
+
+textarea{
+  width: 100%;
+  height: 250px;
+  margin: auto;
+  display: block;
+  font-family: monospace;
+}
+
+
+.myCol {
+  float: left;
+  min-width: 200px;
+  padding: 2px;
+  margin-right: 5px;
+  margin: auto;
+
+}
+.colheading{
+  background-color: rgba(0, 135, 150, 0.25);
+  min-height: 50px;
+}
+
