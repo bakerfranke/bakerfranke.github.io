@@ -8,6 +8,7 @@ cond{
   padding: 1px 10px 1px 10px;
   display: inline-block;
 }
+
 val{
   border: solid 1px black;
   border-radius: 0px;
@@ -15,6 +16,7 @@ val{
   padding: 2px 3px 2px 3px;
   display: inline-block;
 }
+
 bl{
   border: solid 1px black;
   border-radius: 5px;
