@@ -16,7 +16,6 @@ textarea{
 .myCol {
   float: left;
   min-width: 200px;
-  max-width: 500px;
   padding: 2px;
   margin-right: 5px;
   margin: auto;
