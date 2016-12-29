@@ -26,3 +26,6 @@ textarea{
   min-height: 50px;
 }
 
+#apmlHelp{
+  display: none;
+}

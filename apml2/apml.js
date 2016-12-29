@@ -6,6 +6,7 @@ samples.procedure = '[PROCEDURE min |a, b, c|\n  [[min <- a]\n[IF (b < min)\n  [
 
 var multilineBlocks = ["IF","ELSE", "REPEAT","FOR EACH","PROCEDURE"];
 
+var codeType = "ap";  //this can be "ap" or "apml"
 
 /*
 Conversions:  Find all occurances of a in text replace with b
@@ -27,12 +28,17 @@ convs.push({a: "<-", b: "&larr;"});
 
 /////// HELPER FUNCTIONS //////
 /* 
-* Process array of conversions. Set text and html output boxes
+* Process apml and replace special chars with appropriate html blocks
+* Worth nothing: css says that styles here are <pre> style so spaces have an effect!
 */
-function convert(){
+function convert(){  //make this be apml2html(input)
 
 
-  var input = parse($("#code").val());
+  var input = $("#code").val();
+
+  if(codeType==="ap"){
+    input = AP2apml(input);
+  }
   
   for(var i=0; i<convs.length; i++){
     var reg = new RegExp(convs[i].a, "g");
@@ -89,12 +95,111 @@ function isBlockStatement(line){
   return false;
 }
 
-// Takes AP-style code and parses it into Baker's apml
-function parse(){
+function apml2AP(code){
 
-  var lines = $("#code").val().split("\n");
+  var lines = code.split("\n");
 
   var out = "";
+  var indent = 0; //keep track of indent depth
+
+  for(var i=0; i<lines.length; i++){
+
+    var line = lines[i];
+
+    console.log(i+".) "+line)
+
+    // first remove double brackets. Those are curly braces
+    line = line.replace(/\[ *\[/g,"{\n");
+    line = line.replace(/\] *\]/g, "}");
+
+    line = line.replace("ELSE","}\nELSE");
+
+
+    
+    
+
+    // now get rid of single brackets
+    line = line.replace(/[\[\]]/g,"");
+
+    //strip any amount of leading whitespace
+    line = line.replace(/^[ ]*/,"");
+
+    // if there is a closing curly brace de-dent immediatly
+    if(line.indexOf("}")>=0) indent-=2;
+
+    // replace with proper amount.
+    if(line.indexOf("{\n")>=0){ //if I inserted a \n it's because of open curly or else indent needs to happen to remainder of line after \n
+      console.log("found line break replacing with \\n + pad >>  "+pad(indent)+"<<");
+      line = line.replace(/[\n]/,"\n  "+pad(indent));  //force add 2 spaces since indent hasn't increased yet.
+    }
+    else if(line.indexOf("}\nELSE")>=0){  //I created this above --
+
+      console.log("found ELSE  >>"+line+"<<");
+      
+      line = line.replace("}\nELSE", "}\n"+pad(indent)+"ELSE")
+    }
+    
+    
+    
+    line = pad(indent)+line;
+    
+    
+
+    console.log("\t"+ i+".) >>"+line+"<<")
+
+    //figure out how to replace pipes || with proper parenstr.search(/^[ ]*$/g)s ()
+    line = pipe2parens(line);
+
+    if(line.search(/^[ ]*$/g) == -1){ //if the line is NOT just all spaces
+      
+      out += line+"\n";
+    } 
+    else{
+      console.log("\tONLY SPACES!!!");
+    }
+    // if there is an opening curly brace increase indent here to affect future lines
+    if(line.indexOf("{")>=0) indent+=2;
+
+  }
+  return out;
+
+}
+
+
+function pipe2parens(str){
+
+  //alternate first occurance to (  then last occurance to )
+  // should deal with embeded pipes...which shouldn't happen but still.
+  var out = str;
+  while ( out.search(/[|]/g) >= 0){
+
+    var left = out.indexOf("|");
+    var right = out.lastIndexOf("|");
+
+    out = out.slice(0, left)+"("+out.slice(left+1, right)+")"+out.slice(right+1)
+
+
+  }
+  return out;
+
+}
+
+function pad(amt){
+
+  return Array(amt+1).toString().replace(/,/g," ")
+}
+
+
+// Takes AP-style code and parses it into Baker's apml
+// TODO:  need to parse right-side expressions on assignment...or any invocation of known commands with params
+function AP2apml(code){
+
+  //var lines = $("#code").val().split("\n");
+  var lines = code.split("\n");
+
+  var out = "";
+
+  var nestLevel = 0; //count nesting of blocks, use to determine whether to use indent at the end.
 
   for(var i=0; i<lines.length; i++){
 
@@ -112,10 +217,15 @@ function parse(){
         line = line.replace(/[\(\)]/g,"|");
     }
 
+    // TODO: if line contains pattern PROCEDURE_NAME (...)  then it needs to be surrounded with []
+
 
     //2. preserve indentation?
     var firstCharPos = line.search("[^ ]");
     var indent = line.substring(0, firstCharPos ); //anything from 0 up to first non-space is indent
+
+    // TODO: 
+
     line = line.substring(firstCharPos);
 
     
@@ -126,19 +236,22 @@ function parse(){
 
     // if it's a block statement it cannot end with a bracket
     if( isBlockStatement(line)){
-      endToken = "\n";
+      endToken = "\n   ";  //NOTE: extra spaces are for proper indent of block statements on next line.
+      nestLevel++;         //   this fixes the indent problem for blocks where the first line after IF/REPEAT etc.
+                          // needs to be indented.
     }
 
     //line = line.replace(/[\}]/g,"]");
     //line = line.replace(/[\{}]/g,"[");
 
-    if(line.indexOf("}") >= 0){   //if this is the closing curly for an if-statement
+    if(line.indexOf("}") >= 0){   //if this is the closing curly for a block statement
       if(i<lines.length-1 && lines[i+1].indexOf("ELSE")>=0){  // if next thing is an ELSE then only single-close 
         out +="]\n";                      
       }
       else{
         out+="]]\n";
       }
+      nestLevel--;
     }
     else if(line.indexOf("{") >= 0){
       out+=""
@@ -147,12 +260,19 @@ function parse(){
       out += "\n";
     }
     else if(line.indexOf("ELSE")>=0){
-      out += "ELSE\n";
+      out += "ELSE\n   ";  //NOTE: adding indent here as part of ELSE token
     }
     else{
       if(i>0 && lines[i-1].indexOf("{")>=0){
         beginToken = "[[";
       }
+
+      //Don't use indent if code is already nested.
+      // Initial tab is taken car of endToken from IF/REPEAT/PROCEDURE, etc.
+      if(nestLevel>0){
+        indent ="";
+      }
+
       out+=indent+ beginToken + line + endToken;
     }
 
@@ -183,6 +303,34 @@ $("#code").change(convert);
 
 $("#fSize").change(fontSize);
 
+$("input[name='codeType']").change(function(e){
+
+    console.log("changed and val is: ")
+    console.debug(e);
+    codeType = $("input[name='codeType']:checked").val();
+
+    if(codeType==="apml"){ //assumes that code in input is ap now and needs to be switched. 
+
+      var apml = AP2apml($("#code").val()); // convert to apml
+      $("#code").val(apml); // put it in input box
+    }
+    else{  // assumes it's apml and needs to be switched to ap
+
+      console.log("converting apml-to-AP...");
+      var ap = apml2AP($("#code").val());
+
+      $("#code").val(ap);
+
+    }
+
+    //toggle instructions
+    $("#apHelp").toggle();
+    $("#apmlHelp").toggle();
+
+    convert(); //shouldn't need to do this but...
+
+});
+
 
 $("#updateSavedCode_btn").click(updateStorage);
 
@@ -212,7 +360,7 @@ $("#loadSample").change(function(e){
 
 //// AT START ///
 
-loadSample("if");
+//loadSample("if");
 convert();
 
 

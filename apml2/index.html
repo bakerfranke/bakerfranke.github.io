@@ -22,34 +22,43 @@
 
 
     <div class="myCol">
-      <div class="colheading">
-        <strong>Input:</strong><br>
+      <div class="colheading" id="apmlHelp">
+        <strong>Input: apml</strong><br>
         <code>[block], |val|, (cond),  <br>2-spaces=tab, <- = arrow</code>
+      </div>
+      <div class="colheading" id="apHelp">
+        <strong>Input: AP Pseudocode</strong><br>
+        <code>2-spaces=tab, <- = arrow,<br> {} should be on own line</code>
       </div>
       <div id="input" class="myCol">
         <textarea id="code">
-          [a <- 7]
-          [b <- 5]
-          [DISPLAY | a |]
-          [ IF ( a <= 7)
-          {
-            [ a <- 6 ]
-          }
-          ELSE
-          {
-            [[IF ( a ≥ 10)
-          {
-            [ a <- 10 ]
-          }]]
-          }]
+a <- 7
+b <- RANDOM (0, 100)
+REPEAT UNTIL (a > b)
+{
+   DISPLAY (a)
+   a <- a + 1
+   IF (a < b)
+   {
+      DISPLAY(a)
+   }
+   ELSE
+   {
+      DISPLAY(b)
+   }
+}
+DISPLAY (foo)
           </textarea>
-          <button id="saveInput" alt="copies code from here into saved area">Prepend to Saved Area</button><br>
+          <input type="radio" name="codeType" value="ap" checked>AP Pseudocode
+          <input type="radio" name="codeType" value="apml">APML<br>          
           <select id="loadSample">
             <option value="if" selected>If Statement</option>
             <option value="foreach">For Each Loop</option>
             <option value="robot">Repeat Loop (with robot)</option>
             <option value="procedure">Procedure </option>
-          </select>
+          </select><br>
+          <button id="saveInput" alt="copies code from here into saved area">Prepend to Saved Area</button>
+
       </div>
     </div>
 
@@ -104,13 +113,10 @@
 
   <strong>What this is NOT:</strong>
     <p>
-      This is NOT AP code parser, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.
+      This is NOT AP pseudocode, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.
     </p>
     <p>
-      This will NOT even convert AP text code into block form.  Why? Because I'm too lazy to write a parser.
-    </p>
-    <p>
-      It will NOT help you write valid AP-style block pseudocode. You can draw it wrong using this tool.
+      It will NOT help you write valid AP-style pseudocode or blocks. You can draw it wrong using this tool.
     </p>
 
   <strong>What problem does it solve?</strong>
@@ -121,9 +127,12 @@
       The main thing you might want is to screen-cap an image of the code for use on handouts, quizzes, etc. You can also easily copy out the HTML - the same code that is rendered on the screen - for use on your own site.  You'll need the <a href="blockStyles.css">blockStyles.css</a> file that accompanies it.  Yes, I made up my own arbitrary tags.  
     </p>
 
-  <strong>How do I use it?</strong>
+  <strong>How does APML work?</strong>
   <p>
-    Think of it this way: this a weird hybrid a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
+    First, APML is completely made up...by me...for purposes of this app.
+  </p>
+  <p>
+      Think of apml as a weird hybrid a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
   </p>
 
   <img src="apml_example2.gif">

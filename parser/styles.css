@@ -1,0 +1,14 @@
+body{
+  background-color: white;
+  font-size: 12px;
+  font-family: sans-serif;
+}
+
+textarea{
+  width: 250px;
+  height: 250px;
+  margin: auto;
+  display: block;
+  font-family: monospace;
+  float: left;
+}
