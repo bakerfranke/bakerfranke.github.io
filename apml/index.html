@@ -49,7 +49,8 @@ DISPLAY (foo)
           <input type="radio" name="codeType" value="ap" checked>AP Pseudocode
           <input type="radio" name="codeType" value="apml">APML<br>          
           <select id="loadSample">
-            <option value="if" selected>If Statement</option>
+            <option value="" selected> -- Load APML Sample --</option>
+            <option value="if">If Statement</option>
             <option value="foreach">For Each Loop</option>
             <option value="robot">Repeat Loop (with robot)</option>
             <option value="procedure">Procedure </option>
@@ -105,15 +106,15 @@ DISPLAY (foo)
 
   <strong>What this is:</strong>
     <p>
-      A hacked together janky string parser that lets you dictate how and where AP CSP-style blocks are drawn using only ASCII symbols.
+      A hacked together janky string parser that lets you dictate how and where AP CSP-style blocks are drawn by converting from AP CSP Pseudocode, or from using a markup language that I made up and am calling APML - AP Markup Language. 
     </p>
 
   <strong>What this is NOT:</strong>
     <p>
-      This is NOT AP pseudocode, complier, validator or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.
+      This is NOT an AP pseudocode complier, validator, coding environment, or any other thing that might lead you to believe this is doing something beyond drawing pretty picutres on the screen.
     </p>
     <p>
-      It will NOT help you write valid AP-style pseudocode or blocks. You can draw it wrong using this tool.
+      It will NOT ensure you write valid AP-style pseudocode or blocks. You can draw it wrong using this tool.
     </p>
 
   <strong>What problem does it solve?</strong>
@@ -126,21 +127,22 @@ DISPLAY (foo)
 
   <strong>How does APML work?</strong>
   <p>
-    First, APML is completely made up...by me...for purposes of this app.
+    First, APML is completely made up...by me...for purposes of this app.  So you know, good luck.
   </p>
   <p>
-      Think of apml as a weird hybrid a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.
+      Think of apml as a weird hybrid a drawing tool.  You type ASCII text in the input box and special characters are interpreted to draw AP-style blocks.  There are really only 6 special characters: <code> [ ] ( ) | <- </code> (square brackets, parentheses, pipes, and left-arrow).
   </p>
 
+  <p> Here's how to use it:<br>
   <img src="apml_example2.gif">
-
+  </p>
   <p>
-    For now only 5.5 things are recognized.  Here's the list:
+    Mini doc:
   </p>
   <ol>
-  <li><code>[code]</code> -- Rounded Rectangle - used by most ap-style statements. e.g. <code>[a <- 7]</code></li>
-  <li><code>(condition)</code> -- Oval - used by conditions and conditional expressions</li>
-  <li><code>|value|</code> -- Square Rectangle - used for arguments and parameters</li>
+  <li><code>[ <em>code</em> ]</code> -- Rounded Rectangle - used by most ap-style statements. e.g. <code>[a <- 7]</code></li>
+  <li><code>( <em>condition</em> )</code> -- Oval - used by conditions and conditional expressions</li>
+  <li><code>| <em> value/expr</em> |</code> -- Square Rectangle - used for arguments, parameters and some expressions</li>
   <li><code> &lt;- </code> -- Converts to left arrow symbol: &larr;</li> 
   <li>(2 spaces) -- use for indenting. Single spaces are ignored.</li>
   </ol>

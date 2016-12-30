@@ -147,6 +147,14 @@ function apml2AP(code){
 
     console.log("\t"+ i+".) >>"+line+"<<")
 
+    // if the line only contains characters with no spaces then it's a no-param procedure call
+    if(line.search(/^[A-Za-z0-9_]{1}[ ]*$/g)>=0){
+
+      line = line.replace(/[ ]*$/g, "");
+      line = line+" ()";
+      console.log("\tFOUND procedure call line? "+line);
+    }
+
     //figure out how to replace pipes || with proper parenstr.search(/^[ ]*$/g)s ()
     line = pipe2parens(line);
 
@@ -210,8 +218,11 @@ function AP2apml(code){
 
     // figure out what to do with line contents    
 
+    //0. Find empty parens (e.g. "()") and replace with nothing
+    line = line.replace(/[ ]*\([ ]*\)/g,"");
 
-    //1. if it's not an IF or a REPEAT UNTIL then parentheses
+
+    //1. if it's NOT an IF or a REPEAT UNTIL then parentheses
     // need to be turned into pipes
     if(line.indexOf("IF") < 0 && line.indexOf("UNTIL") < 0){
         line = line.replace(/[\(\)]/g,"|");
@@ -303,16 +314,24 @@ $("#code").change(convert);
 
 $("#fSize").change(fontSize);
 
-$("input[name='codeType']").change(function(e){
+$("input[name='codeType']").change(function(){
 
     console.log("changed and val is: ")
-    console.debug(e);
     codeType = $("input[name='codeType']:checked").val();
+
+    toggleCodeType(codeType);
+
+});
+
+function toggleCodeType(codeType){
 
     if(codeType==="apml"){ //assumes that code in input is ap now and needs to be switched. 
 
       var apml = AP2apml($("#code").val()); // convert to apml
       $("#code").val(apml); // put it in input box
+
+      $("#apHelp").hide();
+      $("#apmlHelp").show();
     }
     else{  // assumes it's apml and needs to be switched to ap
 
@@ -321,15 +340,14 @@ $("input[name='codeType']").change(function(e){
 
       $("#code").val(ap);
 
-    }
+      $("#apHelp").show();
+      $("#apmlHelp").hide()
 
-    //toggle instructions
-    $("#apHelp").toggle();
-    $("#apmlHelp").toggle();
+    }
 
     convert(); //shouldn't need to do this but...
 
-});
+}
 
 
 $("#updateSavedCode_btn").click(updateStorage);
@@ -350,6 +368,12 @@ $("#saveInput").click(function(){
 
 $("#loadSample").change(function(e){
   console.debug("menu change "+e);
+
+  // toogle radio button to apml
+ // $("input[name='codeType'][value='apml']").prop("checked", true);
+  //toggleCodeType('apml');
+
+  // then load the sample
   loadSample($("#loadSample").val());
 })
 
