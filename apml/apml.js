@@ -12,7 +12,7 @@ var codeType = "ap";  //this can be "ap" or "apml"
 Conversions:  Find all occurances of a in text replace with b
 NOTE: order matters here
 */
-var convs = [];
+var convs = []
 convs.push({a:"[|](?=.*[|])", b:"<val>"}); //look ahead for val delimiters
 convs.push({a:"[|]", b:"</val>"});
 convs.push({a:"[\[] *(?=IF|REPEAT|PROCEDURE|FOR)", b:"<bl class='dark'>"});
