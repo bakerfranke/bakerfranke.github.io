@@ -29,35 +29,32 @@
       </div>
       <div id="input" class="myCol">
         <textarea id="code">
-a <- 7
-b <- RANDOM (INPUT(), INPUT())
-c <- RANDOM (0, 100)
-DISPLAY (a)
-DISPLAY (a + RANDOM(0, 50))
-REPEAT UNTIL (a > b)
+user <- INPUT()
+rand <- RANDOM (0, 100)
+REPEAT UNTIL ( user = rand )
 {
-   DISPLAY (a)
-   a <- a + 1
-   IF (a < b)
-   {
-      DISPLAY(a)
-   }
-   ELSE
-   {
-      DISPLAY(b)
-   }
+  DISPLAY ("guess again!")
+  IF (user < rand)
+  {
+    DISPLAY ("Higher")
+  }
+  ELSE
+  {
+    DISPLAY ("Lower")
+  }
+  user <- INPUT()
 }
-DISPLAY (foo)
+DISPLAY ("You got it!")
           </textarea>
           <input type="radio" name="codeType" value="ap" checked>AP Pseudocode
           <input type="radio" name="codeType" value="apml">APML<br>          
-          <select id="loadSample">
+          <!--<select id="loadSample">
             <option value="" selected> -- Load APML Sample --</option>
             <option value="if">If Statement</option>
             <option value="foreach">For Each Loop</option>
             <option value="robot">Repeat Loop (with robot)</option>
             <option value="procedure">Procedure </option>
-          </select><br>
+          </select><br>-->
           <button id="saveInput" alt="copies code from here into saved area">Prepend to Saved Area</button>
 
       </div>
