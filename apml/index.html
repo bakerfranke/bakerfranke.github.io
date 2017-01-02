@@ -30,7 +30,10 @@
       <div id="input" class="myCol">
         <textarea id="code">
 a <- 7
-b <- RANDOM (0, 100)
+b <- RANDOM (INPUT(), INPUT())
+c <- RANDOM (0, 100)
+DISPLAY (a)
+DISPLAY (a + RANDOM(0, 50))
 REPEAT UNTIL (a > b)
 {
    DISPLAY (a)

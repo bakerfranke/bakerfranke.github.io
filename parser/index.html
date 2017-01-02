@@ -1,6 +1,6 @@
 <html>
  <head>
-  <title>APML - The DIY AP markup language</title>
+  <title>PARSER --> APML - The DIY AP markup language</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
 
   <script
@@ -19,7 +19,17 @@
     <em>the DIY, roll-your-own ASCII-2-AP block code tool.</em><br>
     <hr>
 
-    <textarea id="code"></textarea> <textarea id="dump"></textarea>
+    <textarea id="code">
+DISPLAY ("foo")
+a <- 7
+b <- RANDOM (0, 100)
+c <- RANDOM (INPUT(), INPUT())
+IF( b < c)
+{
+  a <- INPUT()
+  DISPLAY (a)
+}
+</textarea> <textarea id="dump"></textarea> <textarea id="apDump"></textarea>
 
 </body>
 </html>
