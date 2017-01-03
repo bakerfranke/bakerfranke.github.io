@@ -75,7 +75,11 @@ function convert(){  //make this be apml2html(input)
 */
 function fontSize(){
    $("#APblocks").css("font-size", $("#fSize").val()+'px');
-   $("#fSizeout").html($("#fSize").val())
+   $("#fSizeout").html($("#fSize").val());
+
+   $("#APblocks_width").html(parseInt($("#APblocks").width()));
+   $("#APblocks_height").html(parseInt($("#APblocks").height()));
+
 }
 
 /*
