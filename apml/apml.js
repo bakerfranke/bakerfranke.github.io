@@ -32,7 +32,7 @@ convs.push({a: "<-", b: "&larr;"});
 
 
 /////// HELPER FUNCTIONS //////
-var DEBUG = false;
+var DEBUG = true;
 var DEBUG_LEVEL = 0; // 0=always, 1=important, 2=debugging fodder
 
 function debug(msg, level){
