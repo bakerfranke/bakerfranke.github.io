@@ -42,7 +42,7 @@ function debug(msg, level){
     }
 
     if(DEBUG || level <= DEBUG_LEVEL){
-      debug(msg);
+      console.log(msg);
     }
 }
 
