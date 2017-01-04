@@ -255,7 +255,7 @@
         cspframework["5.4.1F"]="5.4.1F Knowledge of what a program is supposed to do is required in order to find most program errors.";
         cspframework["5.4.1G"]="5.4.1G Examples of intended behavior on specific inputs help people understand what a program is supposed to do.";
         cspframework["5.4.1H"]="5.4.1H Visual displays (or different modalities) of program state can help in finding errors.";
-        cspframework["5.4.1I"]="5.4.1I Programmers justify and explain a program’s correctness.";
+        cspframework["5.4.1I"]="5.4.1I Programmers justify and explain a program's correctness.";
         cspframework["5.4.1J"]="5.4.1J Justification can include a written explanation about how a program meets its specifications.";
         cspframework["5.4.1K"]="5.4.1K Correctness of a program depends on correctness of program components, including code segments and procedures.";
         cspframework["5.4.1L"]="5.4.1L An explanation of a program helps people understand the functionality and purpose of it.";
@@ -298,7 +298,7 @@
         cspframework["6.2.2G"]="6.2.2G Standards for packets and routing include transmission control protocol/Internet protocol (TCP/IP).";
         cspframework["6.2.2H"]="6.2.2H Standards for sharing information and communicating between browsers and servers on the Web include HTTP and secure sockets layer/transport layer security (SSL/TLS).";
         cspframework["6.2.2I"]="6.2.2I The size and speed of systems affect their use.";
-        cspframework["6.2.2J"]="6.2.2J The bandwidth of a system is a measure of bit rate — the amount of data (measured in bits) that can be sent in a fixed amount of time.";
+        cspframework["6.2.2J"]="6.2.2J The bandwidth of a system is a measure of bit rate - the amount of data (measured in bits) that can be sent in a fixed amount of time.";
         cspframework["6.2.2K"]="6.2.2K The latency of a system is the time elapsed between the transmission and the receipt of a request.";
         cspframework["6.3"]="6.3 Cybersecurity is an important concern for the Internet and the systems built on it.";
         cspframework["6.3.1"]="6.3.1 Identify existing cybersecurity concerns and potential options to address these issues with the Internet and the systems built on it. [P1]";
