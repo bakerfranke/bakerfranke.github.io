@@ -38,7 +38,8 @@ function updateScore(scoreChange){
     setText("score2", p2Score);
   }
 }
-</textarea><button id="doit">Do it</button>
+</textarea><br>
+<button id="doit">Prettify</button><button id="hideBtn">Hide/Show Code Input</button>
 	<pre class="line-numbers language-javascript">
 <code id="prettyArea" class="language-javascript"></code>
 </pre>
@@ -47,6 +48,9 @@ function updateScore(scoreChange){
 
 		document.getElementById("theCode").addEventListener("input", convert);
 
+		$("#hideBtn").click(function(){
+			$("#theCode").toggle();
+		});
 
 		$("#doit").click(function(){
 			convert();
