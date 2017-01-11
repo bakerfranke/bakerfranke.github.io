@@ -21,7 +21,24 @@
 </script>
 </head>
 <body>
-	<textarea id="theCode" style="width: 500px; height: 40px"></textarea><button id="doit">Do it</button>
+	<textarea id="theCode" style="width: 500px; height: 300px">
+var difficulty = 15;
+var correctSquare;
+var p1Score = 0;
+var p2Score = 0;
+var currentPlayer = 1;
+
+function updateScore(scoreChange){
+  if(currentPlayer == 1){
+    p1Score += scoreChange;
+    setText("score1", p1Score);
+  }
+  else{
+    p2Score += scoreChange;
+    setText("score2", p2Score);
+  }
+}
+</textarea><button id="doit">Do it</button>
 	<pre class="line-numbers language-javascript">
 <code id="prettyArea" class="language-javascript"></code>
 </pre>
@@ -41,6 +58,8 @@
 			$("#prettyArea").html(html);
 			Prism.highlightAll();
 		}
+
+		convert();
 
 		
 	</script>
