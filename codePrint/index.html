@@ -8,25 +8,14 @@
   integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
   crossorigin="anonymous"></script>
 	<script src="prism.js"></script>
-	<script type="text/javascript">
 
-	function doit(){
-		var code = "var data = 1;\nconsole.log(foo);";
-
-
-		var html = Prism.highlight(code, Prism.languages.javascript);
-		console.log(html);
-	}
-	
-</script>
 
 <style>
 	body{
 
 		font-family: sans-serif;
 		font-size: 12px;
-		width: 850px;
-		margin: auto;
+		margin-left: 30px;
 
 	}
 	#canvas{
@@ -35,6 +24,7 @@
 		background-color: rgba(255, 0, 0, 0.0);
 		position: absolute;
 		z-index: 999;
+
 
 	}
 
@@ -51,7 +41,6 @@
 		-webkit-margin-after: 0px;
 	}
 
-
 	</style>
 </head>
 <body>
@@ -59,7 +48,8 @@
 	
 	<div id="inputArea">
 	<h1>AP PT CodePrint</h1> 
-	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.  If you can print a PDF from the browser, this should be everything you need.</em> <strong>&copy;</strong> Baker Franke 2017<br><br>
+	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.<br>
+	If you can print a PDF from the browser, this should be everything you need.</em> <strong>&copy;</strong> Baker Franke 2017<br><br>
 	
 	1. Type (or paste) your code into the big box below.  Click this button <button id="doit">Prettify</button> if it doesn't automagically prettify. <br>
 	Optionally add a title or other text to show as a header.<br>
@@ -223,10 +213,10 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 				objy = $(svgObjId)[0].cy;
 
 				//modify x to account for center position and radius
-				console.log("x before: "+x);
+				//console.log("x before: "+x);
 				 x += parseInt($("#myOval")[0].rx.baseVal.value/2);
 				 y += parseInt($("#myOval")[0].ry.baseVal.value/2);
-				console.log("x after: "+x);
+				//console.log("x after: "+x);
 
 				
 
@@ -249,7 +239,7 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 
 		 $("input[name='drawShapeToggle']").change(function(){
 
-		 	console.log("toggle!!!");
+		 	//console.log("toggle!!!");
 
 		 	var shapeVal = $("input[name='drawShapeToggle']:checked").val();
 
@@ -277,6 +267,9 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 			var val = $("#fontSize").val()+"px"
 			$("#outerPrettyArea").css("font-size", val);
 			$("#fontSizeDisplay").html(val);
+
+			//make sure the canvas height stretches to match the pretty code
+			$("#canvas").height($("#outerPrettyArea").height());
 		}
 
 		document.getElementById("projTitleInput").addEventListener("input", setTitle);
