@@ -24,6 +24,7 @@
 		background-color: rgba(255, 0, 0, 0.0);
 		position: absolute;
 		z-index: 999;
+		cursor: crosshair;
 
 
 	}
@@ -50,11 +51,11 @@
 	
 	
 	<div id="inputArea">
-	<h1 class="noblock">AP PT CodePrint</h1> <strong>&copy;</strong> Baker Franke 2017<br>
+	<h1 class="noblock">AP PT CodePrint</h1>  <strong>&copy;</strong> Baker Franke 2017<br>
 	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.<br>
 	If you can print a PDF from the browser, this should be everything you need.</em> <strong>&copy;</strong> Baker Franke 2017<br><br>
 	
-	1. Type (or paste) your code into the big box below.  Click this button <button id="doit">Prettify</button> if it doesn't automagically prettify. <br>
+	1. Type (or paste) your code into the big box below.  Click this button <button id="doit">Prettify</button> if it doesn't automagically pretty-ify. <br>
 	Optionally add a title or other text to show as a header.<br>
 	Project Title: <input type="text" id="projTitleInput">  Other Text: <input type="text" id="otherTextInput"><br>
 	<textarea id="theCode" >
@@ -114,7 +115,7 @@ Made with CodePrint using <a href="http://prismjs.com">Prism</a>
 			Prism.highlightAll();
 
 			//make sure the canvas height stretches to match the pretty code
-			$("#canvas").height($("#outerPrettyArea").height());
+			$("#canvas").height($("#outerPrettyArea").height()+20);
 
 		}
 
@@ -277,7 +278,7 @@ Made with CodePrint using <a href="http://prismjs.com">Prism</a>
 			$("#fontSizeDisplay").html(val);
 
 			//make sure the canvas height stretches to match the pretty code
-			$("#canvas").height($("#outerPrettyArea").height());
+			$("#canvas").height($("#outerPrettyArea").height()+20);
 		}
 
 		document.getElementById("projTitleInput").addEventListener("input", setTitle);
