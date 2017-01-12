@@ -118,6 +118,10 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 			var html = Prism.highlight(code, Prism.languages.javascript);
 			$("#prettyArea").html(html);
 			Prism.highlightAll();
+
+			//make sure the canvas height stretches to match the pretty code
+			$("#canvas").height($("#outerPrettyArea").height());
+
 		}
 
 		convert();
