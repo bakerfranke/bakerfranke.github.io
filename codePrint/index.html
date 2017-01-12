@@ -25,6 +25,9 @@
 
 		font-family: sans-serif;
 		font-size: 12px;
+		width: 850px;
+		margin: auto;
+
 	}
 	#canvas{
 		width: 100%;
@@ -55,10 +58,11 @@
 	
 	
 	<div id="inputArea">
-	<h1>AP PT CodePrint</h1>
-	<em>A browser tool for preparing your code to submit for the AP CSP Performance Tasks</em><br><br>
+	<h1>AP PT CodePrint</h1> 
+	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.  If you can print a PDF from the browser, this should be everything you need</em><br><br>
 	
-	1. Type (or paste) your code into this box.<br>
+	1. Type (or paste) your code into this box.  Click this button <button id="doit">Prettify</button> if it doesn't automagically prettify<br>
+	Project Title: <input type="text" id="projTitleInput"> Other Text: <input type="text" id="otherTextInput"><br>
 	<textarea id="theCode" >
 var difficulty = 15;
 var correctSquare;
@@ -77,12 +81,14 @@ function updateScore(scoreChange){
   }
 }
 </textarea><br>
-2. Set your options 3. Draw shapes on the code 4. Hide the controls 5. Print to PDF from the browser<br>
-<button id="doit">Prettify</button> | Font Size: <input id="fontSize" type="range" min="1" max="40" step="1" value="12"><span id="fontSizeDisplay">12px</span> |
+2. Set font size and draw shapes on the code 3. Hide the controls 4. Print to PDF from the browser<br>
+Font Size: <input id="fontSize" type="range" min="1" max="40" step="1" value="12"><span id="fontSizeDisplay">12px</span> |
 Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rectangle <input type="radio" name="drawShapeToggle" value="oval">Oval <button id="clearRect">Clear Rect</button> <button id="clearOval">Clear Oval</button>
 </div>
 <button id="hideBtn">Hide/Show Controls</button>
 <hr>
+<h1 id="projTitle"></h1>
+<em><span id="otherText"></span></em>
 <svg id="canvas">
   <ellipse id="myOval" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
   <rect id="myRect" x="0" y="0" width="0" height="0" stroke="rgba(255,0,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
@@ -90,6 +96,8 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 <pre id="outerPrettyArea" class="line-numbers language-javascript">
 <code id="prettyArea" class="language-javascript"></code>
 </pre>
+<hr>
+&copy; Baker Franke 2017
 
 	<script src="prism.js"></script>
 	<script type="text/javascript">
@@ -265,6 +273,19 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 			$("#outerPrettyArea").css("font-size", val);
 			$("#fontSizeDisplay").html(val);
 		}
+
+		document.getElementById("projTitleInput").addEventListener("input", setTitle);
+		$("#projTitleInput").change(setTitle);
+		function setTitle(){
+			$("#projTitle").html($("#projTitleInput").val());
+		}
+
+		document.getElementById("otherTextInput").addEventListener("input", setOtherText);
+		$("#otherTextInput").change(setOtherText);
+		function setOtherText(){
+			$("#otherText").html($("#otherTextInput").val());
+		}
+
 
 		
 	</script>
