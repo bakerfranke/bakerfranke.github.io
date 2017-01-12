@@ -112,12 +112,18 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 		var drawShapeId = "#myRect";
 		var down = false;
 		var startPos = null;
+		boundingRect = {}
+		boundingRect.x = -1;
+		boundingRect.y = -1;
+		boundingRect.w = -1;
+		boundingRect.h = -1;
 
 		$("#canvas").mousedown(function(e){
 			down = true;
 			startPos = {x:e.offsetX, y:e.offsetY};
+			
 
-			setPosition(drawShapeId, e.offsetX, e.offsetY);
+			//setPosition(drawShapeId, e.offsetX, e.offsetY);
 			
 		});
 
@@ -138,11 +144,34 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 				var xDiff = e.offsetX - startPos.x;
 				var yDiff = e.offsetY - startPos.y;
 
-				setSize(drawShapeId, xDiff, yDiff);
+				boundingRect.x = startPos.x;
+				boundingRect.y = startPos.y;
+				boundingRect.w = xDiff;
+				boundingRect.h = yDiff;
+
+				if(xDiff < 0 ){
+					boundingRect.x = startPos.x + xDiff;
+					boundingRect.w = -xDiff;
+				}
+
+				if(yDiff < 0){
+					boundingRect.y = startPos.y + yDiff;
+					boundingRect.h = -yDiff;
+				}
+
+
+				drawShape(drawShapeId, boundingRect);
+				// setPosition(drawShapeId, )
+				// setSize(drawShapeId, xDiff, yDiff);
 			}
 
 
 		});
+
+		function drawShape(svgObj, rect){
+			setPosition(svgObj, rect.x, rect.y);
+			setSize(svgObj, rect.w, rect.h);
+		}
 
 		function setSize(svgObjId, w, h){
 
@@ -152,6 +181,9 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 			if($(svgObjId).prop("tagName")=="ellipse"){ //if it's an ellipse we need rx, and ry
 				objw = $(svgObjId)[0].rx;
 				objh = $(svgObjId)[0].ry;
+
+				w = w/2;
+				h = h/2;
 			}
 
 			objw.baseVal.value = w;
@@ -167,6 +199,15 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 			if($(svgObjId).prop("tagName")=="ellipse"){ //if it's an ellipse we need cx, and cy
 				objx = $(svgObjId)[0].cx;
 				objy = $(svgObjId)[0].cy;
+
+				//modify x to account for center position and radius
+				console.log("x before: "+x);
+				 x += parseInt($("#myOval")[0].rx.baseVal.value/2);
+				 y += parseInt($("#myOval")[0].ry.baseVal.value/2);
+				console.log("x after: "+x);
+
+				
+
 			}
 
 
