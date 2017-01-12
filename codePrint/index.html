@@ -118,11 +118,14 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 		boundingRect.w = -1;
 		boundingRect.h = -1;
 
+		
+
 		$("#canvas").mousedown(function(e){
 			down = true;
 			startPos = {x:e.offsetX, y:e.offsetY};
-			
-
+			boundingRect.x = e.offsetX;
+			boundingRect.y = e.offsetY; 
+			drawShape(drawShapeId, boundingRect);
 			//setPosition(drawShapeId, e.offsetX, e.offsetY);
 			
 		});
