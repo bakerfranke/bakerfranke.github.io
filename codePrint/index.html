@@ -40,6 +40,9 @@
 	h1{
 		-webkit-margin-after: 0px;
 	}
+	.noblock{
+		display: inline;
+	}
 
 	</style>
 </head>
@@ -47,7 +50,7 @@
 	
 	
 	<div id="inputArea">
-	<h1>AP PT CodePrint</h1> 
+	<h1 class="noblock">AP PT CodePrint</h1> <strong>&copy;</strong> Baker Franke 2017<br>
 	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.<br>
 	If you can print a PDF from the browser, this should be everything you need.</em> <strong>&copy;</strong> Baker Franke 2017<br><br>
 	
@@ -87,7 +90,8 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 </svg>
 <pre id="outerPrettyArea" class="line-numbers language-javascript">
 <code id="prettyArea" class="language-javascript"></code>
-</pre>
+</pre><hr>
+Made with CodePrint using <a href="http://prismjs.com">Prism</a>
 
 
 	<script src="prism.js"></script>
