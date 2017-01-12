@@ -181,8 +181,10 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 		});
 
 		function drawShape(svgObj, rect){
-			setPosition(svgObj, rect.x, rect.y);
+
 			setSize(svgObj, rect.w, rect.h);
+
+			setPosition(svgObj, rect.x, rect.y);
 		}
 
 		function setSize(svgObjId, w, h){
@@ -214,8 +216,10 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 
 				//modify x to account for center position and radius
 				//console.log("x before: "+x);
-				 x += parseInt($("#myOval")[0].rx.baseVal.value/2);
-				 y += parseInt($("#myOval")[0].ry.baseVal.value/2);
+				 //x += parseInt($("#myOval")[0].rx.baseVal.value/2);
+				 //y += parseInt($("#myOval")[0].ry.baseVal.value/2);
+				 x = boundingRect.x + boundingRect.w/2;
+				 y = boundingRect.y + boundingRect.h/2;
 				//console.log("x after: "+x);
 
 				
