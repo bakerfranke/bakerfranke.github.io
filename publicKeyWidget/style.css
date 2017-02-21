@@ -1,0 +1,1146 @@
+#divApplab.appModern button,
+#divApplab.appModern button:hover {
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  height: 30px;
+  width: 80px;
+  font-size: 14px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(26, 188, 156);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern label,
+#divApplab.appModern label:hover {
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-top: 2px;
+  padding-right: 2px;
+  padding-bottom: 2px;
+  padding-left: 2px;
+  line-height: 1;
+  font-size: 14px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  word-wrap: break-word;
+  color: rgb(51, 51, 51);
+  max-width: 320px;
+  width: 32px;
+  height: 19px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern input[type=text],
+#divApplab.appModern input[type=text]:hover {
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  width: 200px;
+  height: 30px;
+  color: rgb(0, 0, 0);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern input[type=checkbox],
+#divApplab.appModern input[type=checkbox]:hover {
+  width: 12px;
+  height: 12px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern select,
+#divApplab.appModern select:hover {
+  width: 200px;
+  height: 30px;
+  font-size: 14px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(26, 188, 156);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern input[type=radio],
+#divApplab.appModern input[type=radio]:hover {
+  width: 12px;
+  height: 12px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern div.textArea,
+#divApplab.appModern div.textArea:hover {
+  width: 200px;
+  height: 100px;
+  font-size: 14px;
+  color: rgb(0, 0, 0);
+  background-color: rgb(255, 255, 255);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+
+#divApplab.appModern img,
+#divApplab.appModern img:hover {
+  height: 100px;
+  width: 100px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+
+#divApplab.appModern canvas,
+#divApplab.appModern canvas:hover {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+
+#divApplab.appModern div.screen,
+#divApplab.appModern div.screen:hover {
+  display: block;
+  height: 450px;
+  width: 320px;
+  left: 0px;
+  top: 0px;
+  position: absolute;
+  z-index: 0;
+}
+
+#divApplab.appModern div.chart,
+#divApplab.appModern div.chart:hover {
+  height: 100px;
+  width: 100px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+}
+
+#divApplab.appModern input[type=range],
+#divApplab.appModern input[type=range]:hover {
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-top: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+  padding-left: 0px;
+  width: 150px;
+  height: 24px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+#divApplab.appModern #alice_screen(Deprecated) {
+  height: 480px;
+}
+
+#divApplab.appModern #label2 {
+  color: rgb(0, 0, 0);
+  width: 127px;
+  height: 18px;
+  top: 130px;
+  left: 80px;
+}
+
+#divApplab.appModern #welcomeScreen {
+  display: none;
+  height: 480px;
+}
+
+#divApplab.appModern #label1 {
+  color: rgb(0, 0, 0);
+  width: 172px;
+  height: 41px;
+  top: 205px;
+  left: 80px;
+}
+
+#divApplab.appModern #label3 {
+  font-size: 22px;
+  color: rgb(0, 0, 0);
+  width: 290px;
+  height: 28px;
+  top: 30px;
+  left: 20px;
+}
+
+#divApplab.appModern #alice_button {
+  height: 40px;
+  top: 250px;
+  left: 30px;
+}
+
+#divApplab.appModern #bob_button {
+  height: 40px;
+  top: 250px;
+  left: 125px;
+}
+
+#divApplab.appModern #eve_button {
+  height: 40px;
+  top: 250px;
+  left: 220px;
+}
+
+#divApplab.appModern #label28 {
+  font-size: 18px;
+  color: rgb(0, 0, 0);
+  width: 148px;
+  height: 24px;
+  top: 10px;
+  left: 80px;
+}
+
+#divApplab.appModern #modClock_button {
+  width: 140px;
+  height: 40px;
+  top: 120px;
+  left: 85px;
+}
+
+#divApplab.appModern #label72 {
+  color: rgb(0, 0, 0);
+  width: 250px;
+  top: 95px;
+  left: 35px;
+}
+
+#divApplab.appModern #eve_screen {
+  height: 480px;
+  display: none;
+}
+
+#divApplab.appModern #label30 {
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  width: 214px;
+  height: 29px;
+}
+
+#divApplab.appModern #label5 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 248px;
+  height: 17px;
+  top: 25px;
+  left: 5px;
+}
+
+#divApplab.appModern #label10 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 203px;
+  height: 17px;
+  top: 40px;
+  left: 5px;
+}
+
+#divApplab.appModern #label13 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 218px;
+  height: 17px;
+  top: 55px;
+  left: 5px;
+}
+
+#divApplab.appModern #eve_mod_dropdown {
+  font-size: 12px;
+  width: 90px;
+  height: 23px;
+  top: 110px;
+  left: 10px;
+}
+
+#divApplab.appModern #label18 {
+  color: rgb(0, 0, 0);
+  width: 288px;
+  top: 90px;
+  left: 5px;
+}
+
+#divApplab.appModern #label19 {
+  color: rgb(0, 0, 0);
+  width: 244px;
+  height: 20px;
+  top: 165px;
+  left: 5px;
+}
+
+#divApplab.appModern #eve_alicePub_txt {
+  font-size: 12px;
+  width: 79px;
+  height: 23px;
+  top: 110px;
+  left: 120px;
+}
+
+#divApplab.appModern #eve_modmod_txt1 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 104px;
+  height: 17px;
+  top: 205px;
+  left: 140px;
+}
+
+#divApplab.appModern #label25 {
+  color: rgb(0, 0, 0);
+  width: 261px;
+  top: 250px;
+  left: 5px;
+}
+
+#divApplab.appModern #eve_bobNumber_txt {
+  font-size: 12px;
+  width: 77px;
+  height: 23px;
+  top: 110px;
+  left: 220px;
+}
+
+#divApplab.appModern #eve_modmod_txt2 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 131px;
+  height: 17px;
+  top: 285px;
+  left: 140px;
+}
+
+#divApplab.appModern #eve_pubKey_txt1 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 53px;
+  height: 17px;
+  top: 205px;
+  left: 10px;
+}
+
+#divApplab.appModern #eve_pubKey_txt2 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 53px;
+  height: 17px;
+  top: 285px;
+  left: 10px;
+}
+
+#divApplab.appModern #eve_keyList_dropdown1 {
+  font-size: 10px;
+  width: 75px;
+  height: 23px;
+  top: 200px;
+  left: 65px;
+}
+
+#divApplab.appModern #eve_keyList_dropdown2 {
+  font-size: 10px;
+  width: 75px;
+  height: 23px;
+  top: 280px;
+  left: 65px;
+}
+
+#divApplab.appModern #eve_aliceResult_label {
+  color: rgb(255, 255, 255);
+  width: 35px;
+  top: 205px;
+  left: 255px;
+  background-color: rgb(26, 188, 156);
+}
+
+#divApplab.appModern #eve_bobResult_label {
+  color: rgb(255, 255, 255);
+  width: 35px;
+  top: 280px;
+  left: 275px;
+  background-color: rgb(26, 188, 156);
+}
+
+#divApplab.appModern #eveCanvas {
+  width: 185px;
+  height: 130px;
+  top: 297px;
+}
+
+#divApplab.appModern #label47 {
+  font-size: 9px;
+  color: rgb(0, 0, 0);
+  width: 84px;
+  height: 14px;
+  top: 135px;
+  left: 115px;
+}
+
+#divApplab.appModern #label48 {
+  font-size: 9px;
+  color: rgb(0, 0, 0);
+  width: 69px;
+  height: 14px;
+  top: 135px;
+  left: 225px;
+}
+
+#divApplab.appModern #label49 {
+  font-size: 9px;
+  color: rgb(0, 0, 0);
+  width: 73px;
+  height: 14px;
+  top: 135px;
+  left: 20px;
+}
+
+#divApplab.appModern #eveCanvas_clockLabel {
+  color: rgb(0, 173, 188);
+  width: 41px;
+  top: 365px;
+  left: 80px;
+}
+
+#divApplab.appModern #eve_tryIt_button {
+  height: 25px;
+  width: 60px;
+  top: 50px;
+  left: 250px;
+  background-color: rgb(0, 173, 188);
+}
+
+#divApplab.appModern #eve_calc_label {
+  color: rgb(0, 0, 0);
+  width: 93px;
+  top: 360px;
+  left: 210px;
+}
+
+#divApplab.appModern #label52 {
+  font-size: 9px;
+  color: rgb(0, 0, 0);
+  width: 243px;
+  height: 14px;
+  top: 180px;
+  left: 25px;
+}
+
+#divApplab.appModern #eve_bobCrackInstructions_label {
+  font-size: 9px;
+  color: rgb(0, 0, 0);
+  width: 264px;
+  height: 14px;
+  top: 265px;
+  left: 20px;
+}
+
+#divApplab.appModern #eve_tryAgainAlice_label {
+  font-size: 10px;
+  color: rgb(204, 0, 0);
+  width: 56px;
+  height: 15px;
+  top: 225px;
+  left: 245px;
+}
+
+#divApplab.appModern #eve_tryAgainBob_label {
+  font-size: 10px;
+  color: rgb(204, 0, 0);
+  width: 56px;
+  height: 15px;
+  top: 305px;
+  left: 260px;
+}
+
+#divApplab.appModern #eve_screenCover {
+  color: rgb(255, 255, 255);
+  top: 85px;
+  width: 316px;
+  height: 63px;
+  background-color: rgb(255, 255, 0);
+}
+
+#divApplab.appModern #eve_backButton {
+  width: 60px;
+  top: 450px;
+  left: 260px;
+}
+
+#divApplab.appModern #eve_aliceCrackCover {
+  color: rgb(255, 255, 255);
+  top: 160px;
+  width: 321px;
+  height: 81px;
+  background-color: rgb(255, 0, 0);
+}
+
+#divApplab.appModern #eve_bobCrackCover {
+  color: rgb(255, 255, 255);
+  top: 250px;
+  width: 316px;
+  height: 71px;
+  background-color: rgb(0, 0, 255);
+}
+
+#divApplab.appModern #label59 {
+  font-size: 9px;
+  color: rgb(0, 173, 188);
+  width: 83px;
+  height: 14px;
+  top: 466px;
+  left: 60px;
+}
+
+#divApplab.appModern #eve_backButton2 {
+  left: 240px;
+  top: 395px;
+  background-color: rgb(0, 173, 188);
+}
+
+#divApplab.appModern #bob_screen2 {
+  height: 480px;
+  display: none;
+}
+
+#divApplab.appModern #bob_publicKey_txt2 {
+  width: 85px;
+  height: 28px;
+  font-size: 16px;
+  top: 125px;
+  left: 40px;
+}
+
+#divApplab.appModern #bob_secretNumber_txt2 {
+  font-size: 16px;
+  width: 99px;
+  height: 28px;
+  top: 125px;
+  left: 145px;
+}
+
+#divApplab.appModern #instructions {
+  color: rgb(0, 0, 0);
+  top: 25px;
+  left: 5px;
+  width: 307px;
+  height: 34px;
+}
+
+#divApplab.appModern #bob_multResult_txt2 {
+  width: 109px;
+  height: 28px;
+  font-size: 16px;
+  top: 180px;
+  left: 40px;
+}
+
+#divApplab.appModern #bob_multiply_button2 {
+  width: 61px;
+  height: 28px;
+  top: 125px;
+  left: 250px;
+}
+
+#divApplab.appModern #bob_mod_dropdown2 {
+  width: 89px;
+  height: 28px;
+  top: 180px;
+  left: 195px;
+}
+
+#divApplab.appModern #label6 {
+  color: rgb(0, 0, 0);
+  width: 41px;
+  height: 20px;
+  top: 190px;
+  left: 150px;
+}
+
+#divApplab.appModern #bobCanvas2 {
+  width: 241.111px;
+  height: 178.111px;
+  top: 215px;
+  left: 35px;
+}
+
+#divApplab.appModern #label8 {
+  font-size: 20px;
+  color: rgb(0, 173, 188);
+  width: 17px;
+  height: 25px;
+  top: 125px;
+  left: 10px;
+}
+
+#divApplab.appModern #label9 {
+  font-size: 20px;
+  color: rgb(0, 173, 188);
+  width: 21px;
+  height: 25px;
+  top: 180px;
+  left: 10px;
+}
+
+#divApplab.appModern #bob_sendAlice_label {
+  font-size: 18px;
+  color: rgb(0, 173, 188);
+  width: 248px;
+  height: 24px;
+  top: 427px;
+  left: 10px;
+}
+
+#divApplab.appModern #label11 {
+  color: rgb(0, 0, 0);
+  width: 13px;
+  height: 20px;
+  top: 130px;
+  left: 130px;
+}
+
+#divApplab.appModern #label12 {
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  width: 218px;
+  height: 29px;
+}
+
+#divApplab.appModern #bobCanvas2_clockLabel {
+  font-size: 18px;
+  color: rgb(0, 173, 188);
+  width: 44px;
+  height: 24px;
+  top: 295px;
+  left: 145px;
+}
+
+#divApplab.appModern #label14 {
+  font-size: 8px;
+  color: rgb(0, 207, 222);
+  width: 74px;
+  height: 13px;
+  top: 415px;
+  left: 115px;
+}
+
+#divApplab.appModern #label15 {
+  font-size: 12px;
+  color: rgb(128, 214, 222);
+  width: 77px;
+  height: 17px;
+  top: 150px;
+  left: 45px;
+}
+
+#divApplab.appModern #bob_goButton {
+  height: 28px;
+  left: 285px;
+  top: 180px;
+  width: 30px;
+}
+
+#divApplab.appModern #label16 {
+  font-size: 12px;
+  color: rgb(128, 214, 222);
+  width: 102px;
+  height: 17px;
+  top: 150px;
+  left: 145px;
+}
+
+#divApplab.appModern #label17 {
+  color: rgb(0, 0, 0);
+  width: 295px;
+  top: 60px;
+  left: 5px;
+}
+
+#divApplab.appModern #bob_screenCover {
+  color: rgb(255, 255, 255);
+  width: 320px;
+  height: 346px;
+  top: 106px;
+  background-color: rgb(255, 255, 255);
+}
+
+#divApplab.appModern #bob_tryIt_button {
+  width: 75px;
+  height: 29px;
+  top: 80px;
+  left: 5px;
+  background-color: rgb(0, 173, 188);
+}
+
+#divApplab.appModern #bob_back_button2 {
+  width: 60px;
+  top: 395px;
+  left: 255px;
+}
+
+#divApplab.appModern #alice_screen2 {
+  height: 480px;
+  display: none;
+}
+
+#divApplab.appModern #aliceInst {
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  width: 230px;
+  height: 29px;
+}
+
+#divApplab.appModern #label20 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  top: 25px;
+  left: 5px;
+  width: 296px;
+  height: 28px;
+}
+
+#divApplab.appModern #label21 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  top: 55px;
+  left: 5px;
+  width: 289px;
+  height: 28px;
+}
+
+#divApplab.appModern #alice_mod_dropdown2 {
+  font-size: 18px;
+  width: 100px;
+  height: 23px;
+  top: 145px;
+  left: 30px;
+}
+
+#divApplab.appModern #alice_privateKey_dropdown2 {
+  font-size: 18px;
+  top: 145px;
+  left: 135px;
+  width: 89px;
+  height: 23px;
+}
+
+#divApplab.appModern #alice_publicKey_txt2 {
+  color: rgb(255, 255, 255);
+  font-size: 18px;
+  top: 145px;
+  left: 235px;
+  width: 80px;
+  height: 23px;
+  background-color: rgb(255, 164, 0);
+}
+
+#divApplab.appModern #label23 {
+  font-size: 20px;
+  color: rgb(0, 173, 188);
+  width: 17px;
+  height: 25px;
+  top: 140px;
+  left: 5px;
+}
+
+#divApplab.appModern #label24 {
+  font-size: 12px;
+  color: rgb(26, 188, 156);
+  top: 130px;
+  left: 30px;
+  width: 78px;
+  height: 17px;
+}
+
+#divApplab.appModern #alice_privateKey_label2 {
+  font-size: 12px;
+  color: rgb(26, 188, 156);
+  top: 115px;
+  left: 135px;
+  width: 85px;
+  height: 34px;
+}
+
+#divApplab.appModern #alice_computedKey_label2 {
+  font-size: 12px;
+  color: rgb(26, 188, 156);
+  width: 72px;
+  height: 33px;
+  top: 115px;
+  left: 240px;
+}
+
+#divApplab.appModern #label27 {
+  font-size: 20px;
+  color: rgb(0, 173, 188);
+  width: 21px;
+  height: 25px;
+  top: 200px;
+  left: 5px;
+}
+
+#divApplab.appModern #alice_publicNumber_txt2 {
+  font-size: 18px;
+  top: 200px;
+  left: 30px;
+  width: 95px;
+  height: 25px;
+}
+
+#divApplab.appModern #alice_privateKey_txt2 {
+  font-size: 18px;
+  top: 200px;
+  left: 145px;
+  width: 95px;
+  height: 25px;
+}
+
+#divApplab.appModern #alice_multiply_button2 {
+  font-size: 12px;
+  width: 65px;
+  height: 25px;
+  top: 200px;
+  left: 245px;
+}
+
+#divApplab.appModern #alice_multResult_txt2 {
+  font-size: 18px;
+  width: 103px;
+  height: 23px;
+  top: 260px;
+  left: 30px;
+}
+
+#divApplab.appModern #alice_mod_txt2 {
+  font-size: 18px;
+  width: 81px;
+  height: 23px;
+  top: 260px;
+  left: 170px;
+}
+
+#divApplab.appModern #alice_go_button2 {
+  width: 51px;
+  height: 24px;
+  top: 260px;
+  left: 255px;
+}
+
+#divApplab.appModern #aliceCanvas2 {
+  width: 187px;
+  height: 171px;
+  top: 290px;
+  left: 5px;
+}
+
+#divApplab.appModern #alice_bobsSecret_label2 {
+  font-size: 18px;
+  color: rgb(0, 173, 188);
+  top: 320px;
+  left: 200px;
+  width: 120px;
+  height: 120px;
+}
+
+#divApplab.appModern #label39 {
+  font-size: 12px;
+  color: rgb(128, 214, 222);
+  width: 88px;
+  height: 17px;
+  top: 225px;
+  left: 30px;
+}
+
+#divApplab.appModern #label40 {
+  font-size: 12px;
+  color: rgb(128, 214, 222);
+  width: 102px;
+  height: 17px;
+  top: 225px;
+  left: 140px;
+}
+
+#divApplab.appModern #label41 {
+  color: rgb(0, 0, 0);
+  width: 16px;
+  height: 16px;
+  top: 210px;
+  left: 125px;
+}
+
+#divApplab.appModern #label42 {
+  font-size: 10px;
+  color: rgb(0, 0, 0);
+  width: 34px;
+  height: 17px;
+  top: 265px;
+  left: 135px;
+}
+
+#divApplab.appModern #label43 {
+  font-size: 8px;
+  color: rgb(128, 214, 222);
+  width: 74px;
+  height: 13px;
+  top: 467px;
+  left: 65px;
+}
+
+#divApplab.appModern #aliceCanvas2_clockLabel {
+  font-size: 16px;
+  color: rgb(0, 173, 188);
+  width: 46px;
+  height: 21px;
+  top: 365px;
+  left: 90px;
+}
+
+#divApplab.appModern #alice_share_label2 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 67px;
+  height: 17px;
+  top: 170px;
+  left: 240px;
+}
+
+#divApplab.appModern #label7 {
+  font-size: 20px;
+  color: rgb(0, 173, 188);
+  width: 22px;
+  height: 25px;
+  top: 260px;
+  left: 5px;
+}
+
+#divApplab.appModern #alice_screenCover {
+  color: rgb(255, 255, 255);
+  width: 402px;
+  height: 340px;
+  top: 110px;
+  background-color: rgb(255, 255, 0);
+}
+
+#divApplab.appModern #alice_tryIt_button {
+  font-size: 18px;
+  width: 71px;
+  height: 28px;
+  top: 95px;
+  left: 5px;
+  background-color: rgb(0, 173, 188);
+}
+
+#divApplab.appModern #alice_back_button2 {
+  width: 50px;
+  top: 420px;
+  left: 270px;
+}
+
+#divApplab.appModern #how it works {
+  height: 480px;
+  display: none;
+}
+
+#divApplab.appModern #label60 {
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+  width: 295px;
+  height: 25px;
+  top: 5px;
+  left: 5px;
+}
+
+#divApplab.appModern #text_area1 {
+  width: 291px;
+  height: 101px;
+  top: 60px;
+  left: 15px;
+}
+
+#divApplab.appModern #label64 {
+  font-size: 20px;
+  color: rgb(0, 0, 0);
+  width: 212px;
+  height: 25px;
+  top: 170px;
+}
+
+#divApplab.appModern #text_area2 {
+  width: 286px;
+  height: 241px;
+  top: 200px;
+  left: 10px;
+}
+
+#divApplab.appModern #justTheClock {
+  height: 480px;
+  display: none;
+}
+
+#divApplab.appModern #clockCanvas {
+  width: 295px;
+  height: 235px;
+  top: 140px;
+  left: 5px;
+}
+
+#divApplab.appModern #clock_clockSize_dropdown {
+  width: 85px;
+  top: 70px;
+  left: 180px;
+}
+
+#divApplab.appModern #clock_bigNumber {
+  top: 70px;
+  left: 10px;
+  width: 128px;
+  height: 28px;
+}
+
+#divApplab.appModern #clock_go_button {
+  width: 45px;
+  top: 70px;
+  left: 270px;
+}
+
+#divApplab.appModern #label17 {
+  color: rgb(0, 173, 188);
+  width: 127px;
+  top: 370px;
+  left: 95px;
+}
+
+#divApplab.appModern #label66 {
+  font-size: 12px;
+  color: rgb(153, 153, 153);
+  width: 91px;
+  height: 17px;
+  top: 100px;
+  left: 180px;
+}
+
+#divApplab.appModern #label67 {
+  font-size: 12px;
+  color: rgb(153, 153, 153);
+  width: 97px;
+  height: 17px;
+  top: 100px;
+  left: 25px;
+}
+
+#divApplab.appModern #clockTitle {
+  font-size: 24px;
+  color: rgb(0, 0, 0);
+  width: 220px;
+  height: 29px;
+  top: 5px;
+  left: 5px;
+}
+
+#divApplab.appModern #label69 {
+  color: rgb(0, 0, 0);
+  width: 296px;
+  height: 36px;
+  top: 35px;
+  left: 5px;
+}
+
+#divApplab.appModern #clock_speed_dropdown {
+  font-size: 12px;
+  width: 75px;
+  height: 25px;
+  top: 380px;
+  left: 15px;
+}
+
+#divApplab.appModern #clock_back_button {
+  width: 60px;
+  top: 385px;
+  left: 240px;
+}
+
+#divApplab.appModern #label70 {
+  color: rgb(153, 153, 153);
+  width: 47px;
+  top: 405px;
+  left: 20px;
+}
+
+#divApplab.appModern #clockCanvas_clockLabel {
+  font-size: 50px;
+  color: rgb(0, 173, 188);
+  width: 150px;
+  height: 55px;
+  top: 230px;
+  left: 90px;
+}
+
+#divApplab.appModern #clock_addUpNumber {
+  color: rgb(0, 173, 188);
+  width: 90px;
+  top: 280px;
+  left: 120px;
+}
+
+#divApplab.appModern #clock_shortcutWarning_label {
+  font-size: 10px;
+  color: rgb(255, 0, 0);
+  width: 268px;
+  height: 30px;
+  top: 115px;
+  left: 30px;
+}
+
+#divApplab.appModern #label75 {
+  font-size: 12px;
+  color: rgb(0, 0, 0);
+  width: 35px;
+  height: 17px;
+  top: 80px;
+  left: 140px;
+}
