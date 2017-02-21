@@ -1,0 +1,14 @@
+<html>
+  <head>
+    <title>My App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+    <script src="applab/applab-api.js"></script>
+    <link rel="stylesheet" href="applab/applab.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="divApplab" class="appModern running" tabindex="1" style="width: 320px; height: 450px; display: block;"><div class="screen" tabindex="1" id="screen1"><div contenteditable="true" class="textArea" id="inputBits"></div><div contenteditable="false" class="textArea" id="outputBits"></div><div contenteditable="true" class="textArea" id="redCode">1 - red</div><div contenteditable="true" class="textArea" id="greenCode">blue</div><div contenteditable="true" class="textArea" id="blueCode">green</div><button id="filterButton">Filter</button><label id="redLabel">newRed = </label><label id="greenLabel">newGreen = </label><label id="blueLabel">newBlue = </label><button id="cleanInputButton">Clean</button><button id="rawInputButton">Raw</button><button id="cleanOutputButton">Clean</button><button id="rawOutputButton">Raw</button><button id="howItWorks">How it Works</button><div contenteditable="true" class="textArea design-mode-hidden" id="instructions">Colors are expressed as 3-bit sequences, one bit per color channel.<div><br></div><div>You can type anything you like in the "Input" panel and it will immediately be displayed in the image above.</div><div><br></div><div>When you click "Filter" your input bits will be run through the three lines of code you write in the "newRed", "newGreen" and "newBlue" boxes. You can type anything you like. The variables "red", "green", and "blue" will automatically be set to either 0 or 1 for you on each pixel.</div><div><br></div><div>You cannot edit the Output bits directly but you can still clean them up or view them in their raw form.</div><div><br></div><div>Happy filtering!</div></div><button id="closeInstructionsButton" class="design-mode-hidden">Close</button><button id="hexBinary">Switch to Hex</button></div></div>
+    <script src="code.js"></script>
+  </body>
+</html>
