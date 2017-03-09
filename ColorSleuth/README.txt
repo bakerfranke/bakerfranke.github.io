@@ -1,6 +1,6 @@
-# README for Remix: ColorSleuth #
+# README for Remix: Remix: Color Sleuth Exemplar - basic version #
 
-This is the README file for the Remix: ColorSleuth app. It's a great place to write
+This is the README file for the Remix: Remix: Color Sleuth Exemplar - basic version app. It's a great place to write
 down some notes about how your app works. For starters, here is some information
 about the other files in this folder.
 

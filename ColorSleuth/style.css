@@ -179,147 +179,123 @@
   top: 0px;
 }
 
+#divApplab.appModern #player1_highlight {
+  width: 120px;
+  height: 100px;
+  left: 30px;
+  top: 325px;
+  background-color: rgba(197, 197, 197, 0.407843);
+}
+
+#divApplab.appModern #player2_highlight {
+  width: 120px;
+  height: 100px;
+  left: 170px;
+  top: 325px;
+  background-color: rgba(197, 197, 197, 0.407843);
+}
+
 #divApplab.appModern #button1 {
-  height: 80px;
-  left: 25px;
+  height: 120px;
+  width: 120px;
+  left: 30px;
   top: 50px;
 }
 
 #divApplab.appModern #button2 {
-  height: 80px;
-  left: 115px;
+  height: 120px;
+  width: 120px;
+  left: 170px;
   top: 50px;
 }
 
 #divApplab.appModern #button3 {
-  height: 80px;
-  background-color: rgb(255, 255, 0);
-  left: 205px;
-  top: 50px;
+  height: 120px;
+  width: 120px;
+  left: 30px;
+  top: 190px;
 }
 
 #divApplab.appModern #button4 {
-  height: 80px;
-  left: 25px;
-  top: 140px;
+  height: 120px;
+  width: 120px;
+  left: 170px;
+  top: 190px;
 }
 
-#divApplab.appModern #button5 {
-  height: 80px;
-  left: 115px;
-  top: 140px;
-}
-
-#divApplab.appModern #button6 {
-  height: 80px;
-  left: 205px;
-  top: 140px;
-}
-
-#divApplab.appModern #button7 {
-  height: 80px;
-  left: 25px;
-  top: 230px;
-}
-
-#divApplab.appModern #button8 {
-  height: 80px;
-  left: 115px;
-  top: 230px;
-}
-
-#divApplab.appModern #button9 {
-  height: 80px;
-  left: 205px;
-  top: 230px;
-}
-
-#divApplab.appModern #label1 {
+#divApplab.appModern #title_label {
   font-size: 25px;
   color: rgb(117, 107, 107);
   width: 151px;
   height: 30px;
-  left: 25px;
+  left: 30px;
   top: 10px;
-}
-
-#divApplab.appModern #turn {
-  width: 36px;
-  left: 5px;
-  top: 375px;
 }
 
 #divApplab.appModern #label4 {
   font-size: 20px;
   width: 100px;
   height: 25px;
-  left: 50px;
-  top: 370px;
+  left: 35px;
+  top: 345px;
   text-align: center;
-  color: rgb(102, 102, 102);
+  color: rgb(0, 0, 0);
 }
 
-#divApplab.appModern #player1lbl {
-  font-size: 20px;
-  color: rgb(255, 255, 255);
-  width: 100px;
-  height: 25px;
-  left: 50px;
-  top: 370px;
-  background-color: rgb(99, 61, 135);
-  text-align: center;
-}
-
-#divApplab.appModern #score1 {
+#divApplab.appModern #score1_label {
   font-size: 24px;
   width: 100px;
   height: 30px;
-  left: 50px;
-  top: 400px;
+  left: 40px;
+  top: 385px;
   text-align: center;
 }
 
-#divApplab.appModern #score2 {
+#divApplab.appModern #score2_label {
   font-size: 24px;
   width: 100px;
-  left: 170px;
-  top: 400px;
+  left: 180px;
+  top: 385px;
   height: 33px;
   text-align: center;
 }
 
-#divApplab.appModern #button10 {
-  height: 35px;
-  width: 265px;
+#divApplab.appModern #Label2 {
   font-size: 20px;
-  background-color: rgb(188, 26, 26);
-  left: 25px;
-  top: 315px;
-}
-
-#divApplab.appModern #label5 {
-  font-size: 20px;
-  color: rgb(102, 102, 102);
+  color: rgb(0, 0, 0);
   width: 100px;
   height: 25px;
-  left: 170px;
-  top: 370px;
+  left: 180px;
+  top: 345px;
   text-align: center;
 }
 
-#divApplab.appModern #player2lbl {
-  font-size: 20px;
-  color: rgb(255, 255, 255);
-  width: 100px;
-  height: 25px;
-  left: 170px;
-  top: 370px;
-  background-color: rgb(248, 155, 38);
-  text-align: center;
+#divApplab.appModern #gameOver_screen {
+  display: none;
 }
 
-#divApplab.appModern #label6 {
-  width: 45px;
+#divApplab.appModern #label1 {
+  font-size: 50px;
+  width: 305px;
+  height: 55px;
   left: 5px;
-  top: 400px;
+  top: 80px;
+}
+
+#divApplab.appModern #player1Win_label {
+  font-size: 30px;
+  color: rgb(188, 0, 0);
+  width: 207px;
+  height: 35px;
+  left: 55px;
+  top: 195px;
+}
+
+#divApplab.appModern #player2Win_label {
+  font-size: 30px;
+  color: rgb(45, 0, 188);
+  width: 215px;
+  height: 35px;
+  left: 50px;
+  top: 235px;
 }
