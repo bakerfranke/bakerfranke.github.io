@@ -426,7 +426,10 @@ $( document ).ready(function() {
 
 
 // click and oninput for convert
-$("#code").change(convert);
+$("#code").change(function(){
+  convert();
+  fontSize();
+});
 
 $("#fSize").change(fontSize);
 

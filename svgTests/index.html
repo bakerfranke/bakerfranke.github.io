@@ -1,0 +1,113 @@
+<html>
+<head>
+	<title></title>
+	<style>
+	#canvas{
+		width: 500px;
+		height: 500px;
+		background-color: #DDDDDD;
+	}
+
+	</style>
+	<script
+  src="https://code.jquery.com/jquery-3.1.1.js"
+  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+	
+<button id="shapeToggle">Draw Oval</button>
+
+<br>
+
+<svg id="canvas">
+  <ellipse id="myOval" cx="50" cy="50" rx="40" ry="100" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <rect id="myRect" x="0" y="0" width="0" height="0" stroke="rgba(255,0,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
+
+</svg>
+
+
+<script type="text/javascript">
+
+var drawShapeId = "#myRect";
+var down = false;
+var startPos = null;
+
+$("#canvas").mousedown(function(e){
+	down = true;
+	startPos = {x:e.offsetX, y:e.offsetY};
+
+	setPosition(drawShapeId, e.offsetX, e.offsetY);
+	
+});
+
+$("#canvas").mouseup(function(e){
+	down = false;
+	startPos = null;
+});
+
+$("#canvas").mousemove(function(e){
+
+	// var offset = {x: e.offsetX, y:e.offsetY}
+	// var page = {x: e.pageX, y: e.pageY}
+
+	// console.debug("offset: ", JSON.stringify(offset));
+	// console.debug("page: "+JSON.stringify(page));
+
+	if(down==true){
+		var xDiff = e.offsetX - startPos.x;
+		var yDiff = e.offsetY - startPos.y;
+
+		setSize(drawShapeId, xDiff, yDiff);
+	}
+
+
+});
+
+function setSize(svgObjId, w, h){
+
+	var objw = $(svgObjId)[0].width; //assume it's a rect
+	var objh = $(svgObjId)[0].height;
+
+	if($(svgObjId).prop("tagName")=="ellipse"){ //if it's an ellipse we need rx, and ry
+		objw = $(svgObjId)[0].rx;
+		objh = $(svgObjId)[0].ry;
+	}
+
+	objw.baseVal.value = w;
+	objh.baseVal.value = h;
+
+}
+
+function setPosition(svgObjId, x, y){
+
+	var objx = $(svgObjId)[0].x; //assume it's a rect
+	var objy = $(svgObjId)[0].y;
+
+	if($(svgObjId).prop("tagName")=="ellipse"){ //if it's an ellipse we need cx, and cy
+		objx = $(svgObjId)[0].cx;
+		objy = $(svgObjId)[0].cy;
+	}
+
+
+	objx.baseVal.value = x;  // remainder of svg obj path.to.value is the same
+	objy.baseVal.value = y;
+}
+
+ $("#shapeToggle").change(function(){
+ 	console.log("TOGGLEEE!!!")
+ 	if(drawShapeId=="#myRect"){
+ 		drawShapeId="#myOval";
+ 		$("#shapeToggle").html("Draw Rect");
+ 	}
+ 	else{
+ 		drawShapeId="#myRect";
+ 		$("#shapeToggle").html("Draw Oval");
+ 	}
+
+ });
+
+</script>
+
+</body>
+</html>
