@@ -5,9 +5,13 @@ setFillColor("rgba(0,0,0,0.2)");
 
 var eventList = [];
 
+
+
 onEvent("canvasMain", "mousemove", function(event) {
+  console.log(event.shiftKey);
   if (event.shiftKey) {
-    appendItem(eventList, event);
+    //appendItem(eventList, event);
+    eventList.push(event);
     circle(event.offsetX, event.offsetY, dotRadius(event.movementX, event.movementY));
   }
 });
