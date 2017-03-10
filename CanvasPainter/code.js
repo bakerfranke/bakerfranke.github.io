@@ -44,9 +44,8 @@ onEvent("sprayPaintButton", "click", function(event) {
 
 // Begin student code
 onEvent("etchButton", "click", function(event) {
-  // clearCanvas();
+   clearCanvas();
   // Make stroke color visible, so lines will display
-  console.log("trying etch");
   setStrokeColor("black");
   for(var i = 0; i < eventList.length - 10; i++) {
     line(eventList[i].offsetX, eventList[i].offsetY, eventList[i+10].offsetX, eventList[i+10].offsetY);
