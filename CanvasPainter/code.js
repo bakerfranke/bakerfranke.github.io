@@ -7,7 +7,8 @@ var eventList = [];
 
 onEvent("canvasMain", "mousemove", function(event) {
   if (event.shiftKey) {
-    appendItem(eventList, event);
+    //appendItem(eventList, event);
+    eventList.push(event);
     circle(event.offsetX, event.offsetY, dotRadius(event.movementX, event.movementY));
   }
 });
