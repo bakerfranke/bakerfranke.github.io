@@ -7,7 +7,7 @@ samples.procedure = '[PROCEDURE min |a, b, c|\n  [[min <- a]\n[IF (b < min)\n  [
 
 var multilineBlocks = ["IF","ELSE", "REPEAT UNTIL","FOR","PROCEDURE"];
 
-var codeType = "ap";  //this can be "ap" or "apml"
+var codeType = "apml";  //this can be "ap" or "apml"
 
 /*
 Conversions:  Find all occurances of a in text replace with b
@@ -34,6 +34,8 @@ convs.push({a: "<-", b: "&larr;"});
 /////// HELPER FUNCTIONS //////
 var DEBUG = false;
 var DEBUG_LEVEL = 0; // 0=always, 1=important, 2=debugging fodder
+
+convert();
 
 function debug(msg, level){
 

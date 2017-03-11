@@ -40,25 +40,22 @@
       </div>
       <div id="input" class="myCol">
         <textarea id="code">
-user <- INPUT()
-rand <- RANDOM (0, 100)
-REPEAT UNTIL ( user = rand )
-{
-  DISPLAY ("guess again!")
-  IF (user < rand)
-  {
-    DISPLAY ("Higher")
-  }
-  ELSE
-  {
-    DISPLAY ("Lower")
-  }
-  user <- INPUT()
-}
-DISPLAY ("You got it!")
+[user <- [INPUT]]
+[rand <- [RANDOM |0, 100|]]
+[REPEAT UNTIL ( user = rand )
+   [[DISPLAY |"guess again!"|]
+[IF (user < rand)
+   [[DISPLAY |"Higher"|]
+]]
+]
+ELSE
+   [[DISPLAY |"Lower"|]
+]]
+[user <- [INPUT]]]]
+[DISPLAY |"You got it!"|]
           </textarea>
-          <input type="radio" name="codeType" value="ap" checked>AP Pseudocode
-          <input type="radio" name="codeType" value="apml">APML<br>          
+          <input type="radio" name="codeType" value="ap">AP Pseudocode
+          <input type="radio" name="codeType" value="apml" checked>APML<br>          
           <!--<select id="loadSample">
             <option value="" selected> -- Load APML Sample --</option>
             <option value="if">If Statement</option>
