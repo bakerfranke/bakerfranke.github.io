@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>My App</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
+    <script src="applab/applab-api.js"></script>
+    <link rel="stylesheet" href="applab/applab.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="divApplab" class="appModern running" tabindex="1" style="width: 320px; height: 450px; display: block;"><div class="screen" tabindex="1" id="screen2"><canvas width="320px" height="450px" id="canvas2"></canvas><button id="button1">Next</button><label id="label2">Got it?</label><div contenteditable="true" class="textArea" id="text_area1">This is a dexterity test <div>• &nbsp;The dot on the screen moves in the opposite direction of your mouse.</div><div>• &nbsp;Click and drag the mouse around the screen to test it out.</div></div></div><div class="screen" tabindex="1" id="screen1" data-canonical-image-url=""><canvas width="320px" height="450px" id="canvas1"></canvas><label id="label1">Instructions: make the red dot trace the outline of the star.</label><input type="range" value="2.0" min="0.5" max="25.0" step="0.5" id="toleranceSlider" class="design-mode-hidden"><label id="toleranceLabel" class="design-mode-hidden">2.0</label><button id="configButton">?</button><label id="toleranceInstructions" class="design-mode-hidden">Set the tolerance threshold. Try the task with this showing to see what it's calculating.</label></div></div>
+    <script src="code.js"></script>
+  </body>
+</html>
