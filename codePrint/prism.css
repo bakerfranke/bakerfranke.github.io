@@ -15,7 +15,7 @@ pre[class*="language-"] {
 	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
-	word-wrap: normal;
+	word-wrap: break-word;
 	line-height: 1.5;
 
 	-moz-tab-size: 4;
@@ -80,6 +80,11 @@ pre[class*="language-"] {
 .namespace {
 	opacity: .7;
 }
+
+span{
+display: inline-block;
+}
+
 
 .token.property,
 .token.tag,
