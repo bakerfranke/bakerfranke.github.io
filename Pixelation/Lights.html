@@ -1,0 +1,157 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Color Slider (RGB to hexidecimal converter)</title>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<style>
+
+	div{
+
+		border: solid 1px;
+		width: 700px;
+		/*height: 500px;*/
+		/*float: left;*/
+	}
+
+	.colorBlock{
+	
+		color: rgba(0,0,0,0);
+		float:left;
+	
+	}
+	
+	#greenSlider{
+		background-color: green;
+	}
+	#greenSlider::-webkit-slider-thumb{
+		background-color: #060;
+	}
+	
+	#blueSlider{
+		background-color: blue;
+	}
+	#blueSlider::-webkit-slider-thumb{
+		background-color: #006;
+	}
+
+	input[type=range] {
+	    -webkit-appearance: none;
+	    background-color: red;
+	    width: 500px;
+	    height:5px;
+	}
+	
+	input[type="range"]::-webkit-slider-thumb {
+	     -webkit-appearance: none;
+	    background-color: #600;
+	    opacity: 0.5;
+	    width: 10px;
+	    height: 20px;
+	}
+	
+
+</style>
+<script type="text/javascript">
+	
+	function makeColorScale(numSteps){
+	
+		console.debug("recv'd "+numSteps);
+		if(numSteps<2) numSteps=2;
+		if(numSteps >255) numSteps=255;
+		
+		var redDiv = document.getElementById("redRange");
+		var greenDiv = document.getElementById("greenRange");
+		var blueDiv = document.getElementById("blueRange");
+		
+		var divs = [redDiv, greenDiv, blueDiv];
+
+		var stepVal = parseInt((255/(numSteps-1)));
+		var boxWidth = (500.0/numSteps);
+		for(var i=0; i<3; i++){
+			divs[i].innerHTML="";
+		}
+		
+		document.getElementById("redSlider").max = numSteps-1;
+		document.getElementById("greenSlider").max = numSteps-1;
+		document.getElementById("blueSlider").max = numSteps-1;
+
+		
+		for(var i=0; i<256; i+=stepVal){
+			
+			
+			divs[0].innerHTML+="<span class='colorBlock' style='background-color: rgb("+i+",0,0);  width:"+boxWidth+"px'>_</span>";
+			
+			divs[1].innerHTML+="<span class='colorBlock' style='background-color: rgb(0,"+i+",0);  width:"+boxWidth+"px'>_</span>";
+			divs[2].innerHTML+="<span class='colorBlock' style='background-color: rgb(0,0,"+i+");  width:"+boxWidth+"px'>_</span>";
+
+		}	
+	}
+	function setBg(){
+		
+		var r = parseInt(255.0*(parseFloat(document.getElementById("redSlider").value)/document.getElementById("redSlider").max));
+		var g = parseInt(255.0*(parseFloat(document.getElementById("greenSlider").value)/document.getElementById("redSlider").max));
+		var b = parseInt(255.0*(parseFloat(document.getElementById("blueSlider").value)/document.getElementById("redSlider").max));
+
+		
+		document.body.style.backgroundColor = "rgb("+r+","+g+","+b+")";
+		setBPP();
+	}
+	function pad(str, len, prefix){
+	
+		while(str.length !== len){
+			str = prefix+str;
+		}
+		return str;
+	}
+
+	function setBPP(){
+		
+		//force to be multiple of 3, except for 1
+		
+		val = parseInt(document.getElementById("bpp").value/3);
+		//if(val==0) val=1;
+		
+
+		makeColorScale(Math.pow(2,val));
+		
+		
+		document.getElementById("bppDisplay").innerHTML=(val*3)+"bits/pixel | "+val+" bits for each of R,G,B";
+		document.getElementById("bpp").value=(val*3);
+		
+		document.getElementById("redDisplay").innerHTML = pad(parseInt(document.getElementById("redSlider").value).toString(2),val,"0");
+		document.getElementById("greenDisplay").innerHTML = pad(parseInt(document.getElementById("greenSlider").value).toString(2),val,"0");
+		document.getElementById("blueDisplay").innerHTML = pad(parseInt(document.getElementById("blueSlider").value).toString(2),val,"0");
+
+	}
+</script>
+</head>
+<body>
+
+
+<div id="slidersContainer">
+	
+	<input id="redSlider" type=range min=0 max=255 step=1 onChange="setBg()" value=255>
+	<span id="redDisplay">010111</span>
+	<div id="redRange"></div>
+	<br>
+	<br>
+	<input id="greenSlider" type=range  min=0 max=255 step=1 onChange="setBg()" value=255>
+	<span id="greenDisplay">010111</span>
+	<div id="greenRange"></div>
+	<br>
+	<br>
+	<input id="blueSlider" type=range min=0 max=255 step=1 onChange="setBg()" value=255>
+	<span id="blueDisplay">010111</span>
+	<div id="blueRange"></div>
+	<br>
+</div>
+
+
+bpp: <input id="bpp" type=range min=3 max=24 step=1 onChange="setBPP()" value=24> <span id="bppDisplay">24</span>
+
+<br><br>
+
+</body>
+<script type="text/javascript">makeColorScale(15);</script>
+</html>

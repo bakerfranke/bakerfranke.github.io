@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<script>
+		var img, ctx, imgData;
+		
+		function setup(){
+			img=document.getElementById("myPic"); //confusing: img here  == canvas
+			ctx=img.getContext("2d");
+			var pic=document.getElementById("logo");
+			ctx.drawImage(pic,0,0);
+				
+			imgData = ctx.getImageData(0,0,img.width, img.height);
+		}
+		
+	</script>
+	<title>  Image Processing</title>
+</head>
+<body onLoad="setup()">
+
+
+<h1>Canvas Tests:</h1>
+<img src="../logo.png" id="logo" style="visibility: hidden">
+
+<canvas id="myPic">Your browser does not support the HTML5 canvas tag.</canvas>
+
+</body>
+</html>

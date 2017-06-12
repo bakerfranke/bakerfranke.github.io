@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Slider - Vertical slider</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
+  <script>
+  $(function() {
+    $( ".slider-vertical" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: 0,
+      max: 100,
+      value: 60,
+      slide: function( event, ui ) {
+        console.debug(event.target.id);
+        var binVal = ui.value.toString(2);
+        $( "#amount"+event.target.id ).val( binVal );
+      }
+    });
+    $( ".amount" ).val(60); // $( ".slider-vertical" ).slider( "value" ) );
+  });
+  </script>
+  <style type="text/css">
+    .slider-vertical{
+      background: none;
+    }
+    .ui-widget-content{
+      background: none;
+      border: none;
+    }
+    .colorScale{
+      height: 200px; 
+      width: 20px; 
+      float: left;
+    }
+    .colorChannelContainer{
+      float: left;
+      margin-left: 10px;
+      border: solid 1px;
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+
+
+
+<div class="colorChannelContainer" id="redContainer">
+   <p>
+    <label for="amount">Red:</label>
+    <input type="text" id="amountRed" class="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+  </p> 
+  <div id="Red" class="slider-vertical" style="height:200px;"></div>
+</div>
+
+<div class="colorChannelContainer" id="greenContainer">
+  <div class="colorScale" id="GreenScale" style="background-color: green"></div>
+  <div id="Green" class="slider-vertical" style="height:200px;"></div>
+ 
+   <p>
+      <label for="amount">Green:</label>
+    <input type="text" id="amountGreen" class="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+  </p>
+</div>
+ 
+<div class="colorChannelContainer" id="blueContainer">
+
+  <p>
+    <label for="amount">Blue:</label>
+    <input type="text" id="amountBlue" class="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+  </p>
+  <div id="Blue" class="slider-vertical" style="height:200px;"></div>
+</div>
+
+ 
+</body>
+</html>
