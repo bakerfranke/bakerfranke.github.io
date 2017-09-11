@@ -34,6 +34,7 @@
 			background-color: #CCCCCC;
 			font-size: 85%;
 			width: 25%;
+			padding: 2px;
 		}
 		#fwTable td{
 			vertical-align: top;
@@ -44,6 +45,7 @@
 			font-family: courier;
 			color: black;
 			background-color: #ffffff;
+			border: none;
 		}
 		#answerList{
 			margin-left: 30px;
@@ -53,8 +55,31 @@
 		}
 		.answerRow{
 			width: 100%;
-			border-top: solid 1px black;
+			clear: both;
 		}
+		.expl{
+						border-top: solid 1px black;
+
+		}
+
+		.answerNumberCol{
+			float: left;
+			  width: 30px;
+			  padding-bottom: 500em;
+			  margin-bottom: -500em;
+			
+		}
+		.answerTextCol{
+			 float: left;
+  			  width: 90%;
+			  margin-right: -1px; /* Thank you IE */
+			  /*border-left: 1px solid black;
+
+			  background-color: red;
+			  */
+			  padding-bottom: 500em;
+			  margin-bottom: -500em;
+}
 		#jsonOutput{
 			font-family: monospace;
 			font-size: 80%;
@@ -69,7 +94,13 @@
 	
 <body onLoad = "convert()">
 	<h1> CSP AP Question Maker </h1>
-	<p>Load Example: <select id="exampleSelect"><option value=""> </options><option value=0>Example 1</option><option value=1>Example 2</option></select>
+	<p>Load Example: 
+		<select id="exampleSelect">
+			<option value=""> </options>
+			<option value=0>Example 1</option>
+			<option value=1>Example 2</option>
+			<option value=2>Example 3</option>
+		</select>
 
 	<div class="container">
 		<div class="row" >
@@ -318,10 +349,10 @@
 			Answer List.
 		**/
 		html += "<div id='answerList'>"
-		html += converter.makeHtml("&nbsp; &nbsp; (A) "+obj.answers["answer_a"].text);
-		html += converter.makeHtml("&nbsp; &nbsp; (B) "+obj.answers["answer_b"].text);
-		html += converter.makeHtml("&nbsp; &nbsp; (C) "+obj.answers["answer_c"].text);
-		html += converter.makeHtml("&nbsp; &nbsp; (D) "+obj.answers["answer_d"].text);
+		html += "<div class='answerRow'><div class='answerNumberCol'>(A)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_a"].text)+"</div></div>";
+		html += "<div class='answerRow'><div class='answerNumberCol'>(B)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_b"].text)+"</div></div>";
+		html += "<div class='answerRow'><div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_c"].text)+"</div></div>";
+		html += "<div class='answerRow'><div class='answerNumberCol'>(D)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_d"].text)+"</div></div>";
 		html += "</div>";
 
 		
@@ -348,10 +379,10 @@
 
 		//Compose table of answer explanations
 		var ansTable = "";
-		ansTable += "<div class='answerRow'>(A) "+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(B) "+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(C) "+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(D) "+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div>";
+		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(A)</div><div class='answerTextCol'>"+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div></div>";
+		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(B)</div><div class='answerTextCol'>"+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div></div>";
+		ansTable += "<div class='answerRow expl'>(<div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div></div>";
+		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(D)</div><div class='answerTextCol'>"+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div></div>";
 
 
 		html += ansTable;
