@@ -7,6 +7,7 @@
 	<script src="../framework/frameworkArray.js"></script>
 	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.7.4/showdown.min.js"></script>
+	<script src='examples.js' type="text/javascript"></script>
 
 	<style type="text/css">
 		body{
@@ -65,14 +66,10 @@
 			font-size: 105%;
 		}
 	</style>
-	<script type="text/javascript">
-	// pre-loaded examples:
-		
-
-
-	</script>
-<body>
+	
+<body onLoad = "convert()">
 	<h1> CSP AP Question Maker </h1>
+	<p>Load Example: <select id="exampleSelect"><option value=""> </options><option value=0>Example 1</option><option value=1>Example 2</option></select>
 
 	<div class="container">
 		<div class="row" >
@@ -207,6 +204,19 @@
 
 	document.getElementById("EKsearch").addEventListener("input", EKsearch);
 	document.getElementById("jsonOutput").addEventListener("change", loadFromJSONoutput);
+
+	document.getElementById('exampleSelect').addEventListener("input", loadExample);
+
+	function loadExample(e){
+		console.log("Loading..."+$("#exampleSelect").val())
+		var ex = $("#exampleSelect").val();
+		//console.log(JSON.parse(examples[ex]));
+		
+		$("#jsonOutput").val(JSON.stringify(examples[ex],null,2));
+
+		loadFromJSONoutput();
+		
+	}
 	
 	function loadInputFields(obj){
 
