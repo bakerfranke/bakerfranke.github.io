@@ -12,6 +12,10 @@
 	<style type="text/css">
 		body{
 			font-family: serif;
+			margin-left: 5px;
+		}
+		.container{
+
 		}
 		#leftCol{
 			background-color: #d9f3f5;
@@ -34,12 +38,12 @@
 			background-color: #CCCCCC;
 			font-size: 85%;
 			width: 25%;
-			padding: 2px;
+			padding: 5px;
 		}
 		#fwTable td{
 			vertical-align: top;
 			font-size: 85%;
-			padding: 2px;
+			padding: 5px;
 		}
 		pre{
 			font-family: courier;
@@ -59,7 +63,7 @@
 			clear: both;
 		}
 		.expl{
-						border-top: solid 1px black;
+			border-top: solid 1px black;
 
 		}
 
@@ -94,7 +98,10 @@
 	</style>
 	
 <body onLoad = "convert()">
-	<h1> CSP AP Question Maker </h1>
+	
+
+	<div class="container">
+		<h1> CSP AP Question Maker </h1>
 	<p>Load Example: 
 		<select id="exampleSelect">
 			<option value=""> </options>
@@ -102,8 +109,7 @@
 			<option value=1>Example 2</option>
 			<option value=2>Example 3</option>
 		</select>
-
-	<div class="container">
+		<br>
 		<div class="row" >
 			<div class="col-sm-4" id="leftCol">
 				<div class="row">
@@ -156,7 +162,7 @@
 						<textarea id="expl_answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
 					</div>
 				</div>
-
+				<p> </p>
 			</div>
 			<div class="col-sm-8" id="output">
 
@@ -382,7 +388,7 @@
 		var ansTable = "";
 		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(A)</div><div class='answerTextCol'>"+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div></div>";
 		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(B)</div><div class='answerTextCol'>"+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div></div>";
-		ansTable += "<div class='answerRow expl'>(<div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div></div>";
+		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div></div>";
 		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(D)</div><div class='answerTextCol'>"+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div></div>";
 
 
