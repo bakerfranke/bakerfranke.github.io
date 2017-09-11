@@ -44,6 +44,9 @@
 			color: black;
 			background-color: #ffffff;
 		}
+		#answerList{
+			margin-left: 30px;
+		}
 		#ansTable{
 			width: 100%;
 		}
@@ -62,6 +65,12 @@
 			font-size: 105%;
 		}
 	</style>
+	<script type="text/javascript">
+	// pre-loaded examples:
+		
+
+
+	</script>
 <body>
 	<h1> CSP AP Question Maker </h1>
 
@@ -134,7 +143,8 @@
 
 </body>
 <script type="text/javascript">
-
+	
+	
 	ctp = {};
 	ctp.P1 = "Connecting computing";
 	ctp.P2 = "Creating Computational Artifacts"
@@ -168,6 +178,8 @@
 	obj.answers["answer_c"] = {};
 	obj.answers["answer_d"]= {};
 
+	EKsearch(); // must call this BEFORE attempting to load from memory
+
 	if(localStorage.jsonOutput != null){
 
 		console.log("loading from localStorage --> "+localStorage.jsonOutput+" <--")
@@ -179,7 +191,6 @@
 	}
 
 	
-	EKsearch();
 	
 	document.getElementById("qText").addEventListener("input", convert);
 	document.getElementById("answer_a").addEventListener("input", convert);
@@ -211,13 +222,18 @@
 		$("#expl_answer_c").val(obj.answers["answer_c"].expl);
 		$("#expl_answer_d").val(obj.answers["answer_d"].expl);
 
-		$("input[name='correct'][value='answer_d']").prop("checked",true)
-
-		console.log("before "+$("#EKs").val()[0]+" <-- "+obj.ek);
+		for(var ansKey in obj.answers){
+			if(obj.answers[ansKey].correct == 1){
+				$("input[name='correct'][value='"+ansKey+"']").prop("checked",true);
+			}
+			else{
+				$("input[name='correct'][value='"+ansKey+"']").prop("checked",false);
+			}
+		}		
 
 		$("#EKs").val(obj.ek);
+		$("#difficulty").val(obj.difficulty);
 		
-		console.log("after "+$("#EKs").val()[0]+" <-- "+obj.ek);
 
 
 	}
@@ -277,15 +293,26 @@
 			obj.ctp = ctp[obj.lo.substr(obj.lo.indexOf("[")+1, 2)]
 		}
 
+		// fix "is in/correct" heading on answer explanation inputs
+		$("#answer_a_correct").html(getIsCorrectText("answer_a"));
+		$("#answer_b_correct").html(getIsCorrectText("answer_b"));
+		$("#answer_c_correct").html(getIsCorrectText("answer_c"));
+		$("#answer_d_correct").html(getIsCorrectText("answer_d"));
 		
 		/**
-			Compose HTML string for display. Markdown conversion + some stuff by hand
+			Question Text. Compose HTML string for display. Markdown conversion + some stuff by hand
 		**/
 		html = converter.makeHtml(obj.qText);
+
+		/** 
+			Answer List.
+		**/
+		html += "<div id='answerList'>"
 		html += converter.makeHtml("&nbsp; &nbsp; (A) "+obj.answers["answer_a"].text);
 		html += converter.makeHtml("&nbsp; &nbsp; (B) "+obj.answers["answer_b"].text);
 		html += converter.makeHtml("&nbsp; &nbsp; (C) "+obj.answers["answer_c"].text);
 		html += converter.makeHtml("&nbsp; &nbsp; (D) "+obj.answers["answer_d"].text);
+		html += "</div>";
 
 		
 
@@ -311,10 +338,10 @@
 
 		//Compose table of answer explanations
 		var ansTable = "";
-		ansTable += "<div class='answerRow'>(A) "+getIsCorrect(obj.answers['answer_a'].correct)+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(B) "+getIsCorrect(obj.answers['answer_b'].correct)+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(C) "+getIsCorrect(obj.answers['answer_c'].correct)+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div>";
-		ansTable += "<div class='answerRow'>(D) "+getIsCorrect(obj.answers['answer_d'].correct)+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(A) "+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(B) "+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(C) "+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(D) "+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div>";
 
 
 		html += ansTable;
@@ -326,9 +353,11 @@
 		localStorage.jsonOutput = JSON.stringify(obj);
 	}
 
-	function getIsCorrect(correct){ // 0 or 1
+	function getIsCorrectText(answer_id){ // 0 or 1
 
-		return (correct == 1) ? "<strong>This option is correct.</strong>":"This option is incoorect.";
+		var correct = obj.answers[answer_id].correct;
+
+		return (correct == 1) ? "<strong>This option is correct.</strong>":"This option is incorrrect.";
 
 	}
 
