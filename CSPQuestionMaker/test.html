@@ -1,0 +1,379 @@
+<html>
+<head>
+	<title></title>
+</head>
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<script src="../framework/frameworkArray.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.7.4/showdown.min.js"></script>
+
+	<style type="text/css">
+		body{
+			font-family: serif;
+		}
+		#leftCol{
+			background-color: #d9f3f5;
+		}
+		#output{
+			border: solid 1px black;
+		}
+		#jsonOutput{
+			width: 100%;
+			height: 200px;
+		}
+		#Eks{
+			width: 100%;
+			font-size: 75%;
+		}
+		#fwTable{
+			width: 100%;
+		}
+		#fwTable th{
+			background-color: #CCCCCC;
+			font-size: 85%;
+			width: 25%;
+		}
+		#fwTable td{
+			vertical-align: top;
+			font-size: 85%;
+			padding: 2px;
+		}
+		pre{
+			font-family: courier;
+			color: black;
+			background-color: #ffffff;
+		}
+		#answerList{
+			margin-left: 30px;
+		}
+		#ansTable{
+			width: 100%;
+		}
+		.answerRow{
+			width: 100%;
+			border-top: solid 1px black;
+		}
+		#jsonOutput{
+			font-family: monospace;
+			font-size: 80%;
+		}
+		code{
+			font-family: monospace;
+			background-color: rgba(255,255,255,0);
+			color: black;
+			font-size: 105%;
+		}
+	</style>
+	<script type="text/javascript">
+	// pre-loaded examples:
+		
+
+
+	</script>
+<body>
+	<h1> CSP AP Question Maker </h1>
+
+	<div class="container">
+		<div class="row" >
+			<div class="col-sm-4" id="leftCol">
+				<div class="row">
+					<div class="col-sm-12">
+						Question text: <br>
+						<textarea id="qText" style="width: 100%" placeholder="enter markdown"></textarea>
+						<br> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						Answers: <br>
+						(A) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_a"> correct
+						<textarea id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
+						(B) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_b"> correct
+						<textarea id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
+						(C) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_c"> correct
+						<textarea id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
+						(D) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_d"> correct
+						<textarea id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+
+						Essential Knowledge: <input type=text id="EKsearch" placeholder="search">
+						<select multiple id="EKs"></select>
+						Difficulty: <select id="difficulty">
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+										<option value="4">4</option>
+										<option value="5">5</option>
+									</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						Explanation of Answers: <br>
+						(A) <span id="answer_a_correct">This option is incorrect</span>
+						<textarea id="expl_answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
+						
+						(B) <span id="answer_b_correct">This option is incorrect</span>
+						<textarea id="expl_answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
+					
+						(C) <span id="answer_c_correct">This option is incorrect</span>
+						<textarea id="expl_answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
+						
+						(D) <span id="answer_d_correct">This option is incorrect</span>
+						<textarea id="expl_answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
+					</div>
+				</div>
+
+			</div>
+			<div class="col-sm-8" id="output">
+
+			</div>
+		</div>
+		<div class="row">
+			JSON output:<br>
+			<textarea id="jsonOutput">
+
+			</textarea>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript">
+	
+	
+	ctp = {};
+	ctp.P1 = "Connecting computing";
+	ctp.P2 = "Creating Computational Artifacts"
+	ctp.P3 = "Abstracting"
+	ctp.P4 = "Analyzing Problems and Artifacts"
+	ctp.P5 = "Communicating"
+	ctp.P6 = "Collaborating"
+
+	var converter = new showdown.Converter();
+	//converter.setFlavor('github');
+	converter.setOption('tables','true');
+	var text = "# Hello World"
+	var html = converter.makeHtml(text);
+	console.log(html);
+
+	var obj = {};
+	obj.type = 'singleSelect';
+	obj.qText = ''
+	//obj.answers = [{answer_text: "foo", correct:0, answer_expl: ""}];
+	
+
+	obj.eu = "";
+	obj.lo = "";
+	obj.ctp = "";
+	obj.ek = "";
+	obj.difficulty = "1";
+
+	obj.answers = {};
+	obj.answers["answer_a"] = {};
+	obj.answers["answer_b"] = {};
+	obj.answers["answer_c"] = {};
+	obj.answers["answer_d"]= {};
+
+	EKsearch(); // must call this BEFORE attempting to load from memory
+
+	if(localStorage.jsonOutput != null){
+
+		console.log("loading from localStorage --> "+localStorage.jsonOutput+" <--")
+		obj = JSON.parse(localStorage.jsonOutput);
+
+		console.log("\n\n local.ek = "+obj.ek);
+		loadInputFields(obj)
+		convert();
+	}
+
+	
+	
+	document.getElementById("qText").addEventListener("input", convert);
+	document.getElementById("answer_a").addEventListener("input", convert);
+	document.getElementById("answer_b").addEventListener("input", convert);
+	document.getElementById("answer_c").addEventListener("input", convert);
+	document.getElementById("answer_d").addEventListener("input", convert);
+	document.getElementById("expl_answer_a").addEventListener("input", convert);
+	document.getElementById("expl_answer_b").addEventListener("input", convert);
+	document.getElementById("expl_answer_c").addEventListener("input", convert);
+	document.getElementById("expl_answer_d").addEventListener("input", convert);
+	document.getElementById("EKs").addEventListener("input", convert);
+	document.getElementById("difficulty").addEventListener("input", convert);
+
+
+	document.getElementById("EKsearch").addEventListener("input", EKsearch);
+	document.getElementById("jsonOutput").addEventListener("change", loadFromJSONoutput);
+	
+	function loadInputFields(obj){
+
+		console.log("loading input fields...ek = "+obj.ek)
+		$("#qText").val(obj.qText);
+		$("#answer_a").val(obj.answers["answer_a"].text);
+		$("#answer_b").val(obj.answers["answer_b"].text);
+		$("#answer_c").val(obj.answers["answer_c"].text);
+		$("#answer_d").val(obj.answers["answer_d"].text);
+
+		$("#expl_answer_a").val(obj.answers["answer_a"].expl);
+		$("#expl_answer_b").val(obj.answers["answer_b"].expl);
+		$("#expl_answer_c").val(obj.answers["answer_c"].expl);
+		$("#expl_answer_d").val(obj.answers["answer_d"].expl);
+
+		for(var ansKey in obj.answers){
+			if(obj.answers[ansKey].correct == 1){
+				$("input[name='correct'][value='"+ansKey+"']").prop("checked",true);
+			}
+			else{
+				$("input[name='correct'][value='"+ansKey+"']").prop("checked",false);
+			}
+		}		
+
+		$("#EKs").val(obj.ek);
+		$("#difficulty").val(obj.difficulty);
+		
+
+
+	}
+
+	function loadFromJSONoutput(){
+
+		obj = JSON.parse($("#jsonOutput").val());
+		console.log("ATTEMPTING TO LOAD FROM JSONoutput\n");
+		console.debug(obj);
+		loadInputFields(obj);
+		convert();
+	}
+
+	function convert(){
+		console.log("ping");
+
+		/**
+			Load json object from fields
+		**/
+
+		// Question text
+		obj.qText = $("#qText").val();
+		
+		// Answers, explantions and correctness
+		obj.answers["answer_a"] = {text: $("#answer_a").val()}
+		obj.answers["answer_b"] = {text: $("#answer_b").val()}
+		obj.answers["answer_c"] = {text: $("#answer_c").val()}
+		obj.answers["answer_d"] = {text: $("#answer_d").val()}
+
+		obj.answers["answer_a"].expl = $("#expl_answer_a").val();
+		obj.answers["answer_b"].expl = $("#expl_answer_b").val();
+		obj.answers["answer_c"].expl = $("#expl_answer_c").val();
+		obj.answers["answer_d"].expl = $("#expl_answer_d").val();
+
+		// assume no correct answer chosen yet
+		obj.answers["answer_a"].correct = 0;
+		obj.answers["answer_b"].correct = 0;
+		obj.answers["answer_c"].correct = 0;
+		obj.answers["answer_d"].correct = 0;
+
+		// use the id of checked one to set answer[id].correct=1
+		var correct_id = $("input[name='correct']:checked").val();
+
+		if(correct_id!=null){
+			obj.answers[correct_id].correct=1;
+		}	
+
+		// Difficulty
+		obj.difficulty = $("#difficulty").val();
+
+		// Figure out which EU, LO and CTP based on EK that was selected
+		obj.ek = $("#EKs").val()[0];
+		if(obj.ek != null){
+			var fw = obj.ek.split(/[.A-Z]/); //break ek into components
+			obj.eu = cspframework[fw[0]+"."+fw[1]];
+			obj.lo = cspframework[fw[0]+"."+fw[1]+"."+fw[2]];
+			obj.ctp = ctp[obj.lo.substr(obj.lo.indexOf("[")+1, 2)]
+		}
+
+		// fix "is in/correct" heading on answer explanation inputs
+		$("#answer_a_correct").html(getIsCorrectText("answer_a"));
+		$("#answer_b_correct").html(getIsCorrectText("answer_b"));
+		$("#answer_c_correct").html(getIsCorrectText("answer_c"));
+		$("#answer_d_correct").html(getIsCorrectText("answer_d"));
+		
+		/**
+			Question Text. Compose HTML string for display. Markdown conversion + some stuff by hand
+		**/
+		html = converter.makeHtml(obj.qText);
+
+		/** 
+			Answer List.
+		**/
+		html += "<div id='answerList'>"
+		html += converter.makeHtml("&nbsp; &nbsp; (A) "+obj.answers["answer_a"].text);
+		html += converter.makeHtml("&nbsp; &nbsp; (B) "+obj.answers["answer_b"].text);
+		html += converter.makeHtml("&nbsp; &nbsp; (C) "+obj.answers["answer_c"].text);
+		html += converter.makeHtml("&nbsp; &nbsp; (D) "+obj.answers["answer_d"].text);
+		html += "</div>";
+
+		
+
+		var fwTable = "<table id='fwTable'>";
+		fwTable += "<tr><th>Enduring Understandings</th>";
+		fwTable += "<th>Learning Objectives</th>";
+		fwTable += "<th>Computational Thinking Practices</th>";
+		fwTable += "<th>Essential Knowlege</th>";
+		fwTable += "<th>Difficulty</th>";
+
+		fwTable += "</tr><tr>"
+
+		fwTable += "<td>"+obj.eu+"</td>";
+		fwTable += "<td>"+obj.lo+"</td>";
+		fwTable += "<td>"+obj.ctp+"</td>";
+		fwTable += "<td>"+obj.ek+"</td>";
+		fwTable += "<td>"+obj.difficulty+"</td>";
+
+		fwTable += "</tr></table>"
+
+		html+=fwTable;
+
+
+		//Compose table of answer explanations
+		var ansTable = "";
+		ansTable += "<div class='answerRow'>(A) "+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(B) "+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(C) "+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div>";
+		ansTable += "<div class='answerRow'>(D) "+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div>";
+
+
+		html += ansTable;
+
+
+
+		$("#output").html(html);
+		$("#jsonOutput").val(JSON.stringify(obj, null, 2));
+		localStorage.jsonOutput = JSON.stringify(obj);
+	}
+
+	function getIsCorrectText(answer_id){ // 0 or 1
+
+		var correct = obj.answers[answer_id].correct;
+
+		return (correct == 1) ? "<strong>This option is correct.</strong>":"This option is incorrrect.";
+
+	}
+
+	function EKsearch(){
+		$("#EKs").empty()
+
+		var searchVal = $("#EKsearch").val().toLowerCase();
+		
+		for(k in cspframework){
+			if(cspframework[k].toLowerCase().indexOf(searchVal) >= 0){
+				$("#EKs").append($('<option>', {
+				    value: k,
+				    text: cspframework[k]
+				}));
+			}
+		}
+	}
+</script>
+</html>
