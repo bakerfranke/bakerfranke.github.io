@@ -42,7 +42,7 @@
   "answers": {
     "answer_a": {
       "text": "\n\n    IF (( NOT rainy) OR (NOT tooCold)\n    {\n        DISPLAY(\"It's a good beach day\")\n    }\n",
-      "expl": "`NOT` can’t be distributed over `OR`",
+      "expl": "`NOT` can't be distributed over `OR`",
       "correct": 0
     },
     "answer_b": {

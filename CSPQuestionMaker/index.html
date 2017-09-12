@@ -39,6 +39,8 @@
 			font-size: 85%;
 			width: 25%;
 			padding: 5px;
+			border-top: solid 1px black;
+			border-bottom: solid 1px black;
 		}
 		#fwTable td{
 			vertical-align: top;
@@ -84,7 +86,11 @@
 			  */
 			  padding-bottom: 500em;
 			  margin-bottom: -500em;
-}
+		}
+		.answer_input{
+			font-size: 90%;
+			height: 50px;
+		}
 		#jsonOutput{
 			font-family: monospace;
 			font-size: 80%;
@@ -114,28 +120,31 @@
 			<div class="col-sm-4" id="leftCol">
 				<div class="row">
 					<div class="col-sm-12">
-						Question text: <br>
+						<br>
+						<strong>Question text:</strong> <br>
 						<textarea id="qText" style="width: 100%" placeholder="enter markdown"></textarea>
 						<br> 
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-sm-12">
-						Answers: <br>
+						<br>
+						<strong>Answers:</strong> <br>
 						(A) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_a"> correct
-						<textarea id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
+						<textarea class="answer_input" id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
 						(B) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_b"> correct
-						<textarea id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
+						<textarea class="answer_input" id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
 						(C) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_c"> correct
-						<textarea id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
+						<textarea class="answer_input" id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
 						(D) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_d"> correct
-						<textarea id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
+						<textarea class="answer_input" id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
 					</div>
 				</div>
+				<br>
 				<div class="row">
 					<div class="col-sm-12">
-
-						Essential Knowledge: <input type=text id="EKsearch" placeholder="search">
+						<strong>Essential Knowledge: </strong><input type=text id="EKsearch" placeholder="search" style="font-family: sans-serif">
+						<br>
 						<select multiple id="EKs"></select>
 						Difficulty: <select id="difficulty">
 										<option value="1">1</option>
@@ -144,11 +153,13 @@
 										<option value="4">4</option>
 										<option value="5">5</option>
 									</select>
+						</p>
 					</div>
 				</div>
+				<br>
 				<div class="row">
 					<div class="col-sm-12">
-						Explanation of Answers: <br>
+						<strong>Explanation of Answers: </strong><br>
 						(A) <span id="answer_a_correct">This option is incorrect</span>
 						<textarea id="expl_answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
 						
@@ -164,8 +175,52 @@
 				</div>
 				<p> </p>
 			</div>
-			<div class="col-sm-8" id="output">
+			
+			 <div class="col-sm-8" id="output_2">
 
+				<div id='questionText'> question </div>
+
+				<div id='answerList'>
+					<div class='answerRow'><div class='answerNumberCol'>(A)</div><div class='answerTextCol' id="answer_a_disp"> answer a </div></div>
+					<div class='answerRow'><div class='answerNumberCol'>(B)</div><div class='answerTextCol' id="answer_b_disp"> answer b </div></div>
+					<div class='answerRow'><div class='answerNumberCol'>(C)</div><div class='answerTextCol' id="answer_c_disp"> answer c </div></div>
+					<div class='answerRow'><div class='answerNumberCol'>(D)</div><div class='answerTextCol' id="answer_d_disp"> answer d </div></div>
+				</div>
+
+				<table id='fwTable'>
+					<tr>
+						<th>Enduring Understandings</th>
+						<th>Learning Objectives</th>
+						<th>Computational Thinking Practices</th>
+						<th>Essential Knowlege</th>
+						<th>Difficulty</th>
+					</tr>
+					<tr>
+						<td id='eu_disp'>"+obj.eu+"</td>
+						<td id='lo_disp'>"+obj.lo+"</td>
+						<td id='ctp_disp'>"+obj.ctp+"</td>
+						<td id='ek_disp'>"+obj.ek+"</td>
+						<td id='difficulty_disp'>"+obj.difficulty+"</td>
+
+						</tr>
+				</table>
+
+				<div class='answerRow expl'>
+					<div class='answerNumberCol'>(A)</div>
+					<div class='answerTextCol' id='answer_a_expl'>"+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div>
+				</div>
+				<div class='answerRow expl'>
+					<div class='answerNumberCol'>(B)</div>
+					<div class='answerTextCol' id='answer_b_expl'>"+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div>
+				</div>
+				<div class='answerRow expl'>
+					<div class='answerNumberCol'>(C)</div>
+					<div class='answerTextCol' id='answer_c_expl'>"+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div>
+				</div>
+				<div class='answerRow expl'>
+					<div class='answerNumberCol'>(D)</div>
+					<div class='answerTextCol' id='answer_d_expl'>"+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div>
+				</div>
 			</div>
 		</div>
 		<div class="row">
@@ -349,55 +404,46 @@
 		
 		/**
 			Question Text. Compose HTML string for display. Markdown conversion + some stuff by hand
+
+			TO DO: should load values into hard coded HTML fields rather than composing this giant string.
 		**/
-		html = converter.makeHtml(obj.qText);
+		// html = "<div id='questionText'>"+converter.makeHtml(obj.qText)+"<div>";
+		$("#questionText").html(converter.makeHtml(obj.qText));
 
 		/** 
 			Answer List.
 		**/
-		html += "<div id='answerList'>"
-		html += "<div class='answerRow'><div class='answerNumberCol'>(A)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_a"].text)+"</div></div>";
-		html += "<div class='answerRow'><div class='answerNumberCol'>(B)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_b"].text)+"</div></div>";
-		html += "<div class='answerRow'><div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_c"].text)+"</div></div>";
-		html += "<div class='answerRow'><div class='answerNumberCol'>(D)</div><div class='answerTextCol'>"+converter.makeHtml(obj.answers["answer_d"].text)+"</div></div>";
-		html += "</div>";
+		$("#answer_a_disp").html(converter.makeHtml(obj.answers["answer_a"].text));
+		$("#answer_b_disp").html(converter.makeHtml(obj.answers["answer_b"].text));
+		$("#answer_c_disp").html(converter.makeHtml(obj.answers["answer_c"].text));
+		$("#answer_d_disp").html(converter.makeHtml(obj.answers["answer_d"].text));
 
-		
+		/**
+			Table of EU/LO/EK mappings
+		**/
+		$("#eu_disp").html(obj.eu);
+		$("#lo_disp").html(obj.lo);
+		$("#ctp_disp").html(obj.ctp);
+		$("#ek_disp").html(obj.ek);
+		$("#difficulty_disp").html(obj.difficulty);
 
-		var fwTable = "<table id='fwTable'>";
-		fwTable += "<tr><th>Enduring Understandings</th>";
-		fwTable += "<th>Learning Objectives</th>";
-		fwTable += "<th>Computational Thinking Practices</th>";
-		fwTable += "<th>Essential Knowlege</th>";
-		fwTable += "<th>Difficulty</th>";
-
-		fwTable += "</tr><tr>"
-
-		fwTable += "<td>"+obj.eu+"</td>";
-		fwTable += "<td>"+obj.lo+"</td>";
-		fwTable += "<td>"+obj.ctp+"</td>";
-		fwTable += "<td>"+obj.ek+"</td>";
-		fwTable += "<td>"+obj.difficulty+"</td>";
-
-		fwTable += "</tr></table>"
-
-		html+=fwTable;
+		/**
+			Answer explanations
+		**/
+		$("#answer_a_expl").html(getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl));
+		$("#answer_b_expl").html(getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl));
+		$("#answer_c_expl").html(getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl));
+		$("#answer_d_expl").html(getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl));
 
 
-		//Compose table of answer explanations
-		var ansTable = "";
-		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(A)</div><div class='answerTextCol'>"+getIsCorrectText('answer_a')+" "+converter.makeHtml(obj.answers["answer_a"].expl)+"</div></div>";
-		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(B)</div><div class='answerTextCol'>"+getIsCorrectText('answer_b')+" "+converter.makeHtml(obj.answers["answer_b"].expl)+"</div></div>";
-		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(C)</div><div class='answerTextCol'>"+getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl)+"</div></div>";
-		ansTable += "<div class='answerRow expl'><div class='answerNumberCol'>(D)</div><div class='answerTextCol'>"+getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl)+"</div></div>";
-
-
-		html += ansTable;
-
-
-
-		$("#output").html(html);
+		/**
+			Dump pretty json into textarea
+		**/
 		$("#jsonOutput").val(JSON.stringify(obj, null, 2));
+
+		/**
+			Save json local so don't lose changes on page reload
+		**/
 		localStorage.jsonOutput = JSON.stringify(obj);
 	}
 
