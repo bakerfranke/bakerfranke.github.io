@@ -101,6 +101,16 @@
 			color: black;
 			font-size: 105%;
 		}
+		#qType{
+			font-family: monospace;
+			font-style: italic;
+			font-weight: bold;
+			padding: 5px;
+			
+		}
+		#qTypeInstructions{
+			font-style: italic;
+		}
 	</style>
 	
 <body onLoad = "convert()">
@@ -121,6 +131,18 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<br>
+						<strong>Question type:</strong> <span id='qType'> unknown </span><br>
+						<span id="qTypeInstructions"><small>(Auto-filled based on number of correct answers chosen below)</small></span>
+					</div>
+					<!--
+					<div class="col-sm-6">Single Select: <input type="radio" name="qType" value="singleSelect" onChange="changeCorrectSelectToType('radio')" selected></div>
+					<div class="col-sm-6">Choose two (buggy): <input type="radio" name="qType" value="chooseTwo" onChange="changeCorrectSelectToType('checkbox')"></div>
+				-->
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						
+						<br>
 						<strong>Question text:</strong> <br>
 						<textarea id="qText" style="width: 100%" placeholder="enter markdown"></textarea>
 						<br> 
@@ -130,13 +152,13 @@
 					<div class="col-sm-12">
 						<br>
 						<strong>Answers:</strong> <br>
-						(A) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_a"> correct
+						(A) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_a"> correct
 						<textarea class="answer_input" id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
-						(B) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_b"> correct
+						(B) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_b"> correct
 						<textarea class="answer_input" id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
-						(C) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_c"> correct
+						(C) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_c"> correct
 						<textarea class="answer_input" id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
-						(D) &nbsp; &nbsp; <input type="radio" name="correct" onchange="convert()" value="answer_d"> correct
+						(D) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_d"> correct
 						<textarea class="answer_input" id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
 					</div>
 				</div>
@@ -175,7 +197,7 @@
 				</div>
 				<p> </p>
 			</div>
-			
+			<!--- Markdown output area -->
 			 <div class="col-sm-8" id="output_2">
 
 				<div id='questionText'> question </div>
@@ -251,24 +273,11 @@
 	console.log(html);
 
 	var obj = {};
-	obj.type = 'singleSelect';
-	obj.qText = ''
-	//obj.answers = [{answer_text: "foo", correct:0, answer_expl: ""}];
+
+	resetJSONObj();
 	
 
-	obj.eu = "";
-	obj.lo = "";
-	obj.ctp = "";
-	obj.ek = "";
-	obj.difficulty = "1";
-
-	obj.answers = {};
-	obj.answers["answer_a"] = {};
-	obj.answers["answer_b"] = {};
-	obj.answers["answer_c"] = {};
-	obj.answers["answer_d"]= {};
-
-	EKsearch(); // must call this BEFORE attempting to load from memory
+	EKsearch(); // must call this BEFORE attempting to load from memory, it populates the EK list
 
 	if(localStorage.jsonOutput != null){
 
@@ -282,6 +291,9 @@
 
 	
 	
+	//** TO DO: refactor event handler attachment to use JQuery so can attach
+	// to entire class of objects  with .on("input", convert)
+	// also get html inline function calls out of the html (see: correctness checking)
 	document.getElementById("qText").addEventListener("input", convert);
 	document.getElementById("answer_a").addEventListener("input", convert);
 	document.getElementById("answer_b").addEventListener("input", convert);
@@ -300,6 +312,25 @@
 
 	document.getElementById('exampleSelect').addEventListener("input", loadExample);
 
+	function resetJSONObj(){
+
+	obj = {};
+	obj.qType = 'unknown';
+	obj.qText = ""
+	obj.eu = "";
+	obj.lo = "";
+	obj.ctp = "";
+	obj.ek = "";
+	obj.difficulty = "1";
+
+	obj.answers = {};
+	obj.answers["answer_a"] = {};
+	obj.answers["answer_b"] = {};
+	obj.answers["answer_c"] = {};
+	obj.answers["answer_d"]= {};
+
+	}
+
 	function loadExample(e){
 		console.log("Loading..."+$("#exampleSelect").val())
 		var ex = $("#exampleSelect").val();
@@ -314,6 +345,7 @@
 	function loadInputFields(obj){
 
 		console.log("loading input fields...ek = "+obj.ek)
+		$("#qType").val(obj.qType);
 		$("#qText").val(obj.qText);
 		$("#answer_a").val(obj.answers["answer_a"].text);
 		$("#answer_b").val(obj.answers["answer_b"].text);
@@ -351,11 +383,11 @@
 	}
 
 	function convert(){
-		console.log("ping");
 
 		/**
 			Load json object from fields
 		**/
+		//obj.qType = $("input[name='qType']:checked").val();
 
 		// Question text
 		obj.qText = $("#qText").val();
@@ -378,11 +410,22 @@
 		obj.answers["answer_d"].correct = 0;
 
 		// use the id of checked one to set answer[id].correct=1
-		var correct_id = $("input[name='correct']:checked").val();
+		// var correct_id = $("input[name='correct']:checked").val();
 
-		if(correct_id!=null){
-			obj.answers[correct_id].correct=1;
-		}	
+		$("input[name='correct']:checked").each(function(){ 
+				var correct_id = $(this).val();
+				obj.answers[correct_id].correct=1;
+		});
+
+		// question type derrived from number of answers checked correct
+		$("#qTypeInstructions").hide()
+		var numCheckedCorrect = $("input[name='correct']:checked").length;
+		if(numCheckedCorrect == 1) obj.qType = "singleSelect";
+		else if(numCheckedCorrect == 2) obj.qType = "chooseTwo";
+		else{
+			obj.qType = "unknown";
+			$("#qTypeInstructions").show();
+		}
 
 		// Difficulty
 		obj.difficulty = $("#difficulty").val();
@@ -396,23 +439,17 @@
 			obj.ctp = ctp[obj.lo.substr(obj.lo.indexOf("[")+1, 2)]
 		}
 
-		// fix "is in/correct" heading on answer explanation inputs
-		$("#answer_a_correct").html(getIsCorrectText("answer_a"));
-		$("#answer_b_correct").html(getIsCorrectText("answer_b"));
-		$("#answer_c_correct").html(getIsCorrectText("answer_c"));
-		$("#answer_d_correct").html(getIsCorrectText("answer_d"));
-		
 		/**
-			Question Text. Compose HTML string for display. Markdown conversion + some stuff by hand
-
-			TO DO: should load values into hard coded HTML fields rather than composing this giant string.
+			Set all html fields and displays to reflect JSON object.  Largely markdown coversion + some stuff by hand
 		**/
-		// html = "<div id='questionText'>"+converter.makeHtml(obj.qText)+"<div>";
+
+		$("#qType").html(obj.qType);
+		
+		// Question text
 		$("#questionText").html(converter.makeHtml(obj.qText));
 
-		/** 
-			Answer List.
-		**/
+		
+		// Student-facing list of answers
 		$("#answer_a_disp").html(converter.makeHtml(obj.answers["answer_a"].text));
 		$("#answer_b_disp").html(converter.makeHtml(obj.answers["answer_b"].text));
 		$("#answer_c_disp").html(converter.makeHtml(obj.answers["answer_c"].text));
@@ -435,6 +472,12 @@
 		$("#answer_c_expl").html(getIsCorrectText('answer_c')+" "+converter.makeHtml(obj.answers["answer_c"].expl));
 		$("#answer_d_expl").html(getIsCorrectText('answer_d')+" "+converter.makeHtml(obj.answers["answer_d"].expl));
 
+		// aside: set correct/incorrect heading above answer explanation inputs 
+		$("#answer_a_correct").html(getIsCorrectText("answer_a"));
+		$("#answer_b_correct").html(getIsCorrectText("answer_b"));
+		$("#answer_c_correct").html(getIsCorrectText("answer_c"));
+		$("#answer_d_correct").html(getIsCorrectText("answer_d"));
+
 
 		/**
 			Dump pretty json into textarea
@@ -447,6 +490,7 @@
 		localStorage.jsonOutput = JSON.stringify(obj);
 	}
 
+
 	function getIsCorrectText(answer_id){ // 0 or 1
 
 		var correct = obj.answers[answer_id].correct;
@@ -454,6 +498,7 @@
 		return (correct == 1) ? "<strong>This option is correct.</strong>":"This option is incorrrect.";
 
 	}
+
 
 	function EKsearch(){
 		$("#EKs").empty()
@@ -468,6 +513,24 @@
 				}));
 			}
 		}
+	}
+
+	function changeCorrectSelectToType(type){  // radio | checkbox
+
+		$("input[name='correct']").each(function(){
+	       var self=$(this);
+	       $(this).replaceWith(
+	           $('<input type="'+type+'"" />').
+	               attr("value",self.attr("value")).
+	               attr("name", self.attr("name")).
+	               attr("onChange",self.attr("onChange"))
+	               //attr("id",self.attr("id")).
+	               //addClass("correct-checkbox")
+	       );
+	    });
+
+	    convert();
+
 	}
 </script>
 </html>
