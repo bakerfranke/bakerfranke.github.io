@@ -11,8 +11,11 @@
 
 	<style type="text/css">
 		body{
-			font-family: serif;
+			font-family: sans-serif;
 			margin-left: 5px;
+		}
+		textarea{
+			font-family: serif;
 		}
 		.container{
 
@@ -20,8 +23,9 @@
 		#leftCol{
 			background-color: #d9f3f5;
 		}
-		#output{
+		#output_2{
 			border: solid 1px black;
+			font-family: serif;
 		}
 		#jsonOutput{
 			width: 100%;
@@ -121,10 +125,13 @@
 	<p>Load Example: 
 		<select id="exampleSelect">
 			<option value=""> </options>
-			<option value=0>Example 1</option>
-			<option value=1>Example 2</option>
-			<option value=2>Example 3</option>
+			<option value=0>Ex. 1 - Logic gates</option>
+			<option value=1>Ex. 2 - Boolean Logic</option>
+			<option value=2>Ex. 3 - Internet Terms</option>
+			<option value=3>Ex. 4 - Cybersecurity</option>
+			<option value=4>Ex. 5 - Array swap</option>
 		</select>
+		<button class="btn btn-xs btn-primary" id="clearBtn">New Question</button>
 		<br>
 		<div class="row" >
 			<div class="col-sm-4" id="leftCol">
@@ -144,7 +151,7 @@
 						
 						<br>
 						<strong>Question text:</strong> <br>
-						<textarea id="qText" style="width: 100%" placeholder="enter markdown"></textarea>
+						<textarea id="qText" style="width: 100%" placeholder="enter markdown" class="convertOnInput"></textarea>
 						<br> 
 					</div>
 				</div>
@@ -153,13 +160,13 @@
 						<br>
 						<strong>Answers:</strong> <br>
 						(A) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_a"> correct
-						<textarea class="answer_input" id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
+						<textarea class="answer_input" id="answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"  class="convertOnInput"></textarea>
 						(B) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_b"> correct
-						<textarea class="answer_input" id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
+						<textarea class="answer_input" id="answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"  class="convertOnInput"></textarea>
 						(C) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_c"> correct
-						<textarea class="answer_input" id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
+						<textarea class="answer_input" id="answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"  class="convertOnInput"></textarea>
 						(D) &nbsp; &nbsp; <input type="checkbox" name="correct" onchange="convert()" value="answer_d"> correct
-						<textarea class="answer_input" id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
+						<textarea class="answer_input" id="answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"  class="convertOnInput"></textarea>
 					</div>
 				</div>
 				<br>
@@ -183,18 +190,55 @@
 					<div class="col-sm-12">
 						<strong>Explanation of Answers: </strong><br>
 						(A) <span id="answer_a_correct">This option is incorrect</span>
-						<textarea id="expl_answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"></textarea>
+						<textarea id="expl_answer_a" style="width: 100%" placeholder="enter markdown for Answer (A)"  class="convertOnInput"></textarea>
 						
 						(B) <span id="answer_b_correct">This option is incorrect</span>
-						<textarea id="expl_answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"></textarea>
+						<textarea id="expl_answer_b" style="width: 100%" placeholder="enter markdown for Answer (B)"  class="convertOnInput"></textarea>
 					
 						(C) <span id="answer_c_correct">This option is incorrect</span>
-						<textarea id="expl_answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"></textarea>
+						<textarea id="expl_answer_c" style="width: 100%" placeholder="enter markdown for Answer (C)"  class="convertOnInput"></textarea>
 						
 						(D) <span id="answer_d_correct">This option is incorrect</span>
-						<textarea id="expl_answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"></textarea>
+						<textarea id="expl_answer_d" style="width: 100%" placeholder="enter markdown for Answer (D)"  class="convertOnInput"></textarea>
 					</div>
 				</div>
+				<!-- <div class="row">
+					<br>
+					<div class="btn-group btn-group-xs col-sm-6">
+						<button id="saveAsBtn" class="btn btn-primary">Save...</button>
+						<button id="deleteBtn" class="btn btn-primary" disabled>Delete</button>
+					</div>
+					<div class="btn-group btn-group-xs col-sm-6">
+						<button id="clearBtn" class="btn btn-primary" disabled>Clear fields</button>
+					</div><br>
+					<div class="col-sm-12" id="saveAsDialog">
+						Author: <input type="text" id="authorName" placeholder="Enter your name"> <br>
+						Project: <input type="text" id="save_project_name" placeholder="enter project title"><button id="saveBtn" class="btn-xs btn-success">Save</button>
+					</div>
+					<div class="col-sm-12">
+
+						Load saved project: <select id="saved_projects">
+							<option>A</option>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<br>
+					<div class="col-sm-4">Author:</div>
+					<div class="col-sm-4">Title:</div>
+					<div class="col-sm-4"> </div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4">
+						<input type="text" id="authorName" placeholder="Enter your name">
+					</div>
+					<div class="col-sm-4">
+						<input type="text" id="save_project_name" placeholder="enter project title">
+					</div>
+					<div class="col-sm-4">
+						<button id="saveBtn" class="btn-xs btn-success">Save</button>
+					</div>
+				</div> -->
 				<p> </p>
 			</div>
 			<!--- Markdown output area -->
@@ -266,7 +310,7 @@
 	ctp.P6 = "Collaborating"
 
 	var converter = new showdown.Converter();
-	//converter.setFlavor('github');
+	converter.setFlavor('github');
 	converter.setOption('tables','true');
 	var text = "# Hello World"
 	var html = converter.makeHtml(text);
@@ -289,7 +333,7 @@
 		convert();
 	}
 
-	
+	//$("#saveAsDialog").hide();
 	
 	//** TO DO: refactor event handler attachment to use JQuery so can attach
 	// to entire class of objects  with .on("input", convert)
@@ -311,6 +355,21 @@
 	document.getElementById("jsonOutput").addEventListener("change", loadFromJSONoutput);
 
 	document.getElementById('exampleSelect').addEventListener("input", loadExample);
+
+	$("#clearBtn").on("click", reset);
+
+	//$("#saveAsBtn").on("click", revealSaveDialog);
+
+	// function revealSaveDialog(){
+	// 	$("#saveAsDialog").show();
+	// }
+
+	function reset(){
+		console.log("RESETTING");
+		resetJSONObj();
+		loadInputFields(obj);
+		convert();
+	}
 
 	function resetJSONObj(){
 
@@ -478,7 +537,10 @@
 		$("#answer_c_correct").html(getIsCorrectText("answer_c"));
 		$("#answer_d_correct").html(getIsCorrectText("answer_d"));
 
-
+		// for anything that's `code`  convert <-- to &larr; in html
+		$("code").each(function(){ 
+			$(this).html($(this).html().replace(/&lt;--/g,"&larr;"))
+		})
 		/**
 			Dump pretty json into textarea
 		**/
