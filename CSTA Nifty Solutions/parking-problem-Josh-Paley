@@ -1,0 +1,8 @@
+function placeCars(start, end){
+    if( end - 1.0 - start < 0) return 0;
+    var carStart = randBetween(start, end-1.0);
+  var leftNum = placeCars(start, carStart);
+  var rightNum = placeCars(carStart + 1.0, end);
+
+  return 1+leftNum+rightNum;
+}

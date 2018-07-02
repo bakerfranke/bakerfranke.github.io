@@ -24,6 +24,29 @@
  	var currUnitNumber = 2;
  	var currLessonNumber = 2;
  	var letterString = "";
+
+ 	var map = {};
+ 	for(var i=0; i<arr.length; i++){
+ 		
+ 		if(map[arr[i][UNIT]] == undefined){ 
+
+ 			map[arr[i][UNIT]]={};
+ 		}
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]]={};
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]] = {}
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]] = [];
+
+ 		map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]].push(arr[i][EK]);
+
+ 	}
+
+
  	append("Unit 1: "+arr[0][UNIT]);
  	append("\t1. "+arr[0][LESSON])
  	for(var i=1; i<arr.length; i++){
@@ -83,6 +106,8 @@
 
  		
  	}
+
+
  	console.log("Done with Mapping")
 
 
@@ -111,7 +136,7 @@
  	console.log("EKs with Count == 0");
  	for(var k in allEKs){
  		if(allEKs[k]==0){
- 			console.log(k);
+ 			console.log(cspframework[k]);
  		}
  	}
 

@@ -275,6 +275,7 @@
         cspframework["6.1"]="6.1 The Internet is a network of autonomous systems.";
         cspframework["6.1.1"]="6.1.1 Explain the abstractions in the Internet and how the Internet functions. [P3]";
         cspframework["6.1.1A"]="6.1.1A The Internet connects devices and networks all over the world.";
+        cspframework["6.1.1B"]="6.1.1B An end to end architecture facilitates connecting new devices and networks on the Internet.";
         cspframework["6.1.1C"]="6.1.1C Devices and networks that make up the Internet are connected and communicate using addresses and protocols.";
         cspframework["6.1.1D"]="6.1.1D The Internet and the systems built on it facilitate collaboration.";
         cspframework["6.1.1E"]="6.1.1E Connecting new devices to the Internet is enabled by assignment of an Internet protocol (IP) address.";
