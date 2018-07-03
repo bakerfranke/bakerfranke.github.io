@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <style type="text/css">
+        .question_box {
+        	border: solid 1px black;
+        	margin-bottom: 20px;
+        	width: 900px;
+        	padding: 10px;
+        	background-color: #efefef
+        }
+        .is_correct_true{
+        	background-color: #EEFFEE;
+        }
+        .answer{
+        	margin-bottom: 5px;
+        }
+        body{
+        	padding-left: 20px;
+        }
+        </style>
+        	<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.7.4/showdown.min.js"></script>
+
+         <!-- <script type="text/javascript" src="rqb_export.js"></script> -->
+           <script
+  src="https://code.jquery.com/jquery-3.1.1.js"
+  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+  crossorigin="anonymous"></script>
+        <script type="text/javascript">
+
+        var converter = new showdown.Converter();
+		converter.setFlavor('github');
+		converter.setOption('tables','true');
+		var allQs = null;
+		var reader = new FileReader();
+
+		reader.onload = function(e){
+			allQs = JSON.parse(reader.result);
+			$("#status").html("Loading <b>"+allQs.length+"</b> questions.  Please wait...");
+
+			setTimeout(function(){
+				displayAllQs();
+				}, 25);
+		}
+		
+
+        	$(document).ready(function(){
+        		$("#output").val("hello");
+        		converter = new showdown.Converter();
+				converter.setFlavor('github');
+				converter.setOption('tables','true');
+
+
+        		document.getElementById('qfile').addEventListener('change', handleFileSelect, false);
+        		if(allQs!=null){
+	        		displayAllQs();
+	        	}
+
+        	});
+        	function displayAllQs(){
+
+
+        		for(var i=0; i<allQs.length; i++){
+        			if(i%100==0){
+        			}
+        			$("#allQs").append(makeQBox(allQs[i]));
+        		}
+        		$("#status").html("");
+
+        	}
+
+        	function makeQBox(obj){
+        		var html="";
+        		html+="(id: "+obj.id+") EU: "+obj.enduring_understaning+" LO: "+obj.learning_objective;
+        		html+="<div class='question_box'>";
+        		html+=converter.makeHtml(obj.question);
+        		html+="<details><summary>answers</summary>";
+        		html+="<ol type='a'>";
+
+        		for(var i=0; i<obj.answer_choices.length; i++){
+        			var ans = obj.answer_choices[i];
+        			html+="<li class='answer is_correct_"+ans.is_correct+"'>"+converter.makeHtml(ans.text)+"</li>";
+        		}
+        		html+="</ol></details>";
+
+        		html+="</div>";
+        		return html;
+
+        	}
+        
+
+        	function handleFileSelect(evt){
+        		var file = evt.target.files[0];
+        		reader.readAsText(file);
+        		console.log("loaded? "+file);
+
+
+        	}
+        </script>
+    </head>
+    <body>
+    	<input id='qfile' type=file>
+
+    	<h1>RQB question bank</h1>
+    	<div id="status">status </div>
+    	<div id="allQs">
+
+    	</div>
+
+    </body>
+</html>
