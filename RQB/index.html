@@ -2,11 +2,16 @@
     <head>
         <style type="text/css">
         .question_box {
-        	border: solid 1px black;
+        	border: solid 1px #00adbc;
         	margin-bottom: 20px;
         	width: 900px;
         	padding: 10px;
-        	background-color: #efefef
+        	background-color: #efefef;
+        }
+        .standards_box{
+            border-bottom: solid 1px #00adbc;
+            font-family: sans-serif;
+            font-size: 70%;
         }
         .is_correct_true{
         	background-color: #EEFFEE;
@@ -32,16 +37,44 @@
 		converter.setOption('tables','true');
 		var allQs = null;
 		var reader = new FileReader();
+        var eus = {};
+        var los = {};
+        var eks = {};
+        var uniqueQs = [];
 
 		reader.onload = function(e){
 			allQs = JSON.parse(reader.result);
-			$("#status").html("Loading <b>"+allQs.length+"</b> questions.  Please wait...");
+
+
+
+            var qtext_hash = {};
+            // find all unique Qs by hashing on question text
+            // add a list to the question object, to hold other question ids that have this same question text
+            for(var i = 0; i<allQs.length; i++){
+                var qtext = allQs[i].question;
+                if(qtext_hash[qtext] == undefined){
+                    qtext_hash[qtext] = allQs[i];
+                    qtext_hash[qtext].otherids=[allQs[i].id];
+                }
+                else{
+                    qtext_hash[qtext].otherids.push(allQs[i].id);
+                }
+            }
+            // get unique qs into array to mimic allQs from JSON
+            for(var k in qtext_hash){
+                uniqueQs.push(qtext_hash[k]);
+            }
+
+            $("#status").html("Loading <b>"+allQs.length+"</b> questions.  Please wait...");
+            $("#status").html("Found <b>"+uniqueQs.length+"</b> UNIQUE questions out of "+allQs.length+" in file.  Please wait...");
 
 			setTimeout(function(){
+
 				displayAllQs();
-				}, 25);
+			}, 25);
 		}
 		
+
 
         	$(document).ready(function(){
         		$("#output").val("hello");
@@ -59,19 +92,89 @@
         	function displayAllQs(){
 
 
-        		for(var i=0; i<allQs.length; i++){
-        			if(i%100==0){
-        			}
-        			$("#allQs").append(makeQBox(allQs[i]));
+        		for(var i=0; i<uniqueQs.length; i++){
+        		//for(var i=0; i<150; i++){	
+        			$("#allQs").append(makeQBox(uniqueQs[i]));
+                    //map_standards(allQs[i]);
+
         		}
+
+                 $("#status").html("Maping EUs....");
+                 //map_eus();
+                 map_standards(eus, "enduring_understanding")
+                 add_options("#eu_select",eus, "enduring_understanding");
+                 //add_eu_options();
+
+                $("#status").html("Maping LOs....");
+
+                 //map_los();
+                 map_standards(los, "learning_objective")
+                 add_options("#lo_select", los, "learning_objective");
+                 //add_lo_options();
+                 $("#status").html("Maping EKs....");
+
+                 map_eks();
+                 add_options("#ek_select", eks, "essential_knowledge");
+                 //add_ek_options();
         		$("#status").html("");
+
+            $("#status").html(uniqueQs.length+" unique questions loaded.");
 
         	}
 
+            function add_options(id, dict, key){
+                var keys = Object.keys(dict).sort();
+                for(var i in keys){
+                    $(id).append("<option value='"+keys[i]+"'>"+keys[i]+" ("+dict[keys[i]].length+")</option>");
+                }
+                add_select_event_listener(id, key);
+            }
+
+
+            function add_select_event_listener(id, standard){
+                $(id).on("change", function(){
+                    console.log("CHANGED! "+ $(this).val() );
+                    var eu = $()
+                    for(var i in uniqueQs){
+                        $("#"+uniqueQs[i].id).hide();
+
+                        if(uniqueQs[i][standard] == $(this).val() || $(this).val()=="all"){
+                            $("#"+uniqueQs[i].id).show();
+                        }
+
+
+                    }
+                });
+            }
+
+            function map_standards(list, standard){
+                 for(var i=0; i<uniqueQs.length; i++){
+                    var std = uniqueQs[i][standard]
+                    if(list[std]==undefined) list[std] = [];
+                    list[std].push(uniqueQs[i].id);
+                }
+            }
+
+
+            function map_eks(){
+                for(var i=0; i<uniqueQs.length; i++){
+                    var ek_list = uniqueQs[i].essential_knowledge;
+
+                    for(var j=0; j<ek_list.length; j++){
+                        var ek = ek_list[j];
+                        if(eks[ek]==undefined) eks[ek] = [];
+                        eks[ek].push(uniqueQs[i].id);
+                    }
+                }
+            }
+
+
+
         	function makeQBox(obj){
         		var html="";
-        		html+="(id: "+obj.id+") EU: "+obj.enduring_understaning+" LO: "+obj.learning_objective;
-        		html+="<div class='question_box'>";
+
+        		html+="<div class='question_box' id='"+obj.id+"'>";
+                 html+="<div class='standards_box'>"+obj.enduring_understanding+" <strong>"+obj.essential_knowledge+"</strong> ("+obj.id+") </div>";
         		html+=converter.makeHtml(obj.question);
         		html+="<details><summary>answers</summary>";
         		html+="<ol type='a'>";
@@ -86,6 +189,18 @@
         		return html;
 
         	}
+
+            function printKeys(){
+
+                for(var k in allQs[0]){ 
+                   console.log(k+" ("+typeof(k)+")");
+                   if(typeof(allQs[0][k])=="object"){
+                        for(var j in allQs[0][k] ){
+                            console.log("\t"+j+" ("+typeof(j)+")");
+                        }
+                   }
+                }
+            }
         
 
         	function handleFileSelect(evt){
@@ -99,6 +214,9 @@
     </head>
     <body>
     	<input id='qfile' type=file>
+        EUs: <select id='eu_select'><option value="all">show all</option></select>
+        LOs: <select id='lo_select'><option value="all">show all</option></select>
+        EKs: <select id='ek_select'><option value="all">show all</option></select>
 
     	<h1>RQB question bank</h1>
     	<div id="status">status </div>

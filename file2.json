@@ -1,0 +1,31 @@
+{
+  "type": "singleSelect",
+  "qText": "In the following code block, assume that the variables Rainy and too_cold are boolean.\n\n    IF (NOT (Rainy OR too_cold))\n    {\n        DISPLAY(“It’s a good beach day”)\n    }\n\nWhich of the following are equivalent to the above code block?",
+  "eu": "5.5 Programming uses mathematical and logical concepts.",
+  "lo": "5.5.1 Employ appropriate mathematical and logical concepts in programming. [P1]",
+  "ctp": "Connecting computing",
+  "ek": "5.5.1E",  
+  "difficulty": "3",
+  "answers": {
+    "answer_a": {
+      "text": "\n\n    IF (( NOT rainy) OR (NOT tooCold)\n    {\n        DISPLAY(\"It's a good beach day\")\n    }\n",
+      "expl": "`NOT` can’t be distributed over `OR`",
+      "correct": 0
+    },
+    "answer_b": {
+      "text": "\n\n    IF (( NOT rainy) AND  tooCold)\n    {\n        DISPLAY(\"It's a good beach day\")\n    }",
+      "expl": "`NOT` needs to be applied to the second clause as well",
+      "correct": 0
+    },
+    "answer_c": {
+      "text": "\n\n    IF (( NOT rainy) AND (NOT tooCold)\n    {\n        DISPLAY(\"It's a good beach day\")\n    }",
+      "expl": "This option makes sense in a real­-world setting and also adheres to DeMorgan’s law",
+      "correct": 1
+    },
+    "answer_d": {
+      "text": "\n\n    IF (rainy AND tooCold)\n    {\n        DISPLAY(\"It's a good beach day\")\n    }",
+      "expl": "`NOT` needs to be applied to each clause",
+      "correct": 0
+    }
+  }
+}

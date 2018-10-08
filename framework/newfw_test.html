@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            td, p{
+                font-family: sans-serif;
+                font-size: 12px;
+                vertical-align: bottom;
+            }
+            eu{
+                background-color: #FFFFAA;
+                
+            }
+            lo{
+                background-color: #AAFFAA; 
+                margin-left: 20px;
+
+            }
+            ek{
+                background-color: #FFAAAA; 
+                margin-left: 40px;
+            }
+            
+            #highlight{
+                 
+             
+               
+                
+                text-decoration: underline;
+                font-weight: bold;
+                font-size: 12px;
+                
+            }
+            #fwTextarea{
+                font-family: sans-serif;
+                font-size: 11px;
+                overflow: scroll;
+                
+            }
+            #fwOutputFixedWidth{
+                 font-family: monospace;   
+            }
+            .fwOutput{
+                
+                width: 700px;
+                border: solid 1px;
+                min-height: 100px;
+                height: 100%;
+                  resize: both;
+            overflow: auto;
+                
+            }
+        </style>
+        <script type="text/javascript" src="frameworkArray.js"></script>
+        <script type="text/javascript">
+     
+    </script>
+    </head>
+    <body>
+
+
+<P> 
+
+    <h3>Keyword search</h3>
+    <table width=100%>
+        <tr>
+            <td width=100% valign=bottom>
+                Type in keywords you want to search for (separate by space, comma, or line).<br>
+                <input type=text id="keywordPlaintext" onkeyup="findKeywords()" style="width: 50%; border: solid 3px #0099AA; font-size: 14pt"><span id="lineCount"  style="color: #008899; font-size: 14pt"> Line Count: </span>
+                <div id="keywordOutput" class="fwOutput" style="height: 200px; width:100%"></div>
+
+            </td>
+        
+    </table>
+    <h3>CSP Framework Quick Lookup</h3>
+    <table>
+        <tr>
+            <td>
+                 Mouseover thumbnail of framework.<br>
+                 Click to freeze/unfreeze.<br>
+                 <canvas id="myCanvas" width="275px" height="400px" style="border:1px solid #000000;" onmousemove="canvasMouse(event)" onclick="toggleScrollPause()"></canvas>
+            </td>
+            <td>
+                 Selected Line of Framework:<br>
+                 <div style="height: 400px; width: 800px;" id="fwTextarea"></div>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <p>This resource is &copy; Baker Franke 2016. If there are bugs contact me at baker [at] code [dot] org</P>
+    <p>While this version should be considered the up-to-date version - it is supposedly hosted at <a href="http://csprinciples.org">csprinciples.org</a> as well, but here is a direct link to it <a href="http://www.cs.duke.edu/csed/csprinciples/framework/">CSP Framework tool</a>
+        </p>
+    <p>The information for this comes from the 2016 AP CS Principles Course & Exam Description (CED) <a  href="http://bit.ly/apcsp-ced2016">http://bit.ly/apcsp-ced2016</a></p>
+        
+    </body>
+
+</html>
