@@ -1,0 +1,169 @@
+<html>
+<head>
+	<title></title>
+	 <script type="text/javascript" src="cspcurricmappings.js"></script>
+        <script type="text/javascript" src="frameworkArray.js"></script>
+
+
+
+</head>
+<body>
+
+	<textarea id="out" cols=80 rows=50></textarea>
+
+</body>
+
+ <script type="text/javascript">
+
+ 	var UNIT = 0;
+ 	var LESSON = 1;
+ 	var EU = 2;
+ 	var LO = 3;
+ 	var EK = 5;
+
+ 	var currUnitNumber = 2;
+ 	var currLessonNumber = 2;
+ 	var letterString = "";
+
+ 	var map = {};
+ 	for(var i=0; i<arr.length; i++){
+ 		
+ 		if(map[arr[i][UNIT]] == undefined){ 
+
+ 			map[arr[i][UNIT]]={};
+ 		}
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]]={};
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]] = {}
+
+ 		if(map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]] == undefined) 
+ 			map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]] = [];
+
+ 		map[arr[i][UNIT]][arr[i][LESSON]][arr[i][EU]][arr[i][LO]].push(arr[i][EK]);
+
+ 	}
+
+
+ 	append("Unit 1: "+arr[0][UNIT]);
+ 	append("\t1. "+arr[0][LESSON])
+ 	for(var i=1; i<arr.length; i++){
+		
+		if(arr[i][LO]==arr[i-1][LO]){
+ 			letterString += arr[i-1][EK];
+ 		}
+ 		if(arr[i][LO]!==arr[i-1][LO]){
+ 			letterString += arr[i-1][EK];
+ 			var practice = cspframework[arr[i-1][LO]];
+ 			var pNum = practice.substring(practice.length-4);
+ 			append("\t\t"+arr[i-1][EU]+"\t"+arr[i-1][LO]+pNum+" ("+letterString+")");
+ 			letterString="";
+ 		}
+
+ 		if(arr[i][UNIT]!==arr[i-1][UNIT]){
+ 			append("Unit "+currUnitNumber+": "+arr[i][UNIT]);
+ 			currUnitNumber++;
+ 			currLessonNumber = 1;
+ 		}
+ 		if(arr[i][LESSON]!==arr[i-1][LESSON]){
+ 			append("\t"+currLessonNumber+". "+arr[i][LESSON]);
+ 			currLessonNumber++;
+ 		}
+
+ 		
+
+
+
+ 		// for(var col=0; col<arr[i].length; col++){
+
+ 		// 	if(arr[i][col]!==arr[i-1][col]){
+ 		// 		var tabs = Array(col+2).join("\t");
+
+ 		// 		if(col==EK){
+ 		// 			letterString+=arr[i][col];
+ 		// 		}
+ 				
+ 		// 		if(col==UNIT){
+ 		// 			append(tabs+arr[i][UNIT])
+ 		// 		}
+ 		// 		if(col==LESSON){
+ 		// 			append(tabs+arr[i][LESSON])
+ 		// 		}
+ 		// 		if(col==LO){
+ 		// 			//append(tabs+letterString);
+ 		
+ 		// 			append(tabs+arr[i-1][col]+" "+letterString);
+ 		// 			letterString="";
+ 		// 		}
+
+
+
+ 		// 	}
+
+ 		// }
+
+ 		
+ 	}
+
+
+ 	console.log("Done with Mapping")
+
+
+	var fwkeys = Object.keys(cspframework)
+	var allEKs = {};
+	for(var i=0; i<fwkeys.length; i++){
+	  if(fwkeys[i].match(/[A-Z]/g)!=null){
+	     allEKs[fwkeys[i]]=0;
+	  }
+	}
+
+ 	//var allMappings = {};
+
+ 	for(var i=0; i<arr.length; i++){
+		
+		var key = arr[i][LO]+arr[i][EK];
+		//if(allMappings[key]==undefined){
+		//	allMappings[key]=0;
+		//}
+		//allMappings[key]++;	
+		allEKs[key]++;
+
+ 		
+ 	}
+
+ 	console.log("EKs with Count == 0");
+ 	for(var k in allEKs){
+ 		if(allEKs[k]==0){
+ 			console.log(cspframework[k]);
+ 		}
+ 	}
+
+
+ 	console.log("Done with Inventory")
+
+ 	append("\n\n------------------\n\n")
+ 	// var keys2 = Object.keys(allEKs);
+ 	// for(var i=0; i<keys2.length; i++){
+ 	// 	//console.log(allEKs[keys2[i]]+"\t"+cspframework[keys2[i]]);
+ 	// 	append(allEKs[keys2[i]]+"\t"+cspframework[keys2[i]]);
+ 	// }
+
+ 	for(var i=0; i<fwkeys.length; i++){
+ 		var tabs = Array(Math.floor(fwkeys[i].length/2)).join("\t");
+
+ 		if(allEKs[fwkeys[i]]==undefined){
+ 			append(tabs+cspframework[fwkeys[i]]);
+ 		}
+ 		else{
+ 			append("\t\t"+allEKs[fwkeys[i]]+"\t"+cspframework[fwkeys[i]]);
+ 		}
+ 	}
+
+ 	function append(str){
+	 	document.getElementById("out").value += str+"\n";
+	}
+
+	 </script>
+</html>
