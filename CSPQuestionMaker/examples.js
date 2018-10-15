@@ -5,7 +5,7 @@
   "qText": "What value of A would make the output of the logic circuit `false`?\n\n\n<img src=\"https://preview.ibb.co/iWHjgv/Screen_Shot_2017_09_10_at_6_13_58_PM.png\" alt=\"Screen_Shot_2017_09_10_at_6_13_58_PM\" border=\"0\" style=\"width: 250px; margin:auto; display:block\">\n",
   "eu": "2.2 Multiple levels of abstraction are used to write programs or create other computational artifacts",
   "lo": "2.2.3 Identify multiple levels of abstractions that are used when writing programs. [P3]",
-  "ek": "2.2.3F",
+  "eks": ["2.2.3F"],
   "ctp": "Abstracting",
   "difficulty": "4",
   "answers": {
@@ -38,7 +38,7 @@
   "eu": "5.5 Programming uses mathematical and logical concepts.",
   "lo": "5.5.1 Employ appropriate mathematical and logical concepts in programming. [P1]",
   "ctp": "Connecting computing",
-  "ek": "5.5.1E",
+  "eks": ["5.5.1E"],
   "difficulty": "3",
   "answers": {
     "answer_a": {
@@ -70,7 +70,7 @@ examples[2] = {
   "eu": "6.1 The Internet is a network of autonomous systems.",
   "lo": "6.1.1 Explain the abstractions in the Internet and how the Internet functions. [P3]",
   "ctp": "Abstracting",
-  "ek": "6.1.1B",
+  "eks": ["6.1.1B"],
   "difficulty": "3",
   "answers": {
     "answer_a": {
@@ -102,7 +102,7 @@ examples[3] = {
   "eu": "6.3 Cybersecurity is an important concern for the Internet and the systems built on it.",
   "lo": "6.3.1 Identify existing cybersecurity concerns and potential options to address these issues with the Internet and the systems built on it. [P1]",
   "ctp": "Connecting computing",
-  "ek": "6.3.1C",
+  "eks": ["6.3.1C"],
   "difficulty": "2",
   "answers": {
     "answer_a": {
@@ -133,7 +133,7 @@ examples[4] = {
   "qText": "You are writing a function called `swap (list, x, y)` which will exchange the position of the two values at indexes x and y in the list.\n\nExample: before and after a call to `swap (list, 2, 3)` on the list shown below\n\n<img src=\"https://preview.ibb.co/byCrDa/Screen_Shot_2017_09_11_at_1_59_14_PM.png\" alt=\"Screen_Shot_2017_09_11_at_1_59_14_PM\" border=\"0\" style=\"display: block; margin: auto; width: 600px\">\n\nThe function header is defined below.  Choose three lines of code that will perform the swap correctly.\n\n    procedure swap (list, x, y) {\n        < MISSING CODE >\n    }",
   "eu": "5.4 Programs are developed, maintained, and used by people for different purposes.",
   "lo": "5.4.1 Evaluate the correctness of a program. [P4]",
-  "ek": "5.4.1F",
+  "eks": ["5.4.1F"],
   "ctp": "Analyzing Problems and Artifacts",
   "difficulty": "4",
   "answers": {

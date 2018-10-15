@@ -28,8 +28,7 @@
 			font-family: serif;
 		}
 		#jsonOutput{
-			width: 100%;
-			height: 200px;
+
 		}
 		#Eks{
 			width: 100%;
@@ -95,9 +94,11 @@
 			font-size: 90%;
 			height: 50px;
 		}
-		#jsonOutput{
+		#jsonOutput, #RQBOutput{
 			font-family: monospace;
 			font-size: 80%;
+						width: 100%;
+			height: 200px;
 		}
 		code{
 			font-family: monospace;
@@ -265,7 +266,7 @@
 						<td id='eu_disp'>"+obj.eu+"</td>
 						<td id='lo_disp'>"+obj.lo+"</td>
 						<td id='ctp_disp'>"+obj.ctp+"</td>
-						<td id='ek_disp'>"+obj.ek+"</td>
+						<td id='ek_disp'>"+obj.eks+"</td>
 						<td id='difficulty_disp'>"+obj.difficulty+"</td>
 
 						</tr>
@@ -290,8 +291,15 @@
 			</div>
 		</div>
 		<div class="row">
-			JSON output:<br>
+			Baker's JSON format:<br>
 			<textarea id="jsonOutput">
+
+			</textarea>
+		</div>
+		<div class="row">
+			<br><hr><br>
+			RQB JSON format:<br>
+			<textarea id="RQBOutput">
 
 			</textarea>
 		</div>
@@ -328,7 +336,7 @@
 		console.log("loading from localStorage --> "+localStorage.jsonOutput+" <--")
 		obj = JSON.parse(localStorage.jsonOutput);
 
-		console.log("\n\n local.ek = "+obj.ek);
+		console.log("\n\n local.ek[0] = "+obj.eks[0]);
 		loadInputFields(obj)
 		convert();
 	}
@@ -371,22 +379,61 @@
 		convert();
 	}
 
+	function toRQB_format(){
+
+		var rqb = {};
+		rqb.question = obj.qText;
+		rqb.answer_choices = []
+
+		rqb.answer_choices[0]={};
+		rqb.answer_choices[0].text = obj.answers["answer_a"].text;
+		rqb.answer_choices[0].reason = obj.answers["answer_a"].expl;
+		rqb.answer_choices[0].is_correct = obj.answers["answer_a"].correct == 1 ? "true":"false";
+
+		rqb.answer_choices[1]={};
+		rqb.answer_choices[1].text = obj.answers["answer_b"].text;
+		rqb.answer_choices[1].reason = obj.answers["answer_b"].expl;
+		rqb.answer_choices[1].is_correct = obj.answers["answer_b"].correct == 1 ? "true":"false";
+
+		rqb.answer_choices[2]={};
+		rqb.answer_choices[2].text = obj.answers["answer_c"].text;
+		rqb.answer_choices[2].reason = obj.answers["answer_c"].expl;
+		rqb.answer_choices[2].is_correct = obj.answers["answer_c"].correct == 1 ? "true":"false";
+
+		rqb.answer_choices[3]={};
+		rqb.answer_choices[3].text = obj.answers["answer_d"].text;
+		rqb.answer_choices[3].reason = obj.answers["answer_d"].expl;
+		rqb.answer_choices[3].is_correct = obj.answers["answer_d"].correct == 1 ? "true":"false";
+
+		rqb.enduring_understanding = obj.eu;
+		rqb.learning_objective = obj.lo;
+
+		rqb.essential_knowledge = [];
+		rqb.essential_knowledge = obj.eks;
+
+		rqb.computational_thinking_practice = obj.ctp;
+
+		
+		$("#RQBOutput").val(JSON.stringify(rqb, null, 2));
+		return rqb;
+	}
+
 	function resetJSONObj(){
 
-	obj = {};
-	obj.qType = 'unknown';
-	obj.qText = ""
-	obj.eu = "";
-	obj.lo = "";
-	obj.ctp = "";
-	obj.ek = "";
-	obj.difficulty = "1";
+		obj = {};
+		obj.qType = 'unknown';
+		obj.qText = ""
+		obj.eu = "";
+		obj.lo = "";
+		obj.ctp = "";
+		obj.eks = [];
+		obj.difficulty = "1";
 
-	obj.answers = {};
-	obj.answers["answer_a"] = {};
-	obj.answers["answer_b"] = {};
-	obj.answers["answer_c"] = {};
-	obj.answers["answer_d"]= {};
+		obj.answers = {};
+		obj.answers["answer_a"] = {};
+		obj.answers["answer_b"] = {};
+		obj.answers["answer_c"] = {};
+		obj.answers["answer_d"]= {};
 
 	}
 
@@ -396,6 +443,7 @@
 		//console.log(JSON.parse(examples[ex]));
 		
 		$("#jsonOutput").val(JSON.stringify(examples[ex],null,2));
+		toRQB_format();
 
 		loadFromJSONoutput();
 		
@@ -425,7 +473,7 @@
 			}
 		}		
 
-		$("#EKs").val(obj.ek);
+		$("#EKs").val(obj.eks.join(", "));
 		$("#difficulty").val(obj.difficulty);
 		
 
@@ -489,10 +537,11 @@
 		// Difficulty
 		obj.difficulty = $("#difficulty").val();
 
-		// Figure out which EU, LO and CTP based on EK that was selected
-		obj.ek = $("#EKs").val()[0];
-		if(obj.ek != null){
-			var fw = obj.ek.split(/[.A-Z]/); //break ek into components
+		// Figure out which EU, LO and CTP based on first EK that was selected
+		obj.eks = $("#EKs").val();
+
+		if(obj.eks[0] != null){
+			var fw = obj.eks[0].split(/[.A-Z]/); //break ek into components
 			obj.eu = cspframework[fw[0]+"."+fw[1]];
 			obj.lo = cspframework[fw[0]+"."+fw[1]+"."+fw[2]];
 			obj.ctp = ctp[obj.lo.substr(obj.lo.indexOf("[")+1, 2)]
@@ -520,7 +569,7 @@
 		$("#eu_disp").html(obj.eu);
 		$("#lo_disp").html(obj.lo);
 		$("#ctp_disp").html(obj.ctp);
-		$("#ek_disp").html(obj.ek);
+		$("#ek_disp").html( obj.eks.join(", "));
 		$("#difficulty_disp").html(obj.difficulty);
 
 		/**
@@ -542,9 +591,10 @@
 			$(this).html($(this).html().replace(/&lt;--/g,"&larr;"))
 		})
 		/**
-			Dump pretty json into textarea
+			Dump pretty json into textarea, AND RQB area
 		**/
 		$("#jsonOutput").val(JSON.stringify(obj, null, 2));
+		toRQB_format();
 
 		/**
 			Save json local so don't lose changes on page reload
