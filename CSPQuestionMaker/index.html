@@ -325,6 +325,7 @@
 	console.log(html);
 
 	var obj = {};
+	var rqb = {};
 
 	resetJSONObj();
 	
@@ -379,9 +380,35 @@
 		convert();
 	}
 
+	function toMultiLevel(){
+		var name = "name '[name this level]_CSP_"+obj.eks[0].slice(0,-1).replace(/\./g,"_")+"'\n\n"
+
+
+		var question_md = "markdown <<MARKDOWN\n"
+		question_md += obj.qText;
+		question_md += "\nMARKDOWN\n\n" 
+
+		var answers = "";
+		var teacher_md = "teacher markdown <<MARKDOWN\n"
+		for(var key in obj.answers){
+			answers += right_or_wrong(key)+" '"+obj.answers[key].text+"'\n"
+			teacher_md += obj.answers[key].expl+"'\n<br><hr><br>\n"
+		}
+		teacher_md += "\nMARKDOWN"
+		
+		return name + answers + question_md + teacher_md
+
+
+	}
+
+	function right_or_wrong(key){
+		return obj.answers[key].correct == 1 ? "right":"wrong"
+	}
+
 	function toRQB_format(){
 
-		var rqb = {};
+		rqb = {};
+		rqb.qType = obj.qType; // not part of RQB format, but useful
 		rqb.question = obj.qText;
 		rqb.answer_choices = []
 
