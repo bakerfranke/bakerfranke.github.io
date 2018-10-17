@@ -388,7 +388,7 @@
 	}
 
 	function toMultiLevel(){
-		var name = "name '[name this level]_CSP_"+obj.eks[0].slice(0,-1).replace(/\./g,"_")+"'\n\n"
+		var name = "name '[name this level]_CSP_"+obj.eks[0].slice(0,obj.eks[0].length-1).replace(/\./g,"_")+"'\n\n"
 
 
 		var question_md = "markdown <<MARKDOWN\n"
