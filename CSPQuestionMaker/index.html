@@ -94,7 +94,7 @@
 			font-size: 90%;
 			height: 50px;
 		}
-		#jsonOutput, #RQBOutput{
+		#jsonOutput, #RQBOutput, #multi_level_output{
 			font-family: monospace;
 			font-size: 80%;
 						width: 100%;
@@ -303,6 +303,13 @@
 
 			</textarea>
 		</div>
+		<div class="row">
+			<br><hr><br>
+			Multi Level:<br>
+			<textarea id="multi_level_output">
+
+			</textarea>
+		</div>
 	</div>
 
 </body>
@@ -396,7 +403,10 @@
 		}
 		teacher_md += "\nMARKDOWN"
 		
-		return name + answers + question_md + teacher_md
+		var out = name + answers + question_md + teacher_md;
+
+		$("#multi_level_output").val(out);
+		return out;
 
 
 	}
@@ -471,6 +481,7 @@
 		
 		$("#jsonOutput").val(JSON.stringify(examples[ex],null,2));
 		toRQB_format();
+		toMultiLevel();
 
 		loadFromJSONoutput();
 		
@@ -622,6 +633,7 @@
 		**/
 		$("#jsonOutput").val(JSON.stringify(obj, null, 2));
 		toRQB_format();
+		toMultiLevel();
 
 		/**
 			Save json local so don't lose changes on page reload
