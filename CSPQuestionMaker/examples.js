@@ -133,27 +133,29 @@ examples[4] = {
   "qText": "You are writing a function called `swap (list, x, y)` which will exchange the position of the two values at indexes x and y in the list.\n\nExample: before and after a call to `swap (list, 2, 3)` on the list shown below\n\n<img src=\"https://preview.ibb.co/byCrDa/Screen_Shot_2017_09_11_at_1_59_14_PM.png\" alt=\"Screen_Shot_2017_09_11_at_1_59_14_PM\" border=\"0\" style=\"display: block; margin: auto; width: 600px\">\n\nThe function header is defined below.  Choose three lines of code that will perform the swap correctly.\n\n    procedure swap (list, x, y) {\n        < MISSING CODE >\n    }",
   "eu": "5.4 Programs are developed, maintained, and used by people for different purposes.",
   "lo": "5.4.1 Evaluate the correctness of a program. [P4]",
-  "eks": ["5.4.1F"],
+  "eks": [
+    "5.4.1F"
+  ],
   "ctp": "Analyzing Problems and Artifacts",
   "difficulty": "4",
   "answers": {
     "answer_a": {
-      "text": "\n\n    var temp <-- list[y]\n    list[x] <-- temp\n    list[y] <-- list[x]",
+      "text": "<pre>\nvar temp <-- list[y]\nlist[x] <-- temp\nlist[y] <-- list[x]\n</pre>",
       "expl": "The data at index `x` is being overwritten by the data in `temp` *before* storing it at index y.  Resulting array: `list[40, 85, 85]`",
       "correct": 0
     },
     "answer_b": {
-      "text": "\n\n    list[x] <-- temp\n    var temp <-- list[y]    \n    list[y] <-- list[x]",
+      "text": "<pre>\nlist[x] <-- temp\nvar temp <-- list[y]    \nlist[y] <-- list[x]\n</pre>",
       "expl": "The value of temp is being assigned *before* the variable has been initialized leading to unpredictable results. Resulting array: unpredictable.",
       "correct": 0
     },
     "answer_c": {
-      "text": "\n\n    list[y] <-- list[x]\n    var temp <-- list[y]\n    list[x] <-- temp\n    \n     \n    ",
+      "text": "<pre>\nlist[y] <-- list[x]\nvar temp <-- list[y]\nlist[x] <-- temp\n</pre>",
       "expl": "The data at index `y` is being overwritten by the data in `temp` *before* storing it at index y.  Resulting array: `list[40, 90, 90]`",
       "correct": 0
     },
     "answer_d": {
-      "text": "\n\n    var temp <-- list[y]\n    list[y] <-- list[x]\n    list[x] <-- temp",
+      "text": "<pre>\nvar temp <-- list[y]\nlist[y] <-- list[x]\nlist[x] <-- temp\n</pre>",
       "expl": "It's important to not that swapping x to y and then y to x will not work.  It is necessary to temporarily store the data of one of the variables to successfully swap the numbers.  To Do the, create a temp variable that holds the data at index `y`. Swap the data at `y` with `x` (move data from index `x` to index `y`), and then set the data at `x` to `temp` which holds the original value of the index `y`.  Resulting array: `list[40, 85, 90]`",
       "correct": 1
     }
