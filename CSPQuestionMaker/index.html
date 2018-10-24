@@ -390,20 +390,20 @@
 	function toMultiLevel(){
 		var name = "name '[name this level]_CSP_"+obj.eks[0].slice(0,obj.eks[0].length-1).replace(/\./g,"_")+"'\n\n"
 
-
+		var type = (obj.qType == "chooseTwo" ? "type 'multi2'":"") + "\n"
 		var question_md = "markdown <<MARKDOWN\n"
 		question_md += obj.qText;
 		question_md += "\nMARKDOWN\n\n" 
 
 		var answers = "";
-		var teacher_md = "teacher markdown <<MARKDOWN\n"
+		var teacher_md = "teacher_markdown <<MARKDOWN\n"
 		for(var key in obj.answers){
-			answers += right_or_wrong(key)+" '"+obj.answers[key].text+"'\n"
-			teacher_md += obj.answers[key].expl+"'\n<br><hr><br>\n"
+			answers += right_or_wrong(key)+" '"+obj.answers[key].text.replace(/<-/g,"&lt;-")+"'\n"
+			teacher_md += obj.answers[key].expl+"\n<br>\n<hr>\n<br>\n"
 		}
 		teacher_md += "\nMARKDOWN"
 		
-		var out = name + answers + question_md + teacher_md;
+		var out = name + type + answers + question_md + teacher_md;
 
 		$("#multi_level_output").val(out);
 		return out;
