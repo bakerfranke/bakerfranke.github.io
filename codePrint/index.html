@@ -72,7 +72,8 @@
 	<div id="inputArea">
 	<h1 class="noblock">AP PT CodePrint</h1>  <strong>&copy;</strong> Baker Franke 2017<br>
 	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.<br>
-	If you can print a PDF from the browser, this should be everything you need.</em> <strong>&copy;</strong> Baker Franke 2017<br><br>
+	If you can print a PDF from the browser, this should be everything you need.</em> <br>
+	<span style="color: #0000AA; width: 600px"><em>**Update: nov 13, 2018 -- added ability to draw up to 3 ovals or rects.</em> It is highly recommended that you only use one rect and one oval for the AP Performance task to avoid confusing the reader. However, in some extreme circumstances your abstraction or algorithm may get split up.</span><br><br>
 	
 	1. Type (or paste) your code into the big box below.  Click this button <button id="doit">Prettify</button> if it doesn't automagically pretty-ify. <br>
 	Optionally add a title or other text to show as a header.<br>
@@ -97,15 +98,16 @@ function updateScore(scoreChange){
 </textarea><br>
 2. Set font size and draw shapes on the code 3. Hide the controls 4. Print to PDF from the browser<br>
 Font Size: <input id="fontSize" type="range" min="1" max="40" step="1" value="12"><span id="fontSizeDisplay">12px</span> |
-Draw Shape:  <select name="drawShapeToggle">
-	<option value="Rect">rect</option>
-	<option value="Rect2">rect 2</option>
-	<option value="Rect3">rect 3</option>
-	<option value="Oval">oval</option>
-	<option value="Oval2">oval 2</option>
-	<option value="Oval3">oval 3</option>
+Draw Shape*:  <select name="drawShapeToggle">
+	<option value="Rect">Rect</option>
+	<option value="Rect2">Rect 2</option>
+	<option value="Rect3">Rect 3</option>
+	<option value="Oval">Oval</option>
+	<option value="Oval2">Oval 2</option>
+	<option value="Oval3">Oval 3</option>
 </select>
-<button id="clearCurrent">Clear</button>
+<button id="clearCurrent">Clear Rect</button><button id="clearAll">Clear All</button><br>
+
 <!--
 <input type="radio" name="drawShapeToggle" value="rect" checked>Rectangle <input type="radio" name="drawShapeToggle" value="oval">Oval <input type="radio" name="drawShapeToggle" value="oval2">Oval 2 <button id="clearRect">Clear Rect</button> <button id="clearOval">Clear Oval</button>
 -->
@@ -291,6 +293,15 @@ Draw Shape:  <select name="drawShapeToggle">
 			var shapeId = "#my" + $("select[name='drawShapeToggle']").val();
 			setSize(shapeId, 0, 0);
 		});
+
+		$("#clearAll").click(function(){
+			setSize("#myOval",0,0);
+			setSize("#myOval2",0,0);
+			setSize("#myOval3",0,0);
+			setSize("#myRect",0,0);
+			setSize("#myRect2",0,0);
+			setSize("#myRect3",0,0);
+		});
 		
 
 		 $("input[name='drawShapeToggle']").change(function(){
@@ -324,6 +335,7 @@ Draw Shape:  <select name="drawShapeToggle">
 
 		 	var shapeVal = $("select[name='drawShapeToggle']").val();
 		 	drawShapeId = "#my"+shapeVal;
+		 	$("#clearCurrent").html("Clear "+shapeVal)
 
 		 	// if(shapeVal=="Oval"){
 		 	// 	drawShapeId="#myOval";
