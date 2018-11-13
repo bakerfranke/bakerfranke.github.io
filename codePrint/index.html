@@ -73,7 +73,12 @@
 	<h1 class="noblock">AP PT CodePrint</h1>  <strong>&copy;</strong> Baker Franke 2017<br>
 	<em>A one-stop shopping browser tool for preparing your code to submit for the AP CSP Performance Tasks.<br>
 	If you can print a PDF from the browser, this should be everything you need.</em> <br>
-	<span style="color: #0000AA; width: 600px"><em>**Update: nov 13, 2018 -- added ability to draw up to 3 ovals or rects.</em> It is highly recommended that you only use one rect and one oval for the AP Performance task to avoid confusing the reader. However, in some extreme circumstances your abstraction or algorithm may get split up.</span><br><br>
+	<span style="color: #AA0055; width: 600px">
+	<details><summary><em>Update: nov 13, 2018 (click to expand)</em></summary>
+	<br>
+	<li> Added ability to draw up to 3 ovals and 3 rectangles.</li>
+	<li> "ovals" bigger than a certain size become rounded rectangles to better support surrounding many-lined sections of code. </li>
+	<br>It is highly recommended that you only use one rect and one oval for the AP Performance task to avoid confusing the reader. However, in some circumstances your abstraction or algorithm may get split up, requiring you to need more than one shape to mark the appropriate sections.</details></span><br><br>
 	
 	1. Type (or paste) your code into the big box below.  Click this button <button id="doit">Prettify</button> if it doesn't automagically pretty-ify. <br>
 	Optionally add a title or other text to show as a header.<br>
@@ -98,7 +103,7 @@ function updateScore(scoreChange){
 </textarea><br>
 2. Set font size and draw shapes on the code 3. Hide the controls 4. Print to PDF from the browser<br>
 Font Size: <input id="fontSize" type="range" min="1" max="40" step="1" value="12"><span id="fontSizeDisplay">12px</span> |
-Draw Shape*:  <select name="drawShapeToggle">
+Draw Shape:  <select name="drawShapeToggle">
 	<option value="Rect">Rect</option>
 	<option value="Rect2">Rect 2</option>
 	<option value="Rect3">Rect 3</option>
@@ -116,14 +121,10 @@ Draw Shape*:  <select name="drawShapeToggle">
 <hr>
 <h1 id="projTitle"></h1>
 <em><span id="otherText"></span></em><br>
-<svg id="canvas"> <!--
-  <ellipse id="myOval" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
-  <ellipse id="myOval2" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
-  <ellipse id="myOval3" cx="0" cy="0" rx="0" ry="0" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
-  -->
-  <rect id="myOval" cx="0" cy="0" rx="100" ry="100" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
-  <rect id="myOval2" cx="0" cy="0" rx="100" ry="100" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
-  <rect id="myOval3" cx="0" cy="0" rx="100" ry="100" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+<svg id="canvas"> 
+  <rect id="myOval" cx="0" cy="0" rx="150" ry="100" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <rect id="myOval2" cx="0" cy="0" rx="150" ry="100" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <rect id="myOval3" cx="0" cy="0" rx="150" ry="100" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
 
   <rect id="myRect" x="0" y="0" width="0" height="0" stroke="rgba(255,0,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
   <rect id="myRect2" x="0" y="0" width="0" height="0" stroke="rgba(255,0,100,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
@@ -285,13 +286,13 @@ Draw Shape*:  <select name="drawShapeToggle">
 		}
 		 //$('input[name=q12_3]:checked').val())
 
-		$("#clearOval").click(function(){
-			setSize("#myOval",0,0);
-		});
+		// $("#clearOval").click(function(){
+		// 	setSize("#myOval",0,0);
+		// });
 
-		$("#clearRect").click(function(){
-			setSize("#myRect",0,0);
-		})
+		// $("#clearRect").click(function(){
+		// 	setSize("#myRect",0,0);
+		// })
 
 		$("#clearCurrent").click(function(){
 			var shapeId = "#my" + $("select[name='drawShapeToggle']").val();
@@ -340,26 +341,6 @@ Draw Shape*:  <select name="drawShapeToggle">
 		 	var shapeVal = $("select[name='drawShapeToggle']").val();
 		 	drawShapeId = "#my"+shapeVal;
 		 	$("#clearCurrent").html("Clear "+shapeVal)
-
-		 	// if(shapeVal=="Oval"){
-		 	// 	drawShapeId="#myOval";
-		 	// 	//$("#shapeToggle").html("Draw Rect");
-		 	// }
-		 	// else if(shapeVal == "Oval2"){
-		 	// 	drawShapeId="#myOval2";
-		 	// }
-		 	// else if(shapeVal == "Rect"){
-		 	// 	drawShapeId="#myRect";
-		 	// 	//$("#shapeToggle").html("Draw Oval");
-		 	// }
-		 	// else{
-		 	// 	drawShapeId="#myRect2";
-		 	// }
-
-		    // debug("changed and val is: ")
-		    // codeType = $("input[name='codeType']:checked").val();
-
-		    // toggleCodeType(codeType);
 
 		});
 
