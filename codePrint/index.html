@@ -97,8 +97,18 @@ function updateScore(scoreChange){
 </textarea><br>
 2. Set font size and draw shapes on the code 3. Hide the controls 4. Print to PDF from the browser<br>
 Font Size: <input id="fontSize" type="range" min="1" max="40" step="1" value="12"><span id="fontSizeDisplay">12px</span> |
-Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rectangle <input type="radio" name="drawShapeToggle" value="oval">Oval <button id="clearRect">Clear Rect</button> <button id="clearOval">Clear Oval</button>
-
+Draw Shape:  <select name="drawShapeToggle">
+	<option value="Rect">rect</option>
+	<option value="Rect2">rect 2</option>
+	<option value="Rect3">rect 3</option>
+	<option value="Oval">oval</option>
+	<option value="Oval2">oval 2</option>
+	<option value="Oval3">oval 3</option>
+</select>
+<button id="clearCurrent">Clear</button>
+<!--
+<input type="radio" name="drawShapeToggle" value="rect" checked>Rectangle <input type="radio" name="drawShapeToggle" value="oval">Oval <input type="radio" name="drawShapeToggle" value="oval2">Oval 2 <button id="clearRect">Clear Rect</button> <button id="clearOval">Clear Oval</button>
+-->
 </div>
 	<button id="hideBtn">Hide/Show Controls</button><button id="printBtn" onClick="window.print()">Print</button>
 <hr>
@@ -106,7 +116,13 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 <em><span id="otherText"></span></em><br>
 <svg id="canvas">
   <ellipse id="myOval" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <ellipse id="myOval2" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <ellipse id="myOval3" cx="0" cy="0" rx="0" ry="0" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+
   <rect id="myRect" x="0" y="0" width="0" height="0" stroke="rgba(255,0,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
+  <rect id="myRect2" x="0" y="0" width="0" height="0" stroke="rgba(255,0,100,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
+  <rect id="myRect3" x="0" y="0" width="0" height="0" stroke="rgba(255,100,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
+
 </svg>
 <pre id="outerPrettyArea" class="line-numbers language-javascript">
 <code id="prettyArea" class="language-javascript"></code>
@@ -270,6 +286,11 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 		$("#clearRect").click(function(){
 			setSize("#myRect",0,0);
 		})
+
+		$("#clearCurrent").click(function(){
+			var shapeId = "#my" + $("select[name='drawShapeToggle']").val();
+			setSize(shapeId, 0, 0);
+		});
 		
 
 		 $("input[name='drawShapeToggle']").change(function(){
@@ -282,10 +303,42 @@ Draw Shape:  <input type="radio" name="drawShapeToggle" value="rect" checked>Rec
 		 		drawShapeId="#myOval";
 		 		//$("#shapeToggle").html("Draw Rect");
 		 	}
+		 	else if(shapeVal == "oval2"){
+		 		drawShapeId="#myOval2";
+		 	}
 		 	else{
 		 		drawShapeId="#myRect";
 		 		//$("#shapeToggle").html("Draw Oval");
 		 	}
+
+		    // debug("changed and val is: ")
+		    // codeType = $("input[name='codeType']:checked").val();
+
+		    // toggleCodeType(codeType);
+
+		});
+
+		$("select[name='drawShapeToggle']").change(function(){
+
+		 	//console.log("toggle!!!");
+
+		 	var shapeVal = $("select[name='drawShapeToggle']").val();
+		 	drawShapeId = "#my"+shapeVal;
+
+		 	// if(shapeVal=="Oval"){
+		 	// 	drawShapeId="#myOval";
+		 	// 	//$("#shapeToggle").html("Draw Rect");
+		 	// }
+		 	// else if(shapeVal == "Oval2"){
+		 	// 	drawShapeId="#myOval2";
+		 	// }
+		 	// else if(shapeVal == "Rect"){
+		 	// 	drawShapeId="#myRect";
+		 	// 	//$("#shapeToggle").html("Draw Oval");
+		 	// }
+		 	// else{
+		 	// 	drawShapeId="#myRect2";
+		 	// }
 
 		    // debug("changed and val is: ")
 		    // codeType = $("input[name='codeType']:checked").val();
