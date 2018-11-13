@@ -116,10 +116,14 @@ Draw Shape*:  <select name="drawShapeToggle">
 <hr>
 <h1 id="projTitle"></h1>
 <em><span id="otherText"></span></em><br>
-<svg id="canvas">
+<svg id="canvas"> <!--
   <ellipse id="myOval" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
   <ellipse id="myOval2" cx="0" cy="0" rx="0" ry="0" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
   <ellipse id="myOval3" cx="0" cy="0" rx="0" ry="0" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  -->
+  <rect id="myOval" cx="0" cy="0" rx="100" ry="100" stroke="rgba(0,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <rect id="myOval2" cx="0" cy="0" rx="100" ry="100" stroke="rgba(0,100,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
+  <rect id="myOval3" cx="0" cy="0" rx="100" ry="100" stroke="rgba(100,0,255,0.5)" stroke-width="4" fill="rgba(0,0,0,0)"/>
 
   <rect id="myRect" x="0" y="0" width="0" height="0" stroke="rgba(255,0,0,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
   <rect id="myRect2" x="0" y="0" width="0" height="0" stroke="rgba(255,0,100,0.5)" stroke-width="3" fill="rgba(0,0,0,0)"  />
@@ -439,6 +443,8 @@ Draw Shape*:  <select name="drawShapeToggle">
 				pastedImage.src = source;
 			};
 		}
+
+
 		
 	</script>
 </body>
