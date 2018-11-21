@@ -1,0 +1,89 @@
+<!--
+You are free to copy and use this sample in accordance with the terms of the
+Apache license (http://www.apache.org/licenses/LICENSE-2.0.html)
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <style>
+      .box{
+
+        background-color: #EEEEEE;
+        box-shadow: 2px 2px 2px #555555;
+        margin: 10px;
+        padding: 5px;
+
+      }
+    </style>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      Google Visualization API Sample
+    </title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['linechart']});
+      google.load('visualization', '1', {packages:['table']});
+
+    </script>
+    <script type="text/javascript">
+    var visualization;
+
+    function drawVisualization() {
+      // To see the data that this visualization uses, browse to
+      // http://spreadsheets.google.com/ccc?key=pCQbetd-CptGXxxQIG7VFIQ
+      var query = new google.visualization.Query(document.getElementById("queryURL").value);
+          //'https://docs.google.com/spreadsheet/tq?key=0AmuoOYttupfWdFlkSEVvZ0FNR2JPOHZ4anBRMUJfaGc&gid=0&headers=-1');
+    
+      // Apply query language.
+      //query.setQuery('SELECT B, avg(G) GROUP BY B');
+      var queryStr = document.getElementById("queryText").value;
+      //alert(queryStr);
+      query.setQuery(queryStr);
+    
+      // Send the query with a callback function.
+      query.send(handleQueryResponse);
+    }
+    
+    function handleQueryResponse(response) {
+      if (response.isError()) {
+        alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+        return;
+      }
+    
+      var data = response.getDataTable();
+
+      
+      var table = new google.visualization.Table(document.getElementById('dataTableView'));
+      table.draw(data, {showRowNumber: true});
+    }
+    
+
+    google.setOnLoadCallback(drawVisualization);
+    </script>
+  </head>
+  <body style="font-family: Arial;border: 0 none;">
+    <header>
+
+    </header>
+
+    <header><h3>Baker's Happiness Data Playground</h3>
+      Page messing around with Google's query language (GQL?) used against a Google spreadsheet.<br/>
+      See the <a href="https://developers.google.com/chart/interactive/docs/querylanguage">query language documentation</a> here.<br/><br/>
+      Try typing queries below.  Note: enter the query <strong> SELECT * </strong> to see everything.<br/>
+    </header>
+    <div class="box">
+    Query URL: <input type=text size=150 id="queryURL" value='https://docs.google.com/spreadsheet/tq?key=0AmuoOYttupfWdFlkSEVvZ0FNR2JPOHZ4anBRMUJfaGc&gid=0&headers=-1'><br>
+    <small>(NOTE: get this string by inserting a gadget - any one - in your spreadsheet and then choosing "get query data source URL" from the pulldown menu in top right corner of the gadget)</small>
+    </div>
+    <div class="box">
+    <textarea id="queryText" style="width:60%; height: 150px; margin: auto; background-color: #000000; color: #00EE00; font-size: 14pt;">SELECT B, avg(G) GROUP BY B</textarea><br/>
+   <input type='button' value="query" onClick="drawVisualization()">
+ </div>
+    <br>
+    Column Heading Reference (you need to use the column letters A,B,C etc. for querying a google spreadsheet).<br>
+    <!-- <img src="colHeadingReference.png" style="box-shadow: 2px 2px 5px rgb(0,0,0); margin: 10px;"> --><br>
+    <h3>Results:</h3>
+    <div id="dataTableView" style="width: 100%;" ></div>
+  </body>
+</html>
