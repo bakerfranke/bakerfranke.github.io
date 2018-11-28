@@ -9,19 +9,40 @@
                 vertical-align: bottom;
             }
             eu{
-                background-color: #FFFFAA;
+                /*background-color: #FFFFAA;*/
+                display: block;
+                background-color: #70C1B3;
+                
                 
             }
             lo{
-                background-color: #AAFFAA; 
+                /*background-color: #AAFFAA; */
+                background-color: #B2DBBF;
+                display: block;
                 margin-left: 20px;
+                padding: 1px;
+                margin-top: 2px;
 
             }
             ek{
-                background-color: #FFAAAA; 
+                /*background-color: #FFAAAA; */
+                
+                background-color: #E1EDD3;
                 margin-left: 40px;
+                display: block;
+                padding: 1px;
+                margin-top: 2px;
             }
-            
+
+            code{
+                font-family: monospace;
+                white-space: pre-wrap;
+                
+            }
+            .nobreak{
+                display: none;
+            }
+       
             #highlight{
                  
              
@@ -74,13 +95,14 @@
                // var keywords = words.split(/[ ,\n]/); //"abstraction"; //.toLowerCase(); // = document.getElementById("plaintext").value;
                 console.debug(keywords);
                 var outStr = "";
-                var fw = document.getElementById("fwTextarea").innerHTML.split("<br>"); //use pre-htmlified version of framework for keyword search
+                //var fw = document.getElementById("fwTextarea").innerHTML.split("<br>"); //use htmlified version of framework for keyword search
+                var fw = document.getElementById("fwTextarea").innerHTML.split("<!--br-->"); //secret line break
                 var lineCount = 0;
                 
                 for(var key in fw){
                     for(var i=0; i<keywords.length; i++){
                         if(fw[key].toLowerCase().indexOf(keywords[i]) >= 0){
-                           outStr+=fw[key]+"<br>";
+                           outStr+=fw[key]; //+"<br>";
                            i=keywords.length;
                            lineCount++;
                         }
@@ -91,65 +113,7 @@
 
             }
             
-            //Parse text to find all EKs which have a particular format
-            // make lists of the EUs and LOs that those EKs fall under
-            function extract(){
-                var text = document.getElementById("plaintext").value;
-                var EKs = text.match(/[0-9][.][0-9][.][0-9][A-Za-z]/g); //makes array of anything fitting this pattern
-                EKs = EKs.sort();
-                var LOArray = new Array();
-                var EUArray = new Array();
-                for(var i=0; i<EKs.length; i++){
-                    
-                    var LOstr = EKs[i].replace(/[A-Za-z]/g,""); //LO is the EK with letter stripped off the back.
-                    LOArray[LOstr]=""; //using LO as key in associative array to act as Set preventing dups
-                    
-                    var LOarr = LOstr.split(".");
-                    var EUstr = LOarr[0]+"."+LOarr[1]; //EU is the first two digits of the LO
-                    EUArray[EUstr]=""; //using EU as key in associative array to act as Set preventing dups
-                }
-                
-                // Make formatted strings for pretty print into text area
-                EKs = EKs.toString().replace(/[,]/g,"\n");
-                var LOs = "";
-                for(key in LOArray){
-                    LOs+=key+"\n";
-                }
-                var EUs = "";
-                for(key in EUArray){
-                    EUs+=key+"\n";
-                }
-                document.getElementById("output").value = "--------- EUs --------\n"+EUs+"\n--------- LOs --------\n"+LOs+"\n--------- EKs --------\n"+EKs;
-            }
-            
-             
-            
-            //Lookup Framework number codes (EU, LO, or EK) from text box.
-            // assume one code per line.  Combine all findings into string for display.
-            function findLines(){
-                var allLOs = document.getElementById("LOonly").value.toUpperCase().split("\n");
-                var fwString="";
-                var fwStringFixedWidth="";
-
-                for(var i=0; i<allLOs.length; i++){
-                    if(cspframework[allLOs[i]]!=null){
-                        var line = cspframework[allLOs[i]];
-                        fwString += line;
-                       // var shorten = line.replace(/the |or |and |of |which/g,"");
-                        fwStringFixedWidth += line.substring(0,70)+"..."+line.substring(line.length-25)+"<br>";
-                    }
-                    if(cspframework[allLOs[i]+".Ex"]!=null){
-                         fwString += cspframework[allLOs[i]+".Ex"];
-                    }
-                    fwString+="<br>";
-                    
-
-                }
-                document.getElementById("fwOutput").innerHTML=fwString;
-                document.getElementById("fwOutputFixedWidth").innerHTML=fwStringFixedWidth;
-                
-            }
-            
+          
             // Draw a thumbnail version of the framework with a single horizontal
             // line for each entry.  EUs, LOs, EKs, have different colors and indentations.
             // Using canvas to draw, so two column format is rolled by hand.  It's ugly.
@@ -199,26 +163,30 @@
             }
             
             function drawEK(g, x, y){
-                drawLine(g, [x,y], [9,1], "#FFFFAA");
-                drawLine(g, [x,y], [9,1], "#AAFFAA");
-                drawLine(g, [x,y], [55,1], "#FFAAAA");
+                drawLine(g, [x,y], [9,1], "#469BA2");
+                drawLine(g, [x,y], [9,1], "#97DAC9");
+                drawLine(g, [x,y], [55,1], "#E1EDD3");
             }
             
             function drawLO(g, x, y){
-                drawLine(g, [x,y], [9,1], "#FFFFAA");
-                drawLine(g, [x,y], [65, 1], "#AAFFAA");
+                drawLine(g, [x,y], [9,1], "#469BA2");
+                drawLine(g, [x,y], [65, 1], "#97DAC9");
             }
             
             function drawEU(g, x, y){
-                drawLine(g, [x,y], [75,1], "#FFFFAA");
+                drawLine(g, [x,y], [75,1], "#469BA2");
 
             }
             
             function getFWType(key){  //what type is this: EU, LO, EK?
                 var type="";
                 if(key==null) return null;
-                if(key.match(/^[0-9][.][0-9]$/)!=null) type="EU";
-                else if(key.match(/^[0-9][.][0-9][.][0-9]$/)!=null) type="LO";
+                // if(key.match(/^[0-9][.][0-9]$/)!=null) type="EU";
+                // else if(key.match(/^[0-9][.][0-9][.][0-9]$/)!=null) type="LO";
+                // else type="EK";
+
+                if(key.match(/[A-Z]{3}-[0-9]$/)!=null) type="EU"; // 
+                else if(key.match(/[A-Z]{3}-[0-9][.][A-Z]$/)!=null) type="LO";
                 else type="EK";
                 
 
@@ -282,7 +250,9 @@
                      
                      if(i==selectedCSPLine) type+=" id='highlight'";
                      
-                     fwString+="<"+type+">"+fwKey+"</"+type+"><br>"; //make a fake tag based on type, used for CSS.  Could do span id=... 
+                     //fwString+="<"+type+">"+fwKey+"</"+type+"><br class='nobreak'>"; //make a fake tag based on type, used for CSS.  Could do span id=... 
+
+                     fwString+="<"+type+">"+fwKey+"</"+type+"><!--br-->";
                  }
                  document.getElementById("fwTextarea").innerHTML = fwString;
                  var scrollPos = document.getElementById("highlight").offsetTop
