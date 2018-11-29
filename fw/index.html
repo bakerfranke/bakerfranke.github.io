@@ -87,13 +87,64 @@
             function toggleScrollPause(){
                 scrollPause = !scrollPause;
             }
+            var htmlFw;
+
+            function doSearch(){
+                //get selected value
+                $("#keywordSearchInstructions").hide();
+                $("#regexSearchInstructions").hide();
+                if($('input[name=searchType]:checked').val() == 'regex'){
+                    $("#regexSearchInstructions").show();
+                    regexSearch();
+                }
+                else{
+                    $("#keywordSearchInstructions").show();
+                    findKeywords();
+                }
+            }
+            function regexSearch(){
+                //var regexStr = new RegExp(document.getElementById("regexSearch").value.trim());
+                var regexStr = new RegExp("");
+
+                try{
+                    regexStr = new RegExp(document.getElementById("keywordPlaintext").value.trim());
+                }
+                catch(e){
+                    //if error proceed as if nothing typed
+                    regexStr = new RegExp("");
+                }
+
+                if(regexStr.source == "" ) return;
+
+
+                //if(key.match(/[A-Z]{3}-[0-9]$/)!=null) type="EU"; // 
+                var fw = document.getElementById("fwTextarea").innerHTML.split("<!--br-->"); //secret line break
+                htmlFw = fw;
+                var lineCount = 0;
+                var outStr = "";
+                for(var key in fw){
+                    //console.log("\t :eyes: "+key)
+                    if(fw[key].match(regexStr)!=null){
+                        //console.log("FOUND MATCH ON: "+key)
+                        outStr += fw[key]; //+"\n";
+                        lineCount++;
+                    }
+                }
+               // console.log("regexStr="+regexStr);
+                //console.log(outStr+"\n----\n");
+                document.getElementById("keywordOutput").innerHTML = outStr;
+                document.getElementById("lineCount").innerHTML = "Line Count: "+lineCount;
+                //return outStr;
+            }
             
             
              function findKeywords(){
                  //alert("called");
                 var keywords = document.getElementById("keywordPlaintext").value.trim().toLowerCase().split(/[ ,\n]/);
                // var keywords = words.split(/[ ,\n]/); //"abstraction"; //.toLowerCase(); // = document.getElementById("plaintext").value;
-                console.debug(keywords);
+                //console.debug(keywords);
+                if(keywords.length==1 && keywords[0]=="") return;
+
                 var outStr = "";
                 //var fw = document.getElementById("fwTextarea").innerHTML.split("<br>"); //use htmlified version of framework for keyword search
                 var fw = document.getElementById("fwTextarea").innerHTML.split("<!--br-->"); //secret line break
@@ -262,6 +313,7 @@
            $(document).ready(function(){
 
                 document.getElementById('qfile').addEventListener('change', handleFileSelect, false);
+                $('input[name=searchType]').click(function(){ doSearch(); });
 
             });
             
@@ -284,6 +336,10 @@
                 console.log("loaded? "+file);
             }
 
+            function toggleScroller(){
+                $("#fw_scroller").toggle();
+            }
+
     </script>
     </head>
     <body onLoad="setup(); drawFramework()">
@@ -291,12 +347,16 @@
         <input id='qfile' type=file>
 
 <P> 
-    <h3>Keyword search</h3>
+    <h3>Search</h3>
+    <!-- <input type=text id="regexSearch" onkeyup="regexSearch()"/> -->
     <table width=100%>
         <tr>
             <td width=100% valign=bottom>
-                Type in keywords you want to search for (separate by space, comma, or line).<br>
-                <input type=text id="keywordPlaintext" onkeyup="findKeywords()" style="width: 50%; border: solid 3px #0099AA; font-size: 14pt"><span id="lineCount"  style="color: #008899; font-size: 14pt"> Line Count: </span>
+                <input type="radio" name="searchType" value="keyword" checked>Keyword search  <input type="radio" name="searchType" value="regex"> Regex search<br>
+                <span id="keywordSearchInstructions">Type in keywords you want to search for (separate by space, comma, or line).</span>
+                <span id="regexSearchInstructions">Type in regex. Example: "[Ee]xample"</span>
+                <br>
+                <input type=text id="keywordPlaintext" onkeyup="doSearch()" style="width: 50%; border: solid 3px #0099AA; font-size: 14pt"><span id="lineCount"  style="color: #008899; font-size: 14pt"> Line Count: </span>
                 <div id="keywordOutput" class="fwOutput" style="height: 200px; width:100%"></div>
 
             </td>
@@ -304,15 +364,15 @@
     </table>
     <h3>Quick Lookup</h3>
     <table>
-        <tr>
-            <td>
-                 Mouseover thumbnail.<br>
-                 Click to freeze/unfreeze.<br>
+        <tr> 
+            <button id="scrollerToggleBtn" onclick="toggleScroller()"> Toggle Scroller </button>
+            <td id="fw_scroller">
+                 Mouseover to scroll, click to freeze/unfreeze.<br>
                  <canvas id="myCanvas" width="275px" height="400px" style="border:1px solid #000000;" onmousemove="canvasMouse(event)" onclick="toggleScrollPause()"></canvas>
             </td>
             <td>
-                 Selected Lines:<br>
-                 <div style="height: 400px; width: 800px;" id="fwTextarea"></div>
+                 Framework:<br>
+                 <div style="height: 400px; width: 100%;" id="fwTextarea"></div>
             </td>
         </tr>
     </table>
