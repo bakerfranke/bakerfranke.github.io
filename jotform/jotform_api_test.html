@@ -1,0 +1,39 @@
+<<html>
+<head>
+    <<script src="https://js.jotform.com/JotForm.js"></script>
+    <script>
+
+        //JF.login(success, error) method takes two optional arguments
+        //Both arguments should be function 
+        //First argument will be called after successful login
+        //Second argument will be called if authorization fails
+        // JF.login(
+
+        //     function success(){
+        //         JF.getForms(function(response){
+        //             for(var i=0; i<response.length; i++){
+        //                 document.write( "<li> " + response[i].title);
+        //             }
+        //         });
+        //     },
+
+        //     function error(){
+        //         window.alert("Could not authorize user");
+        //     }
+        // ); 
+
+JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
+JF.getForm("90486182774164", function(response){
+    /**
+     successful response including form data with given id
+     .
+     */
+     document.write(response.title);  
+});
+</script> 
+</head>
+<body>
+
+</body>
+</html>
+
