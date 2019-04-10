@@ -50,11 +50,29 @@ JF.getFormQuestions("90486182774164", function(response){
         //document.write(response[i].qid+" "+response[i].text+"<br/>");
     }     
     for(var i in orderedQList){
-        if(orderedQList[i].type=="control_matrix"){
-            document.write(makeMatrixTable(orderedQList[i]));
+        var Q = orderedQList[i];
+
+        if(Q.type=="control_matrix"){
+            document.write(makeMatrixTable(Q));
+        }
+        else if(Q.type=="control_radio" || Q.type=="control_checkbox"){
+            document.write(makeSimpleTable(Q));
+        }
+        else if(Q.type == "control_pagebreak"){
+            document.write("<hr>page break<hr>");
+        }
+        else if(Q.type == "control_text"){
+            document.write(Q.text);
+        }
+        else if(Q.type=="control_scale"){
+            //HACK to make my simpleTable thing work
+            Q.options = "Scale - | "+Q.scaleFrom+" to "+Q.scaleAmount;
+            document.write(makeSimpleTable(Q));
+
         }
         else{
-            document.write("--<b>" +orderedQList[i].name+"</b>-- <br/> "+orderedQList[i].text+"<br/>");
+            document.write("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text);
+            document.write("<br/>")
 
         }
     } 
@@ -64,15 +82,15 @@ function makeMatrixTable(qObj){
     var str="<b>["+qObj.name+"]</b><br>";
     str+="<table border=1 width=850 class='matrix_table'><tr><td colspan='2'>";
     str+= qObj.text;
-    str+="</td></tr><tr><td width='75%'>";
+    str+="</td></tr><tr><td width='75%'><ol>";
     // TODO: split on pipes
     var rows = qObj.mrows.split("|");
     for(var i in rows){
-        str += "- "+rows[i]+"<br/>"; //+"</li>";
+        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
     }
-    str+="</td><td>";
+    str+="</ol></td><td>";
     var cols = qObj.mcolumns.split("|");
-    str += cols.length+"pt<br/><br/>"
+    str += "("+cols.length+"pt)<br/>"
     for(var i in cols){
         str += "- "+cols[i]+"<br/>";
     }
@@ -81,6 +99,23 @@ function makeMatrixTable(qObj){
     return str;
 
 }
+function makeSimpleTable(qObj){
+
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table border=1 width=850 class='matrix_table'><tr><td width='50%'>";
+    str+= qObj.text;
+    str+="</td><td>";
+    var options = qObj.options.split("|");
+    //str += options.length+"pt<br/><br/>"
+    for(var i in options){
+        str += "- "+options[i]+"<br/>";
+    }
+    str += "</td></tr></table><br>";
+
+    return str;
+
+}
+
 </script> 
 </head>
 <body>
