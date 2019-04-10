@@ -30,6 +30,16 @@ JF.getForm("90486182774164", function(response){
      */
      document.write(response.title);  
 });
+
+JF.getFormQuestions(formID, function(response){
+    /**
+     successful response including questions of form with given id
+     .
+     */
+    for(var i in response){
+        document.write(response[i].qid);
+    }      
+});
 </script> 
 </head>
 <body>
