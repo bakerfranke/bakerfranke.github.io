@@ -36,9 +36,15 @@ JF.getFormQuestions("90486182774164", function(response){
      successful response including questions of form with given id
      .
      */
+    var orderedQList = [];
     for(var i in response){
-        document.write(response[i].qid);
-    }      
+        var obj = response[i];
+        orderedQList[obj.order] = obj;
+        //document.write(response[i].qid+" "+response[i].text+"<br/>");
+    }     
+    for(var i in orderedQList){
+        document.write("--<b>" +orderedQList[i].name+"</b>-- <br/> "+orderedQList[i].text+"<br/></br/>");
+    } 
 });
 </script> 
 </head>
