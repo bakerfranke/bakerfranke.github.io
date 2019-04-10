@@ -1,7 +1,14 @@
 <<html>
 <head>
     <<script src="https://js.jotform.com/JotForm.js"></script>
-    <script>
+
+    <style>
+    body{
+        width: 850px;
+        font-family: sans-serif;
+    }
+    </style>
+ <script>
 
         //JF.login(success, error) method takes two optional arguments
         //Both arguments should be function 
@@ -43,13 +50,45 @@ JF.getFormQuestions("90486182774164", function(response){
         //document.write(response[i].qid+" "+response[i].text+"<br/>");
     }     
     for(var i in orderedQList){
-        document.write("--<b>" +orderedQList[i].name+"</b>-- <br/> "+orderedQList[i].text+"<br/></br/>");
+        if(orderedQList[i].type=="control_matrix"){
+            document.write(makeMatrixTable(orderedQList[i]));
+        }
+        else{
+            document.write("--<b>" +orderedQList[i].name+"</b>-- <br/> "+orderedQList[i].text+"<br/>");
+
+        }
     } 
 });
+
+function makeMatrixTable(qObj){
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table border=1 width=850 class='matrix_table'><tr><td colspan='2'>";
+    str+= qObj.text;
+    str+="</td></tr><tr><td width='75%'>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += "- "+rows[i]+"<br/>"; //+"</li>";
+    }
+    str+="</td><td>";
+    var cols = qObj.mcolumns.split("|");
+    str += cols.length+"pt<br/><br/>"
+    for(var i in cols){
+        str += "- "+cols[i]+"<br/>";
+    }
+    str += "</td></tr></table><br>";
+
+    return str;
+
+}
 </script> 
 </head>
 <body>
 
+
+ 
 </body>
+  
+
 </html>
 
