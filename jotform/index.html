@@ -126,7 +126,7 @@ function loadJF(){
             }
             else if(Q.type=="control_scale"){
                 //HACK to make my simpleTable thing work
-                Q.options = "Scale - | "+Q.scaleFrom+" to "+Q.scaleAmount;
+                Q.options = Q.scaleFrom+" to "+Q.scaleAmount;
                 //document.write(makeSimpleTable(Q));
                 outStr += makeSimpleTable(Q);
 
