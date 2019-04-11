@@ -35,6 +35,14 @@
         background-color: #DDDDDD;
         margin-bottom: 4px;
     }
+    .hiddenkey{
+        color: rgba(0,0,0,0);
+        font-family: sans-serif;
+        font-size: 9pt;
+    }
+    .hiddenkey:hover{
+        color: rgba(0,0,0,1);
+    }
     ol{
         padding-inline-start: 20px;
     }
@@ -220,9 +228,9 @@ function setFormId(){
 </head>
 <body onLoad="loadLocalstorage(); loadJF();">
 <div id="userinput">
-    jotform api key:     <input type=text value="" size=30 id="apikey">
+    jotform api key:     <input type=text value="" size=30 id="apikey"> 
     <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
-    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button><br/> 
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <span class="hiddenkey">baker's key: db67fed2f8281454859dcb1687a04fbf</span><br/> 
     form: <select id="form-pulldown" onChange="setFormId()"></select><br/>
     form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a><br/>
 
