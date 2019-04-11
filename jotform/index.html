@@ -60,12 +60,29 @@ var my_apikey = "";
 var my_formid = "";
 var item_response_count = 0;
 
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 function loadLocalstorage(){
     if(localStorage["my_apikey"] !==undefined){
         $("#apikey").val(localStorage["my_apikey"] );
+        $("#makeapikey").hide();
     }
     if(localStorage["my_formid"] !==undefined){
         $("#formid").val(localStorage["my_formid"] );
+    }
+
+    // QUERY STRING FORM ID overrides local storage value
+    var param_formid = getParameterByName("formid");
+    if(param_formid!==null){
+         $("#formid").val(param_formid);
     }
 }
 function loadJF(){
@@ -106,6 +123,7 @@ function loadJF(){
 
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
 
     item_response_count = 0;
 
@@ -243,9 +261,9 @@ function setFormId(){
 <div id="userinput">
     jotform api key:     <input type=text value="" size=30 id="apikey"> 
     <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
-    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <span class="hiddenkey">baker's key: db67fed2f8281454859dcb1687a04fbf</span><br/> 
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api">make/get api key</a><br/> 
     form: <select id="form-pulldown" onChange="setFormId()"></select><br/>
-    form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a><br/>
+    form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a><br/>
 
 </div>
 
