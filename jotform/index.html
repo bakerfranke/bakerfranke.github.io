@@ -1,0 +1,233 @@
+<html>
+<head>
+         
+
+    <script src="https://js.jotform.com/JotForm.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+    <style>
+    body{
+        width: 800px;
+        padding-left: 40px;
+        font-size: 11pt;
+
+    }
+    .matrix_table{
+       
+        border-collapse: collapse;
+        font-size: 11pt;
+
+    }
+    .matrix_table td{
+        vertical-align: top;
+        border: solid 1px black;
+        padding: 5px;
+        
+    }
+    .pagebreak{
+        text-align: right;
+        background-color: #d9f3f5;
+        font-size: 8pt;
+        padding: 1px;
+        font-family: sans-serif;
+    }
+    #userinput{
+        background-color: #DDDDDD;
+        margin-bottom: 4px;
+    }
+    ol{
+        padding-inline-start: 20px;
+    }
+    </style>
+ <script>
+var my_apikey = "";
+var my_formid = "";
+
+
+function loadJF(){
+
+    my_apikey = $("#apikey").val();
+    my_formid = $("#formid").val();
+
+    //JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
+    JF.initialize( {apiKey: my_apikey} ); 
+    // JF.getForm("90486182774164", function(response){
+    //     *
+    //      successful response including form data with given id
+    //      .
+         
+    //      document.write(response.title);  
+    // });
+    
+    var options = 
+    JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
+        /**
+         successful response including user forms array
+         *
+         */
+
+        // console.log("# forms = "+response.length)
+        // for(var i=0; i<response.length; i++){
+        //     console.log(response[i].title);
+        // }
+
+        var dropdown = $('#form-pulldown');
+
+        dropdown.empty();
+
+        dropdown.append('<option selected="true" disabled>Choose a form</option>');
+        dropdown.prop('selectedIndex', 0);
+
+      //  const url = 'https://api.myjson.com/bins/7xq2x';
+
+// Populate dropdown with list of provinces
+// $.getJSON(url, function (data) {
+//   $.each(data, function (key, entry) {
+        for(var i=0; i<response.length; i++){
+            dropdown.append($('<option></option>').attr('value', response[i].id).text(response[i].title));
+            if(response[i].id == my_formid){ dropdown.prop('selectedIndex', i+1); }
+        }
+    });
+
+    //JF.getFormQuestions("90486182774164", function(response){
+    JF.getFormQuestions(my_formid, function(response){
+        /**
+         successful response including questions of form with given id
+         .
+         */
+        var orderedQList = [];
+        for(var i in response){
+            var obj = response[i];
+            orderedQList[obj.order] = obj;
+            //document.write(response[i].qid+" "+response[i].text+"<br/>");
+        }
+        var outStr = "";
+
+        for(var i in orderedQList){
+            var Q = orderedQList[i];
+            //outStr += "<input type='text' id='"+Q.name+"' value='"+Q.name+"'><button onClick='updateSlug(\""+Q.qid+"\",\""+Q.name+"\")'>update</button><br>";
+            
+            if(Q.type=="control_matrix"){
+                //document.write(makeMatrixTable(Q));
+                outStr+=makeMatrixTable(Q);
+            }
+            else if(Q.type=="control_radio" || Q.type=="control_checkbox"){
+                //document.write(makeSimpleTable(Q));
+                outStr += makeSimpleTable(Q);
+            }
+            else if(Q.type == "control_pagebreak"){
+                //document.write("<hr>page break<hr>");
+                outStr += "<div class='pagebreak'>page break</div>";
+            }
+            else if(Q.type == "control_text"){
+                //document.write(Q.text);
+                outStr += Q.text +"<br/>";
+            }
+            else if(Q.type=="control_scale"){
+                //HACK to make my simpleTable thing work
+                Q.options = "Scale - | "+Q.scaleFrom+" to "+Q.scaleAmount;
+                //document.write(makeSimpleTable(Q));
+                outStr += makeSimpleTable(Q);
+
+            }
+            else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
+                console.log("inside type tcheck");
+                Q.options = "[input_box]";
+                outStr += makeSimpleTable(Q);
+            }
+            else{
+                // document.write("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text);
+                // document.write("<br/>")
+                outStr += "<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>"
+
+            }
+        }
+        $("#main").html(outStr);
+    });
+}
+
+function updateSlug(id, name){
+    console.log("asked to update "+id+", "+name);
+    var newSlug = $("#"+name).val();
+    console.log("new slug: "+newSlug);
+
+
+    question = { "name" : newSlug};
+
+    JF.editFormQuestion(my_formid, id, question, function(response){
+        // *
+        //  successful response including question with given id of form with given id
+        //  .
+         
+        console.log("name updated."+response);
+    });
+
+}
+
+function makeMatrixTable(qObj){
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table' width='100%'><tr><td colspan='2' class='preamble'>";
+    str+= qObj.text;
+    str+="</td></tr><tr><td width='66%'><ol>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+    }
+    str+="</ol></td><td class='options'>";
+    var cols = qObj.mcolumns.split("|");
+    str += "("+cols.length+"pt)<br/>"
+    for(var i in cols){
+        str += "- "+cols[i]+"<br/>";
+    }
+    str += "</td></tr></table><br>";
+
+    return str;
+
+}
+function makeSimpleTable(qObj){
+
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table' width='100%'><tr><td width='50%'>";
+    str+= qObj.text;
+    str+="</td><td class='options'>";
+    var options = qObj.options.split("|");
+    //str += options.length+"pt<br/><br/>"
+    // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
+    // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
+    str += "("+qObj.type.replace("control_","")+")<br/>";
+
+    for(var i in options){
+        str += "- "+options[i]+"<br/>";
+    }
+    str += "</td></tr></table><br>";
+
+    return str;
+
+}
+
+function setFormId(){
+    var selected_form_id = $("#form-pulldown")[0].options[$("#form-pulldown")[0].selectedIndex].value
+    $("#formid").val(selected_form_id);
+    loadJF();
+}
+
+</script> 
+</head>
+<body onLoad="loadJF()">
+<div id="userinput">
+    jotform api key: <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> <button onClick="loadJF()"> Load </button><br/> 
+    form: <select id="form-pulldown" onChange="setFormId()"></select>form_id: <input type=text value="90486182774164" size=20 id="formid"> <br/>
+
+</div>
+
+<div id="main">
+
+</div>
+
+ 
+</body>
+  
+
+</html>
+
