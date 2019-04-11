@@ -7,15 +7,17 @@
 
     <style>
     body{
-        width: 800px;
+        
         padding-left: 40px;
         font-size: 11pt;
+        width: 850px;
 
     }
     .matrix_table{
        
         border-collapse: collapse;
         font-size: 11pt;
+        width: 100%;
 
     }
     .matrix_table td{
@@ -23,6 +25,12 @@
         border: solid 1px black;
         padding: 5px;
         
+    }
+    .matrix_rows{
+        width: 66%;
+    }
+    .options{
+        width: 50%;
     }
     .pagebreak{
         text-align: right;
@@ -50,6 +58,7 @@
  <script>
 var my_apikey = "";
 var my_formid = "";
+var item_response_count = 0;
 
 function loadLocalstorage(){
     if(localStorage["my_apikey"] !==undefined){
@@ -97,6 +106,8 @@ function loadJF(){
 
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+
+    item_response_count = 0;
 
     //JF.getFormQuestions("90486182774164", function(response){
     JF.getFormQuestions(my_formid, function(response){
@@ -151,6 +162,7 @@ function loadJF(){
 
             }
         }
+        outStr += "<br/><b>Total items: "+item_response_count+"</b>";
         $("#main").html(outStr);
 
     });
@@ -178,15 +190,16 @@ function updateSlug(id, name){
 
 function makeMatrixTable(qObj){
     var str="<b>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table' width='100%'><tr><td colspan='2' class='preamble'>";
+    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
     str+= qObj.text;
-    str+="</td></tr><tr><td width='66%'><ol>";
+    str+="</td></tr><tr><td class='matrix_rows'><ol>";
     // TODO: split on pipes
     var rows = qObj.mrows.split("|");
     for(var i in rows){
         str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+        item_response_count++;
     }
-    str+="</ol></td><td class='options'>";
+    str+="</ol></td><td class='matrix_options'>";
     var cols = qObj.mcolumns.split("|");
     str += "("+cols.length+"pt)<br/>"
     for(var i in cols){
@@ -200,7 +213,7 @@ function makeMatrixTable(qObj){
 function makeSimpleTable(qObj){
 
     var str="<b>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table' width='100%'><tr><td width='50%'>";
+    str+="<table class='matrix_table' ><tr><td>";
     str+= qObj.text;
     str+="</td><td class='options'>";
     var options = qObj.options.split("|");
@@ -213,7 +226,7 @@ function makeSimpleTable(qObj){
         str += "- "+options[i]+"<br/>";
     }
     str += "</td></tr></table><br>";
-
+    item_response_count++;
     return str;
 
 }
