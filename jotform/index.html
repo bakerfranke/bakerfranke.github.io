@@ -238,6 +238,46 @@ function makeMatrixTable(qObj){
 // with question type so can swap readonly and editable.
 function updateQ(qObj_name){
 
+
+
+
+    qToEdit = allQs[qObj_name];
+    console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+    console.log("QTEXT: "+qToEdit.text);
+    console.log("ROWS: "+qToEdit.mrows);
+    console.log("COLS: "+qToEdit.mcolumns);
+
+
+
+  //  console.log("changing preamble text from: "+qToEdit.text);
+    qToEdit.text = $("#"+qObj_name+" .editedQText").val();
+  //  console.log("\tto: "+qToEdit.text);
+
+ //   console.log("Edited Rows are:");
+    var rows = $("#"+qObj_name+" .editedRows").val();
+    rows = $.trim(rows);
+   // console.log(rows);
+    var pipedRows = rows.replace(/\n/g,"|");
+  //  console.log(pipedRows);
+    qToEdit.mrows = pipedRows;
+
+
+  //  console.log("Edited Scale items are:");
+    var rows = $("#"+qObj_name+" .editedScaleItems").val();
+    rows = $.trim(rows);
+//    console.log(rows);
+    var pipedRows = rows.replace(/\n/g,"|");
+//    console.log(pipedRows);
+    qToEdit.mcolumns = pipedRows;
+
+
+    JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
+
+        console.log("UPDATED QUESTION:");
+        console.log(response);
+    });
+
+
     // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
     var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
@@ -258,7 +298,6 @@ function updateQ(qObj_name){
     str += "</td></tr></table><br>";
 
     $("#"+qObj_name).html(str);
-
     //return str;
 
 }
@@ -269,8 +308,8 @@ function makeEditableMatrixTable(qObj_name){
 
     var str="<b>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-    str+= "<input type=text value='"+qObj.text+"' style='width: 90%'>";
-    str+="</td></tr><tr><td class='matrix_rows'><textarea rows=10 style='width: 100%'>";
+    str+= "<input type=text value=\""+qObj.text+"\" style='width: 90%' class='editedQText'>";
+    str+="</td></tr><tr><td class='matrix_rows'><textarea rows=10 style='width: 100%' class='editedRows'>";
     // TODO: split on pipes
     var rows = qObj.mrows.split("|");
     for(var i in rows){
@@ -278,10 +317,12 @@ function makeEditableMatrixTable(qObj_name){
     }
     str+="</textarea></td><td class='matrix_options'>";
     var cols = qObj.mcolumns.split("|");
-    str+="<textarea rows="+(cols.length+2)+" style='width: 100%'>"
+    str+="<textarea rows="+(cols.length+2)+" style='width: 100%' class='editedScaleItems'>"
     for(var i in cols){
         str += cols[i]+"\n";
     }
+    
+    //str = $.trim(str); //remove trailing \n
     str += "</textarea></td></tr>";
     str += "<tr><td align=right colspan=2><button onClick='updateQ(\""+qObj.name+"\")'>save</button></td></tr></table><br>";
 
