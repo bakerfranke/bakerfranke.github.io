@@ -242,20 +242,19 @@ function makeMatrixTable(qObj){
 // with question type so can swap readonly and editable.
 function updateQ(qObj_name){
 
+    var qToEdit = allQs[qObj_name];
 
-
-
-    qToEdit = allQs[qObj_name];
-    console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
-    console.log("QTEXT: "+qToEdit.text);
-    console.log("ROWS: "+qToEdit.mrows);
-    console.log("COLS: "+qToEdit.mcolumns);
-    console.log("OPTIONS: "+qToEdit.options);
+ 
     var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
 
 
     //ONLY UPDATE qObj and POST if I know how to edit it
     if(editableTypes.indexOf(qToEdit.type) >= 0){
+        console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+        console.log("QTEXT: "+qToEdit.text);
+        console.log("ROWS: "+qToEdit.mrows);
+        console.log("COLS: "+qToEdit.mcolumns);
+        console.log("OPTIONS: "+qToEdit.options);
 
         qToEdit.text = $("#"+qObj_name+" .editedQText").val();
 
@@ -298,8 +297,22 @@ function updateQ(qObj_name){
         }
     }
 
+    redrawTable(qToEdit);
 
 
+
+}
+
+function cancelEdit(qObj_name){
+    console.log("CANCELLED edit on "+qObj_name);
+    var qToCancel = allQs[qObj_name];
+    console.log(qToCancel);
+    redrawTable(allQs[qObj_name]);
+}
+
+function redrawTable(qToEdit){
+
+    var qObj_name = qToEdit.name;
     if(qToEdit.type=="control_matrix"){
         // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
         var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
@@ -343,8 +356,6 @@ function updateQ(qObj_name){
 
         $("#"+qObj_name).html(str);
     }
-
-
 }
 
 function makeEditableMatrixTable(qObj_name){
@@ -369,7 +380,12 @@ function makeEditableMatrixTable(qObj_name){
     
     //str = $.trim(str); //remove trailing \n
     str += "</textarea></td></tr>";
-    str += "<tr><td align=right colspan=2><button onClick='updateQ(\""+qObj.name+"\")'>save</button></td></tr></table><br>";
+        str+="</td></tr>";
+    str += "<tr><td align=right colspan=2>";
+    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
+    str +="</td></tr></table><br>";
 
     $("#"+qObj.name).html(str);
 
@@ -400,7 +416,11 @@ function makeEditableSimpleTable(qObj_name){
     }
     str += "</textarea>";
     str+="</td></tr>";
-    str += "<tr><td align=right colspan=2><button onClick='updateQ(\""+qObj.name+"\")'>save</button></td></tr></table><br>";
+    str += "<tr><td align=right colspan=2>";
+    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
+    str +="</td></tr></table><br>";
 
     $("#"+qObj.name).html(str);
 }
@@ -491,7 +511,14 @@ function addQuestion(type){
 //     putNewQuestion(questionsArray);
 // }
 
-
+function clone(qObj_name){
+    item_response_count++;
+    var q = allQs[qObj_name];
+    q.name = q.type.replace("control_","")+item_response_count;
+    delete(q["qid"]);
+    delete(q["order"]);
+    putNewQuestion([q]);
+}
 
 function putNewQuestion(questionsArray){
     jsonData = JSON.stringify({ "questions" : questionsArray});
@@ -500,7 +527,7 @@ function putNewQuestion(questionsArray){
          for(var i in response){
            console.log(response[i]);
         }
-        location.reload("?foo=blah");
+        //location.reload();
     });
 
 }
