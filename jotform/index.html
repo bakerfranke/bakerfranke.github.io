@@ -239,7 +239,7 @@ function makeMatrixTable(qObj){
 function updateQ(qObj_name){
 
     // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
-    var str ="<b>["+qObj.name+"]</b><br>";
+    var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
     str+= qObj.text;
     str+="</td></tr><tr><td class='matrix_rows'><ol>";
