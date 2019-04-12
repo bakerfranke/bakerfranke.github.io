@@ -272,7 +272,7 @@ function updateQ(qObj_name){
 
 
         // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
-        if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)){
+        if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)>=0){
             var rows = $("#"+qObj_name+" .editedScaleItems").val();
             rows = $.trim(rows);
             var pipedRows = rows.replace(/\n/g,"|");
@@ -437,7 +437,7 @@ function setFormId(){
 function addQuestion(type){
     item_response_count++;
 
-    var knowntypes = ["radio","checkbox","matrix"];
+    var knowntypes = ["radio","checkbox","matrix","textbox"];
     if(knowntypes.indexOf(type) < 0){
         return;
     }
@@ -523,7 +523,7 @@ function putNewQuestion(questionsArray){
 </div>
 <hr>
 <div id="footer">
-    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> 
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> 
     <br>(adds to bottom, causes page to refresh)
 </div>
  
