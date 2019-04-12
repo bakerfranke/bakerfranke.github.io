@@ -286,7 +286,7 @@ function updateQ(qObj_name){
         }
 
         //if(qToEdit.type=="control_matrix"){
-        if(editableTypes.indexOf(qToEdit.type)){
+        if(editableTypes.indexOf(qToEdit.type)>=0){
             JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
 
                 console.log("UPDATED QUESTION:");
@@ -434,6 +434,78 @@ function setFormId(){
     loadJF();
 }
 
+function addQuestion(type){
+    item_response_count++;
+
+    var knowntypes = ["radio","checkbox","matrix"];
+    if(knowntypes.indexOf(type) < 0){
+        return;
+    }
+
+    var qtype = "control_"+type;
+    var qObj = {
+        "type": qtype,
+        "name": type+"_"+item_response_count,
+        "text": "New Question Text"
+
+    };
+
+    if(type=="matrix"){
+        qObj["mrows"]="row 1|row 2|row 3";
+        qObj["mcolumns"] = "col 1|col 2|col 3|col 4|col 5";
+    }
+    else if(type == "radio" || type=="checkbox"){
+        qObj["options"] = "option 1|option 2|option 3";
+    }
+    //console.log("about to add");
+    //console.log(qObj);
+    putNewQuestion([qObj]); 
+
+}
+
+// function addMatrixQuestion(){
+//     item_response_count++;
+//     questionsArray = new Array({
+//         "type": "control_matrix", 
+//         "name": "matrix_"+item_response_count,
+//         "text": "New Question Text", 
+//         "mcolumns":"A|B|C|D|E",
+//         "mrows":"row 1|row 2|row 3"
+//     });
+//     putNewQuestion(questionsArray);
+// }
+
+// function addMCQuestion(radio_or_checkbox){
+//     item_response_count++;
+//     var qtype = "control_radio";
+//     if(radio_or_checkbox=="checkbox"){
+//         qtype = "control_checkbox";
+//     }
+
+//     questionsArray = new Array({
+//         "type": qtype, 
+//         "name": qtype+"_"+item_response_count,
+//         "text": "New Question Text", 
+//         "options":"A|B|C|D|E"
+//     });
+//     putNewQuestion(questionsArray);
+// }
+
+
+
+function putNewQuestion(questionsArray){
+    jsonData = JSON.stringify({ "questions" : questionsArray});
+
+    JF.createFormQuestions(my_formid, jsonData, function(response){
+         for(var i in response){
+           console.log(response[i]);
+        }
+        location.reload("?foo=blah");
+    });
+
+}
+
+
 </script> 
 </head>
 <body onLoad="loadLocalstorage(); loadJF();">
@@ -449,7 +521,11 @@ function setFormId(){
 <div id="main">
 
 </div>
-
+<hr>
+<div id="footer">
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> 
+    <br>(adds to bottom, causes page to refresh)
+</div>
  
 </body>
   
