@@ -59,6 +59,7 @@
 var my_apikey = "";
 var my_formid = "";
 var item_response_count = 0;
+var allQs = {};
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -143,6 +144,8 @@ function loadJF(){
 
         for(var i in orderedQList){
             var Q = orderedQList[i];
+
+            allQs[Q.name] = Q;
             //outStr += "<input type='text' id='"+Q.name+"' value='"+Q.name+"'><button onClick='updateSlug(\""+Q.qid+"\",\""+Q.name+"\")'>update</button><br>";
             
             if(Q.type=="control_matrix"){
@@ -206,8 +209,37 @@ function updateSlug(id, name){
 
 }
 
+
 function makeMatrixTable(qObj){
-    var str="<b>["+qObj.name+"]</b><br>";
+    var str = "<div id='"+qObj.name+"' class='question_container'>";
+    str +="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+    str+= qObj.text;
+    str+="</td></tr><tr><td class='matrix_rows'><ol>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+        item_response_count++;
+    }
+    str+="</ol></td><td class='matrix_options'>";
+    var cols = qObj.mcolumns.split("|");
+    str += "("+cols.length+"pt)<br/>"
+    for(var i in cols){
+        str += "- "+cols[i]+"<br/>";
+    }
+    str += "</td></tr></table></div><br>";
+
+    return str;
+}
+
+
+// BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
+// with question type so can swap readonly and editable.
+function updateQ(qObj_name){
+
+    // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
+    var str ="<b>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
     str+= qObj.text;
     str+="</td></tr><tr><td class='matrix_rows'><ol>";
@@ -225,9 +257,40 @@ function makeMatrixTable(qObj){
     }
     str += "</td></tr></table><br>";
 
-    return str;
+    $("#"+qObj_name).html(str);
+
+    //return str;
 
 }
+
+function makeEditableMatrixTable(qObj_name){
+
+    qObj = allQs[qObj_name];
+
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+    str+= "<input type=text value='"+qObj.text+"' style='width: 90%'>";
+    str+="</td></tr><tr><td class='matrix_rows'><textarea rows=10 style='width: 100%'>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += rows[i]+"\n"; //+"</li>";
+    }
+    str+="</textarea></td><td class='matrix_options'>";
+    var cols = qObj.mcolumns.split("|");
+    str+="<textarea rows="+(cols.length+2)+" style='width: 100%'>"
+    for(var i in cols){
+        str += cols[i]+"\n";
+    }
+    str += "</textarea></td></tr>";
+    str += "<tr><td align=right colspan=2><button onClick='updateQ(\""+qObj.name+"\")'>save</button></td></tr></table><br>";
+
+    $("#"+qObj.name).html(str);
+
+    //return str;
+
+}
+
 function makeSimpleTable(qObj){
 
     var str="<b>["+qObj.name+"]</b><br>";
