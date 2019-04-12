@@ -13,6 +13,10 @@
         width: 850px;
 
     }
+    .editedScaleItems:read-only{
+        background-color: #CCCCCC;
+        color: #999999;
+    }
     .matrix_table{
        
         border-collapse: collapse;
@@ -246,59 +250,100 @@ function updateQ(qObj_name){
     console.log("QTEXT: "+qToEdit.text);
     console.log("ROWS: "+qToEdit.mrows);
     console.log("COLS: "+qToEdit.mcolumns);
+    console.log("OPTIONS: "+qToEdit.options);
+    var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
 
 
+    //ONLY UPDATE qObj and POST if I know how to edit it
+    if(editableTypes.indexOf(qToEdit.type) >= 0){
 
-  //  console.log("changing preamble text from: "+qToEdit.text);
-    qToEdit.text = $("#"+qObj_name+" .editedQText").val();
-  //  console.log("\tto: "+qToEdit.text);
+        qToEdit.text = $("#"+qObj_name+" .editedQText").val();
 
- //   console.log("Edited Rows are:");
-    var rows = $("#"+qObj_name+" .editedRows").val();
-    rows = $.trim(rows);
-   // console.log(rows);
-    var pipedRows = rows.replace(/\n/g,"|");
-  //  console.log(pipedRows);
-    qToEdit.mrows = pipedRows;
-
-
-  //  console.log("Edited Scale items are:");
-    var rows = $("#"+qObj_name+" .editedScaleItems").val();
-    rows = $.trim(rows);
-//    console.log(rows);
-    var pipedRows = rows.replace(/\n/g,"|");
-//    console.log(pipedRows);
-    qToEdit.mcolumns = pipedRows;
+        // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
+        if(qToEdit.type=='control_matrix'){
+            //   console.log("Edited Rows are:");
+            var rows = $("#"+qObj_name+" .editedRows").val();
+            rows = $.trim(rows);
+            // console.log(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+            //  console.log(pipedRows);
+            qToEdit.mrows = pipedRows;
+        }
 
 
-    JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
+        // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
+        if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)){
+            var rows = $("#"+qObj_name+" .editedScaleItems").val();
+            rows = $.trim(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
 
-        console.log("UPDATED QUESTION:");
-        console.log(response);
-    });
+            if(qToEdit.type=='control_matrix'){
+                qToEdit.mcolumns = pipedRows;
+            }
+            else if(["control_radio","control_checkbox"].indexOf(qToEdit.type) >= 0){
+                qToEdit.options = pipedRows;
+            }
+        }
 
+        //if(qToEdit.type=="control_matrix"){
+        if(editableTypes.indexOf(qToEdit.type)){
+            JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
 
-    // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
-    var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-    str+= qObj.text;
-    str+="</td></tr><tr><td class='matrix_rows'><ol>";
-    // TODO: split on pipes
-    var rows = qObj.mrows.split("|");
-    for(var i in rows){
-        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
-        item_response_count++;
+                console.log("UPDATED QUESTION:");
+                console.log(response);
+            });
+        }
+        else{
+            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list")
+        }
     }
-    str+="</ol></td><td class='matrix_options'>";
-    var cols = qObj.mcolumns.split("|");
-    str += "("+cols.length+"pt)<br/>"
-    for(var i in cols){
-        str += "- "+cols[i]+"<br/>";
-    }
-    str += "</td></tr></table><br>";
 
-    $("#"+qObj_name).html(str);
-    //return str;
+
+
+    if(qToEdit.type=="control_matrix"){
+        // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
+        var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+        str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+        str+= qObj.text;
+        str+="</td></tr><tr><td class='matrix_rows'><ol>";
+        // TODO: split on pipes
+        var rows = qObj.mrows.split("|");
+        for(var i in rows){
+            str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+            item_response_count++;
+        }
+        str+="</ol></td><td class='matrix_options'>";
+        var cols = qObj.mcolumns.split("|");
+        str += "("+cols.length+"pt)<br/>"
+        for(var i in cols){
+            str += "- "+cols[i]+"<br/>";
+        }
+        str += "</td></tr></table><br>";
+
+        $("#"+qObj_name).html(str);
+        //return str;
+    }
+    else{
+        // copy/paste of makeSimpleTable MINUS the question container.  Fix this later.
+
+        var str ="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+        str+="<table class='matrix_table' ><tr><td>";
+        str+= qObj.text;
+        str+="</td><td class='options'>";
+        var options = qObj.options.split("|");
+        //str += options.length+"pt<br/><br/>"
+        // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
+        // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
+        str += "("+qObj.type.replace("control_","")+")<br/>";
+
+        for(var i in options){
+            str += "- "+options[i]+"<br/>";
+        }
+        str += "</td></tr></table></div><br>";
+
+        $("#"+qObj_name).html(str);
+    }
+
 
 }
 
@@ -332,9 +377,39 @@ function makeEditableMatrixTable(qObj_name){
 
 }
 
-function makeSimpleTable(qObj){
+function makeEditableSimpleTable(qObj_name){
+    qObj = allQs[qObj_name];
 
-    var str="<b>["+qObj.name+"]</b><br>";
+    var str ="<b >["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table' ><tr><td>";
+    str+= "<textarea rows=5 style='width: 90%' class='editedQText'>"+qObj.text+"</textarea>";
+    str+="</td><td class='options'>";
+
+    var options = qObj.options.split("|");
+    str+="<textarea rows="+(options.length+2)+" style='width: 100%' class='editedScaleItems'"; // leave open inorder to write readonly if nec
+
+    if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)<0){
+        str+=" readonly>";
+    }
+    else{
+        str+=">"
+    }
+
+    for(var i in options){
+        str += options[i]+"\n";
+    }
+    str += "</textarea>";
+    str+="</td></tr>";
+    str += "<tr><td align=right colspan=2><button onClick='updateQ(\""+qObj.name+"\")'>save</button></td></tr></table><br>";
+
+    $("#"+qObj.name).html(str);
+}
+
+function makeSimpleTable(qObj){
+    
+    var str = "<div id='"+qObj.name+"' class='question_container'>";
+
+    str +="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table' ><tr><td>";
     str+= qObj.text;
     str+="</td><td class='options'>";
@@ -347,7 +422,7 @@ function makeSimpleTable(qObj){
     for(var i in options){
         str += "- "+options[i]+"<br/>";
     }
-    str += "</td></tr></table><br>";
+    str += "</td></tr></table></div><br>";
     item_response_count++;
     return str;
 
