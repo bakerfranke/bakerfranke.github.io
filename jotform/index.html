@@ -64,6 +64,7 @@ var my_apikey = "";
 var my_formid = "";
 var item_response_count = 0;
 var allQs = {};
+var allForms = [];
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -90,27 +91,29 @@ function loadLocalstorage(){
          $("#formid").val(param_formid);
     }
 }
+
+function clearApikey(){
+
+    delete(localStorage["my_apikey"]);
+    delete(localStorage["my_formid"]);
+    
+    location.reload();
+}
+
 function loadJF(){
     
     my_apikey = $("#apikey").val();
     my_formid = $("#formid").val();
 
     //JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
-    JF.initialize( {apiKey: my_apikey} ); 
 
+    // Login and populate pulldown menu of surveys
+    JF.initialize( {apiKey: my_apikey} ); 
     localStorage["my_apikey"] = my_apikey;
 
     JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
-        /**
-         successful response including user forms array
-         *
-         */
-
-        // console.log("# forms = "+response.length)
-        // for(var i=0; i<response.length; i++){
-        //     console.log(response[i].title);
-        // }
-
+        allForms = response;
+     
         var dropdown = $('#form-pulldown');
 
         dropdown.empty();
@@ -177,7 +180,7 @@ function loadJF(){
             }
             else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
                 console.log("inside type tcheck");
-                Q.options = "[input_box]";
+                Q.options = "[input_"+Q.type.replace("control_","")+"]";
                 outStr += makeSimpleTable(Q);
             }
             else{
@@ -483,34 +486,6 @@ function addQuestion(type){
 
 }
 
-// function addMatrixQuestion(){
-//     item_response_count++;
-//     questionsArray = new Array({
-//         "type": "control_matrix", 
-//         "name": "matrix_"+item_response_count,
-//         "text": "New Question Text", 
-//         "mcolumns":"A|B|C|D|E",
-//         "mrows":"row 1|row 2|row 3"
-//     });
-//     putNewQuestion(questionsArray);
-// }
-
-// function addMCQuestion(radio_or_checkbox){
-//     item_response_count++;
-//     var qtype = "control_radio";
-//     if(radio_or_checkbox=="checkbox"){
-//         qtype = "control_checkbox";
-//     }
-
-//     questionsArray = new Array({
-//         "type": qtype, 
-//         "name": qtype+"_"+item_response_count,
-//         "text": "New Question Text", 
-//         "options":"A|B|C|D|E"
-//     });
-//     putNewQuestion(questionsArray);
-// }
-
 function clone(qObj_name){
     item_response_count++;
     var q = allQs[qObj_name];
@@ -532,17 +507,76 @@ function putNewQuestion(questionsArray){
 
 }
 
+function populateFormSelect(keyword){
+    console.log("searching for..."+keyword);
+    var formList = [];
+   
+    // Search through the pulldown list text
+    var allFormsOptions = $("#form-pulldown")[0].options;
+    var lower_keyword = keyword.toLowerCase();
+    for(var i in allFormsOptions){
+        var text = allFormsOptions[i].text;
+
+        // create an object with the index value in the main pulldown (index: i)
+        // so that we can set selectedIndex later without re-searching the list
+        if(text!==undefined && text.toLowerCase().indexOf(lower_keyword)>=0){
+            formList.push({index: i, value: allFormsOptions[i].value, text: allFormsOptions[i].text})
+        }
+    }
+    
+   
+    // console.log("--FORMS LIST--");
+    // console.log(formList);
+
+    var size = Math.min(10, formList.length);
+
+    var selectFormList = $("#listOfFormOptions");
+    selectFormList.empty();
+    selectFormList.css("display","block")
+    selectFormList.attr("size",size);
+
+    for(var i=0; i<formList.length; i++){
+        selectFormList.append($('<option></option>').attr('value', formList[i].index).text(formList[i].text));
+    }
+}
+
+function formOptionSelected(event, index){
+    console.log(event);
+    var selectFormList = $("#listOfFormOptions").css("display","none");
+    // console.log("index "+index);
+    // console.log("option selected!!!!");
+    if(!(event.code=="Enter" || event.code=="Space")){
+        $("#searchval").val("");
+        return;
+    }
+    //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
+    var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
+
+    $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
+    $("#searchval").val("");
+
+    setFormId();
+}
 
 </script> 
 </head>
 <body onLoad="loadLocalstorage(); loadJF();">
 <div id="userinput">
-    jotform api key:     <input type=text value="" size=30 id="apikey"> 
+    jotform api key: <input type=text value="" size=30 id="apikey"> 
     <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
-    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api">make/get api key</a><br/> 
-    form: <select id="form-pulldown" onChange="setFormId()"></select><br/>
-    form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a><br/>
-
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <button onClick="clearApikey()">clear API key</button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api" target="_blank">make/get api key</a>
+    <div id="form_selection">
+        <!--<div id="formpulldown_div" style="float:left">-->
+            form: <select id="form-pulldown" onChange="setFormId()"></select>
+        <!--</div>
+        <div id="search_div" style="float:left"> -->
+            search: <input id="searchval" oninput="populateFormSelect(this.value)" type=text value="" size=30/><br>
+            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onKeyUp="formOptionSelected(event, this.selectedIndex)"></select>
+       <!-- </div>-->
+    </div>
+    <div style="clear:both">
+         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a>
+    </div>
 </div>
 
 <div id="main">
