@@ -111,6 +111,7 @@ function loadJF(){
     JF.initialize( {apiKey: my_apikey} ); 
     localStorage["my_apikey"] = my_apikey;
 
+    //get all forms available and populate pulldown menu sorted by updated_at
     JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
         allForms = response;
      
@@ -127,71 +128,86 @@ function loadJF(){
         }
     });
 
+    // set cached jotform id and create links appropriately
     localStorage["my_formid"] = my_formid;
-
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
     $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
 
+
+    // render all questions from loaded form to the screen
     item_response_count = 0;
 
-    //JF.getFormQuestions("90486182774164", function(response){
     JF.getFormQuestions(my_formid, function(response){
-        /**
-         successful response including questions of form with given id
-         .
-         */
+
+        // first put Qs in order they appear in in the form
         var orderedQList = [];
         for(var i in response){
             var obj = response[i];
             orderedQList[obj.order] = obj;
+            allQs[obj.name] = obj;
             //document.write(response[i].qid+" "+response[i].text+"<br/>");
         }
-        var outStr = "";
 
+        //compose a giant HTML string of all questions formatted according to type
+        //Baker thoughts: change this to: for each question (1) add a div container where id=qname (2) fill div with appropriate html
+        var outStr = "";
+        $("#main").empty();
         for(var i in orderedQList){
             var Q = orderedQList[i];
 
-            allQs[Q.name] = Q;
-            //outStr += "<input type='text' id='"+Q.name+"' value='"+Q.name+"'><button onClick='updateSlug(\""+Q.qid+"\",\""+Q.name+"\")'>update</button><br>";
-            
+            var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
+            $("#main").append(divstr);
+
+
+
+
             if(Q.type=="control_matrix"){
                 //document.write(makeMatrixTable(Q));
-                outStr+=makeMatrixTable(Q);
+                //outStr+=makeMatrixTable(Q);
+                $("#"+Q.name).html(makeMatrixTable(Q));
             }
             else if(Q.type=="control_radio" || Q.type=="control_checkbox"){
                 //document.write(makeSimpleTable(Q));
-                outStr += makeSimpleTable(Q);
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
             }
             else if(Q.type == "control_pagebreak"){
                 //document.write("<hr>page break<hr>");
-                outStr += "<div class='pagebreak'>page break</div>";
+                //outStr += "<div class='pagebreak'>page break</div>";
+                $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
             }
             else if(Q.type == "control_text"){
                 //document.write(Q.text);
-                outStr += Q.text +"<br/>";
+                //outStr += Q.text +"<br/>";
+                $("#"+Q.name).html(Q.text +"<br/>");
             }
             else if(Q.type=="control_scale"){
                 //HACK to make my simpleTable thing work
                 Q.options = Q.scaleFrom+" to "+Q.scaleAmount;
                 //document.write(makeSimpleTable(Q));
-                outStr += makeSimpleTable(Q);
-
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
             }
             else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
-                console.log("inside type tcheck");
+                //console.log("inside type tcheck");
                 Q.options = "[input_"+Q.type.replace("control_","")+"]";
-                outStr += makeSimpleTable(Q);
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
+
             }
             else{
                 // document.write("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text);
                 // document.write("<br/>")
-                outStr += "<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>"
+                //outStr += "<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>"
+                $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+
 
             }
         }
-        outStr += "<br/><b>Total items: "+item_response_count+"</b>";
-        $("#main").html(outStr);
+        //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
+        $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
+        //$("#main").html(outStr);
 
     });
 
@@ -218,8 +234,8 @@ function updateSlug(id, name){
 
 
 function makeMatrixTable(qObj){
-    var str = "<div id='"+qObj.name+"' class='question_container'>";
-    str +="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+    // var str = "<div id='"+qObj.name+"' class='question_container'>";
+    str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
     str+= qObj.text;
     str+="</td></tr><tr><td class='matrix_rows'><ol>";
@@ -235,7 +251,9 @@ function makeMatrixTable(qObj){
     for(var i in cols){
         str += "- "+cols[i]+"<br/>";
     }
-    str += "</td></tr></table></div><br>";
+    str += "</td></tr></table>";
+    //str += "</div>";
+    str += "<br>";
 
     return str;
 }
@@ -542,20 +560,19 @@ function populateFormSelect(keyword){
 
 function formOptionSelected(event, index){
     console.log(event);
-    var selectFormList = $("#listOfFormOptions").css("display","none");
     // console.log("index "+index);
     // console.log("option selected!!!!");
-    if(!(event.code=="Enter" || event.code=="Space")){
+    if(event.code=="Enter" || event.code=="Space"){
+        $("#listOfFormOptions").css("display","none");
+
+        //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
+        var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
+
+        $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
         $("#searchval").val("");
-        return;
+
+        setFormId();
     }
-    //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
-    var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
-
-    $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
-    $("#searchval").val("");
-
-    setFormId();
 }
 
 </script> 
