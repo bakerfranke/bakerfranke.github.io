@@ -125,8 +125,6 @@ function loadJF(){
     my_apikey = $("#apikey").val();
     my_formid = $("#formid").val();
 
-    //JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
-
     // Login and populate pulldown menu of surveys
     JF.initialize( {apiKey: my_apikey} ); 
     localStorage["my_apikey"] = my_apikey;
@@ -166,24 +164,21 @@ function loadJF(){
             var obj = response[i];
             orderedQList[obj.order] = obj;
             allQs[obj.name] = obj;
-            //document.write(response[i].qid+" "+response[i].text+"<br/>");
         }
 
-        //compose a giant HTML string of all questions formatted according to type
-        //Baker thoughts: change this to: for each question (1) add a div container where id=qname (2) fill div with appropriate html
-        var outStr = "";
-        $("#main").empty();
+        //var outStr = "";
+        $("#main").empty();  
         for(var i in orderedQList){
             var Q = orderedQList[i];
 
-            // TODO: every element from questions array should get its own div and attach to #main
+            // every element from questions array gets its own div attached to #main
             var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
             $("#main").append(divstr);
 
             // if it's an editable type, then it gets a table layout treatment
             if(editableTypes.indexOf(Q.type)>=0){
 
-                var tableHTML = makeQuestionTableTemplateHTML(Q); // creates a table to display question
+                var tableHTML = makeQuestionTableTemplateHTML(Q); // create a table to display question
                 $("#"+Q.name).html(tableHTML); // attach to div we made above.
 
                 makeViewableTable(Q); // sets all the fields in the table template based on Q type
@@ -223,34 +218,8 @@ function updateSlug(id, name){
 }
 
 
-// function makeMatrixTable(qObj){
-//     // var str = "<div id='"+qObj.name+"' class='question_container'>";
-//     str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-//     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-//     str+= qObj.text;
-//     str+="</td></tr><tr><td class='matrix_rows'><ol>";
-//     // TODO: split on pipes
-//     var rows = qObj.mrows.split("|");
-//     for(var i in rows){
-//         str += "<li> "+rows[i]+"<br/>"; //+"</li>";
-//         item_response_count++;
-//     }
-//     str+="</ol></td><td class='matrix_options'>";
-//     var cols = qObj.mcolumns.split("|");
-//     str += "("+cols.length+"pt)<br/>"
-//     for(var i in cols){
-//         str += "- "+cols[i]+"<br/>";
-//     }
-//     str += "</td></tr></table>";
-//     //str += "</div>";
-//     str += "<br>";
-
-//     return str;
-// }
-
-
-// // BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
-// // with question type so can swap readonly and editable.
+// Update an edited question and POST to jotform
+// Currently there is no test for diffs on changes.  Simply grab what's in text boxes and post.
 function updateQ(qObj_name){
 
     var qToEdit = allQs[qObj_name]; // will update this object
@@ -264,20 +233,16 @@ function updateQ(qObj_name){
         // console.log("COLS: "+qToEdit.mcolumns);
         // console.log("OPTIONS: "+qToEdit.options);
 
-        // update text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
+        // update Q.text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
         qToEdit.text = $(qId+" .edited_qtext").val();
 
         // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
         if(qToEdit.type=='control_matrix'){
-            //   console.log("Edited Rows are:");
             var rows = $(qId+" .edited_rows").val();
             rows = $.trim(rows);
-            // console.log(rows);
             var pipedRows = rows.replace(/\n/g,"|");
-            //  console.log(pipedRows);
             qToEdit.mrows = pipedRows;
         }
-
 
         // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
         if(editableScales.indexOf(qToEdit.type)>=0){
@@ -341,9 +306,10 @@ function cancelEdit(qObj_name){
 
 }
 
-// This should replace redrawTable AND initial setup 
-// appends question div to main
-// appends table template for question display to div
+// Create html for template of table that displays questions
+// set ids and classes of table cells.  Will be filled with text, or editable fields
+// i.e. it's text.  When you edit, it replaces cell contents with input fields. Then
+// you save and it replaces cell contents with text (html) again.
 function makeQuestionTableTemplateHTML(Q){
     var short_type = Q.type.replace("control_","");
     //var qid = "#"+Q.name;
@@ -399,18 +365,13 @@ function makeViewableTable(Q){
     //fill scales
 
     var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
-    
-
-
-    //var cols = Q.options.split("|");
-    //var str = "("+scalesArray.length+"pt)<br/>"
-    var str = "("+short_type+")<br>"; // item 0 is a title/label thing
+    var str = "("+short_type+")<br>"; 
     for(var i in scalesArray){
         str += "- "+scalesArray[i]+"<br/>";
     }
     $(qId+"_scale").html(str);
 
-    // ToDo: show/hide footer if there is a status message
+    // footer shows/hides based setStatusMessage
     $(qId+"_footer").hide();
 }
 
@@ -470,6 +431,8 @@ function makeEditableTable(qname){
     $(qId+"_footer").html(str);
 }
 
+// helper function to turn any question response type (text, rows, scale, etc.)
+// into an array for easy display formatting.
 function makeScalesArray(Q){
 
     var array = [];
