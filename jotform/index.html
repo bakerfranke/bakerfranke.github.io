@@ -13,22 +13,40 @@
         width: 850px;
 
     }
-    .editedScaleItems:read-only{
+    .edited_scales:read-only{
         background-color: #CCCCCC;
         color: #999999;
     }
-    .matrix_table{
+    .qtable{
        
         border-collapse: collapse;
         font-size: 11pt;
         width: 100%;
 
     }
-    .matrix_table td{
+    .qtable td{
         vertical-align: top;
         border: solid 1px black;
         padding: 5px;
         
+    }
+
+    .qtable_footer{
+        text-align: right;
+    }
+
+    .input{
+        width: 100%;
+    }
+    .edited_qtext, .edited_scales, .edited_rows{
+        width: 100%;
+    }
+
+    .question_container{
+        margin-bottom: 10px;
+    }
+    .qtext{
+        width: 66%;
     }
     .matrix_rows{
         width: 66%;
@@ -65,6 +83,8 @@ var my_formid = "";
 var item_response_count = 0;
 var allQs = {};
 var allForms = [];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
+var editableScales = ['control_matrix','control_radio','control_checkbox'];
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -156,53 +176,23 @@ function loadJF(){
         for(var i in orderedQList){
             var Q = orderedQList[i];
 
+            // TODO: every element from questions array should get its own div and attach to #main
             var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
             $("#main").append(divstr);
 
+            // if it's an editable type, then it gets a table layout treatment
+            if(editableTypes.indexOf(Q.type)>=0){
 
+                var tableHTML = makeQuestionTableTemplateHTML(Q); // creates a table to display question
+                $("#"+Q.name).html(tableHTML); // attach to div we made above.
 
-
-            if(Q.type=="control_matrix"){
-                //document.write(makeMatrixTable(Q));
-                //outStr+=makeMatrixTable(Q);
-                $("#"+Q.name).html(makeMatrixTable(Q));
+                makeViewableTable(Q); // sets all the fields in the table template based on Q type
             }
-            else if(Q.type=="control_radio" || Q.type=="control_checkbox"){
-                //document.write(makeSimpleTable(Q));
-                //outStr += makeSimpleTable(Q);
-                $("#"+Q.name).html(makeSimpleTable(Q));
-            }
-            else if(Q.type == "control_pagebreak"){
-                //document.write("<hr>page break<hr>");
-                //outStr += "<div class='pagebreak'>page break</div>";
+            else if(Q.type == "control_pagebreak"){ // special display for a page break
                 $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
             }
-            else if(Q.type == "control_text"){
-                //document.write(Q.text);
-                //outStr += Q.text +"<br/>";
-                $("#"+Q.name).html(Q.text +"<br/>");
-            }
-            else if(Q.type=="control_scale"){
-                //HACK to make my simpleTable thing work
-                Q.options = Q.scaleFrom+" to "+Q.scaleAmount;
-                //document.write(makeSimpleTable(Q));
-                //outStr += makeSimpleTable(Q);
-                $("#"+Q.name).html(makeSimpleTable(Q));
-            }
-            else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
-                //console.log("inside type tcheck");
-                Q.options = "[input_"+Q.type.replace("control_","")+"]";
-                //outStr += makeSimpleTable(Q);
-                $("#"+Q.name).html(makeSimpleTable(Q));
-
-            }
             else{
-                // document.write("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text);
-                // document.write("<br/>")
-                //outStr += "<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>"
                 $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
-
-
             }
         }
         //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
@@ -233,56 +223,54 @@ function updateSlug(id, name){
 }
 
 
-function makeMatrixTable(qObj){
-    // var str = "<div id='"+qObj.name+"' class='question_container'>";
-    str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-    str+= qObj.text;
-    str+="</td></tr><tr><td class='matrix_rows'><ol>";
-    // TODO: split on pipes
-    var rows = qObj.mrows.split("|");
-    for(var i in rows){
-        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
-        item_response_count++;
-    }
-    str+="</ol></td><td class='matrix_options'>";
-    var cols = qObj.mcolumns.split("|");
-    str += "("+cols.length+"pt)<br/>"
-    for(var i in cols){
-        str += "- "+cols[i]+"<br/>";
-    }
-    str += "</td></tr></table>";
-    //str += "</div>";
-    str += "<br>";
+// function makeMatrixTable(qObj){
+//     // var str = "<div id='"+qObj.name+"' class='question_container'>";
+//     str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+//     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+//     str+= qObj.text;
+//     str+="</td></tr><tr><td class='matrix_rows'><ol>";
+//     // TODO: split on pipes
+//     var rows = qObj.mrows.split("|");
+//     for(var i in rows){
+//         str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+//         item_response_count++;
+//     }
+//     str+="</ol></td><td class='matrix_options'>";
+//     var cols = qObj.mcolumns.split("|");
+//     str += "("+cols.length+"pt)<br/>"
+//     for(var i in cols){
+//         str += "- "+cols[i]+"<br/>";
+//     }
+//     str += "</td></tr></table>";
+//     //str += "</div>";
+//     str += "<br>";
 
-    return str;
-}
+//     return str;
+// }
 
 
-// BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
-// with question type so can swap readonly and editable.
+// // BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
+// // with question type so can swap readonly and editable.
 function updateQ(qObj_name){
 
-    var qToEdit = allQs[qObj_name];
-
- 
-    var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
-
+    var qToEdit = allQs[qObj_name]; // will update this object
+    var qId = "#"+qObj_name;
 
     //ONLY UPDATE qObj and POST if I know how to edit it
     if(editableTypes.indexOf(qToEdit.type) >= 0){
-        console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
-        console.log("QTEXT: "+qToEdit.text);
-        console.log("ROWS: "+qToEdit.mrows);
-        console.log("COLS: "+qToEdit.mcolumns);
-        console.log("OPTIONS: "+qToEdit.options);
+        // console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+        // console.log("QTEXT: "+qToEdit.text);
+        // console.log("ROWS: "+qToEdit.mrows);
+        // console.log("COLS: "+qToEdit.mcolumns);
+        // console.log("OPTIONS: "+qToEdit.options);
 
-        qToEdit.text = $("#"+qObj_name+" .editedQText").val();
+        // update text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
+        qToEdit.text = $(qId+" .edited_qtext").val();
 
         // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
         if(qToEdit.type=='control_matrix'){
             //   console.log("Edited Rows are:");
-            var rows = $("#"+qObj_name+" .editedRows").val();
+            var rows = $(qId+" .edited_rows").val();
             rows = $.trim(rows);
             // console.log(rows);
             var pipedRows = rows.replace(/\n/g,"|");
@@ -292,8 +280,8 @@ function updateQ(qObj_name){
 
 
         // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
-        if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)>=0){
-            var rows = $("#"+qObj_name+" .editedScaleItems").val();
+        if(editableScales.indexOf(qToEdit.type)>=0){
+            var rows = $(qId+" .edited_scales").val();
             rows = $.trim(rows);
             var pipedRows = rows.replace(/\n/g,"|");
 
@@ -305,169 +293,204 @@ function updateQ(qObj_name){
             }
         }
 
-        //if(qToEdit.type=="control_matrix"){
         if(editableTypes.indexOf(qToEdit.type)>=0){
             JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
 
                 console.log("UPDATED QUESTION:");
+
+                //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
                 console.log(response);
+                makeViewableTable(qToEdit);
+                setStatusMessage(qToEdit, "success", "sucessfully updated ["+qToEdit.name+"]")
             });
         }
         else{
-            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list")
+            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+            makeViewableTable(qToEdit);
+            setStatusMessage(qToEdit, "failure", "UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+
         }
     }
-
-    redrawTable(qToEdit);
-
-
-
 }
+
+function setStatusMessage(Q, code, msg){
+
+    var id = "#"+Q.name; 
+    $(id+"_footer").html(code+": "+ msg);
+    $(id+"_footer").show();
+    if(code=="success"){
+        $(id+"_footer").css("background-color","#d8f9c2");
+    }
+    else { //if(code=="failure"){
+        $(id+"_footer").css("background-color","#f9c2c2");
+    }
+
+    setTimeout(function() {
+        $(id+"_footer").hide();
+    }, 5000);
+}
+
 
 function cancelEdit(qObj_name){
     console.log("CANCELLED edit on "+qObj_name);
     var qToCancel = allQs[qObj_name];
     console.log(qToCancel);
-    redrawTable(allQs[qObj_name]);
+    makeViewableTable(qToCancel);
+    //setStatusMessage(qToCancel,"Cancelled","question not updated.")
+
+
 }
 
-function redrawTable(qToEdit){
+// This should replace redrawTable AND initial setup 
+// appends question div to main
+// appends table template for question display to div
+function makeQuestionTableTemplateHTML(Q){
+    var short_type = Q.type.replace("control_","");
+    //var qid = "#"+Q.name;
 
-    var qObj_name = qToEdit.name;
-    if(qToEdit.type=="control_matrix"){
-        // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
-        var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-        str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-        str+= qObj.text;
-        str+="</td></tr><tr><td class='matrix_rows'><ol>";
-        // TODO: split on pipes
-        var rows = qObj.mrows.split("|");
+    //[slug] with click to Edit
+    str ="<b onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b><br>";
+
+    // <table id=[slug]_table >
+    str += "<table id='"+Q.name+"_table' class='qtable'>";
+    // hide top row unless matrix
+    str += "<tr><td colspan=2 id='"+Q.name+"_preamble'>[preamble]</td><tr>";
+    str += "<tr><td id='"+Q.name+"_qtext' class='qtext "+short_type+"'>[qtext or matrix rows]</td>"
+    str += "<td id='"+Q.name+"_scale'>[scale]</td></tr>";
+
+    // bottom row stuff
+    str += "<tr><td colspan=2 id='"+Q.name+"_footer' class='qtable_footer'>footer</td></tr>";
+    str += "</table>";
+
+    //$(qid).append(str);
+    return str;
+}
+
+// Make viewable (read only) version of question
+// set html of div and table elements 
+function makeViewableTable(Q){
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
+
+    // Show preamble if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        $(qId+"_preamble").html(Q.text);
+    }
+    else{
+        $(qId+"_preamble").hide();
+    }
+
+    // Fill in question text.  If matrix then rows, otherwise qtext
+    if(Q.type=="control_matrix"){
+        var rows = Q.mrows.split("|");
+        var str = "<ol>";
         for(var i in rows){
-            str += "<li> "+rows[i]+"<br/>"; //+"</li>";
-            item_response_count++;
+            str+="<li>"+rows[i];
         }
-        str+="</ol></td><td class='matrix_options'>";
-        var cols = qObj.mcolumns.split("|");
-        str += "("+cols.length+"pt)<br/>"
-        for(var i in cols){
-            str += "- "+cols[i]+"<br/>";
-        }
-        str += "</td></tr></table><br>";
-
-        $("#"+qObj_name).html(str);
-        //return str;
+        str += "</ol>";
+        $(qId+"_qtext").html(str);
+        item_response_count += rows.length; 
     }
     else{
-        // copy/paste of makeSimpleTable MINUS the question container.  Fix this later.
-
-        var str ="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-        str+="<table class='matrix_table' ><tr><td>";
-        str+= qObj.text;
-        str+="</td><td class='options'>";
-        var options = qObj.options.split("|");
-        //str += options.length+"pt<br/><br/>"
-        // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
-        // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
-        str += "("+qObj.type.replace("control_","")+")<br/>";
-
-        for(var i in options){
-            str += "- "+options[i]+"<br/>";
-        }
-        str += "</td></tr></table></div><br>";
-
-        $("#"+qObj_name).html(str);
+        $(qId+"_qtext").html(Q.text);
+        item_response_count++;
     }
-}
 
-function makeEditableMatrixTable(qObj_name){
+    //fill scales
 
-    qObj = allQs[qObj_name];
-
-    var str="<b>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
-    str+= "<input type=text value=\""+qObj.text+"\" style='width: 90%' class='editedQText'>";
-    str+="</td></tr><tr><td class='matrix_rows'><textarea rows=10 style='width: 100%' class='editedRows'>";
-    // TODO: split on pipes
-    var rows = qObj.mrows.split("|");
-    for(var i in rows){
-        str += rows[i]+"\n"; //+"</li>";
-    }
-    str+="</textarea></td><td class='matrix_options'>";
-    var cols = qObj.mcolumns.split("|");
-    str+="<textarea rows="+(cols.length+2)+" style='width: 100%' class='editedScaleItems'>"
-    for(var i in cols){
-        str += cols[i]+"\n";
-    }
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
     
-    //str = $.trim(str); //remove trailing \n
-    str += "</textarea></td></tr>";
-        str+="</td></tr>";
-    str += "<tr><td align=right colspan=2>";
-    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
-    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
-    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
-    str +="</td></tr></table><br>";
 
-    $("#"+qObj.name).html(str);
 
-    //return str;
+    //var cols = Q.options.split("|");
+    //var str = "("+scalesArray.length+"pt)<br/>"
+    var str = "("+short_type+")<br>"; // item 0 is a title/label thing
+    for(var i in scalesArray){
+        str += "- "+scalesArray[i]+"<br/>";
+    }
+    $(qId+"_scale").html(str);
 
+    // ToDo: show/hide footer if there is a status message
+    $(qId+"_footer").hide();
 }
 
-function makeEditableSimpleTable(qObj_name){
-    qObj = allQs[qObj_name];
+function makeEditableTable(qname){
 
-    var str ="<b >["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table' ><tr><td>";
-    str+= "<textarea rows=5 style='width: 90%' class='editedQText'>"+qObj.text+"</textarea>";
-    str+="</td><td class='options'>";
+    var Q = allQs[qname];
+    if(editableTypes.indexOf(Q.type)<0) return;
 
-    var options = qObj.options.split("|");
-    str+="<textarea rows="+(options.length+2)+" style='width: 100%' class='editedScaleItems'"; // leave open inorder to write readonly if nec
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
 
-    if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)<0){
-        str+=" readonly>";
+    // PREAMBLE AREA
+    // Show preamble in text box if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        var str = "<input type=text class='edited_qtext' value='"+Q.text+"'/>";
+        $(qId+"_preamble").html(str);
     }
     else{
-        str+=">"
+        $(qId+"_preamble").hide();
     }
 
-    for(var i in options){
-        str += options[i]+"\n";
+    // MAIN QUESTION TEXT AREA (or matrix rows)
+    str = "<textarea class='edited_"; // this is TRICKY -- setting class to be _qtext IF NOT a matrix question, since preamble in a matrix is Q.text in the jotform object
+    if(Q.type=="control_matrix"){
+        str += "rows' rows=10>"
+        var rows = Q.mrows.split("|");
+        for(var i in rows){
+            str+=rows[i]+"\n";
+        }
+    }
+    else{
+        str += "qtext' rows=5>"
+        str += Q.text;
     }
     str += "</textarea>";
-    str+="</td></tr>";
-    str += "<tr><td align=right colspan=2>";
-    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
-    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
-    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
-    str +="</td></tr></table><br>";
+    $(qId+"_qtext").html(str);
 
-    $("#"+qObj.name).html(str);
-}
 
-function makeSimpleTable(qObj){
-    
-    var str = "<div id='"+qObj.name+"' class='question_container'>";
-
-    str +="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
-    str+="<table class='matrix_table' ><tr><td>";
-    str+= qObj.text;
-    str+="</td><td class='options'>";
-    var options = qObj.options.split("|");
-    //str += options.length+"pt<br/><br/>"
-    // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
-    // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
-    str += "("+qObj.type.replace("control_","")+")<br/>";
-
-    for(var i in options){
-        str += "- "+options[i]+"<br/>";
+    // SCALES AREA
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
+    //str = "("+short_type+")<br>";
+    str = "<textarea class='edited_scales'>";
+    for(var i in scalesArray){
+        str += scalesArray[i]+"\n";
     }
-    str += "</td></tr></table></div><br>";
-    item_response_count++;
-    return str;
+    $(qId+"_scale").html(str);
+    $(qId+" .edited_scales").attr("rows", Math.max(5, scalesArray.length+1));
+    if(editableScales.indexOf(Q.type)<0){
+        $(qId+" .edited_scales").attr("readonly","readonly");
+    }
 
+    // FOOTER AREA
+    $(qId+"_footer").show();
+    str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
+    $(qId+"_footer").html(str);
 }
+
+function makeScalesArray(Q){
+
+    var array = [];
+    var short_type = Q.type.replace("control_","");
+    if(short_type == "matrix"){
+        array = Q.mcolumns.split("|");
+    }
+    else if(short_type=="radio" || short_type=="checkbox"){
+        array = Q.options.split("|");
+    }
+    else if(Q.type=="control_scale"){
+        array.push(Q.scaleFrom+" to "+Q.scaleAmount);
+    }
+    else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
+        //console.log("inside type tcheck");
+        array.push("[input_"+short_type+"]");
+        //outStr += makeSimpleTable(Q);
+    }
+    return array;
+}
+
 
 function setFormId(){
     var selected_form_id = $("#form-pulldown")[0].options[$("#form-pulldown")[0].selectedIndex].value
@@ -508,6 +531,7 @@ function clone(qObj_name){
     item_response_count++;
     var q = allQs[qObj_name];
     q.name = q.type.replace("control_","")+item_response_count;
+    q.text = "(COPY) "+q.text;
     delete(q["qid"]);
     delete(q["order"]);
     putNewQuestion([q]);
@@ -542,9 +566,6 @@ function populateFormSelect(keyword){
         }
     }
     
-   
-    // console.log("--FORMS LIST--");
-    // console.log(formList);
 
     var size = Math.min(10, formList.length);
 
@@ -559,10 +580,8 @@ function populateFormSelect(keyword){
 }
 
 function formOptionSelected(event, index){
-    console.log(event);
-    // console.log("index "+index);
-    // console.log("option selected!!!!");
-    if(event.code=="Enter" || event.code=="Space"){
+
+    //if(event.code=="Enter" || event.code=="Space"){
         $("#listOfFormOptions").css("display","none");
 
         //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
@@ -572,7 +591,7 @@ function formOptionSelected(event, index){
         $("#searchval").val("");
 
         setFormId();
-    }
+    //}
 }
 
 </script> 
@@ -588,7 +607,7 @@ function formOptionSelected(event, index){
         <!--</div>
         <div id="search_div" style="float:left"> -->
             search: <input id="searchval" oninput="populateFormSelect(this.value)" type=text value="" size=30/><br>
-            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onKeyUp="formOptionSelected(event, this.selectedIndex)"></select>
+            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onChange="formOptionSelected(event, this.selectedIndex)"></select>
        <!-- </div>-->
     </div>
     <div style="clear:both">
