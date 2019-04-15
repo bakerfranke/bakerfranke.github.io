@@ -13,6 +13,9 @@
         width: 850px;
 
     }
+    .edited_slug{
+        font-weight: bold;
+    }
     .edited_scales:read-only{
         background-color: #CCCCCC;
         color: #999999;
@@ -199,23 +202,36 @@ function loadJF(){
     
 }
 
-function updateSlug(id, name){
-    console.log("asked to update "+id+", "+name);
-    var newSlug = $("#"+name).val();
-    console.log("new slug: "+newSlug);
+function updateSlug(Q, new_slug){
+
+    var old_slug = Q.name;
+    Q.name = new_slug; //object updated
+
+    allQs[new_slug] = Q;
+    delete(allQs[old_slug]);
+
+    // change id of question_container div to new
+    $("#"+old_slug).prop("id",new_slug);
 
 
-    question = { "name" : newSlug};
-
-    JF.editFormQuestion(my_formid, id, question, function(response){
-        // *
-        //  successful response including question with given id of form with given id
-        //  .
-         
-        console.log("name updated."+response);
-    });
+    // recreate question table HTML template -- since template has all the ids
+    $("#"+Q.name).html(makeQuestionTableTemplateHTML(Q)); // attach to div we made above.
+    makeViewableTable(Q);
 
 }
+
+// function updateSlug_old(id, name){
+//     console.log("asked to update "+id+", "+name);
+//     var newSlug = $("#"+name).val();
+//     console.log("new slug: "+newSlug);
+
+
+//     question = { "name" : newSlug};
+
+//     JF.editFormQuestion(my_formid, id, question, function(response){
+//         console.log("name updated."+response);
+//     });
+// }
 
 
 // Update an edited question and POST to jotform
@@ -232,6 +248,7 @@ function updateQ(qObj_name){
         // console.log("ROWS: "+qToEdit.mrows);
         // console.log("COLS: "+qToEdit.mcolumns);
         // console.log("OPTIONS: "+qToEdit.options);
+
 
         // update Q.text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
         qToEdit.text = $(qId+" .edited_qtext").val();
@@ -256,6 +273,16 @@ function updateQ(qObj_name){
             else if(["control_radio","control_checkbox"].indexOf(qToEdit.type) >= 0){
                 qToEdit.options = pipedRows;
             }
+        }
+
+        //Update slug IF changed -- do it last because it re-writes the html table structure
+        if(qToEdit.name !== $(qId+" .edited_slug").val()){
+            console.log("THE SLUG HAS CHANGED!!!!");
+            updateSlug(qToEdit, $(qId+" .edited_slug").val());
+        }
+        else{
+            console.log("The slug has NOT changed");
+
         }
 
         if(editableTypes.indexOf(qToEdit.type)>=0){
@@ -315,7 +342,7 @@ function makeQuestionTableTemplateHTML(Q){
     //var qid = "#"+Q.name;
 
     //[slug] with click to Edit
-    str ="<b onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b><br>";
+    str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
 
     // <table id=[slug]_table >
     str += "<table id='"+Q.name+"_table' class='qtable'>";
@@ -337,6 +364,15 @@ function makeQuestionTableTemplateHTML(Q){
 function makeViewableTable(Q){
     var short_type = Q.type.replace("control_","");
     var qId = "#"+Q.name; //jquery dom id
+
+    // SLUG AREA
+    // id_slug never changes when editable, but an input field is appened to id_slug_div
+    // so this effectively gets rid of the input field id_slug_div by replacing inner html
+    // with just the text slug
+    $(qId+" .edited_slug").remove();
+    //$("#matrix_2 .edited_slug").remove()
+    //console.log("attempting to call $(\""+qId+"_slug .edited_slug\").remove()");
+
 
     // Show preamble if matrix question, otherwise hide top row
     if(Q.type=="control_matrix"){
@@ -382,6 +418,16 @@ function makeEditableTable(qname){
 
     var short_type = Q.type.replace("control_","");
     var qId = "#"+Q.name; //jquery dom id
+
+    // SLUG AREA
+    // -- Because click handler doesn't get disabled on slug text, this will
+    // keep appending text inputs on each click.  This if statment checks to 
+    // see if it's already there and adds if not.
+    if($(qId+" .edited_slug").val() == undefined){
+        var str = "<input type=text class='edited_slug' value='"+Q.name+"'/>"
+        $(qId+"_slug_div").append(str);
+    }
+    //$(qId+"_slug")[0].onclick = null;
 
     // PREAMBLE AREA
     // Show preamble in text box if matrix question, otherwise hide top row
