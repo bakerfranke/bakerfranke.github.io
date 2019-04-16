@@ -130,6 +130,8 @@ function clearApikey(){
 }
 
 function loadJF(){
+
+    $("#csvDumpDiv").hide();
     
     my_apikey = $("#apikey").val();
     my_formid = $("#formid").val();
@@ -689,7 +691,7 @@ function showDumpToCSV(){
 
 </script> 
 </head>
-<body onLoad="loadLocalstorage(); loadJF();">
+<body onLoad="loadLocalstorage(); loadJF(); ">
 <div id="userinput">
     jotform api key: <input type=text value="" size=30 id="apikey"> 
     <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
