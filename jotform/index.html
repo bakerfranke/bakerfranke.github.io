@@ -665,7 +665,7 @@ function makeCSVRows(Q){
     if(Q.type=="control_matrix"){
         var mrows = Q.mrows.split("|");
         for(var i in mrows){
-            ids[i] = Q.name+"_"+(i+1);
+            ids[i] = Q.name+"_"+(parseInt(i)+1);
             preambles[i] = Q.text;
             rows[i] = mrows[i];
             scales[i] = scaleStr;
