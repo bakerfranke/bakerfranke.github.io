@@ -13,6 +13,10 @@
         width: 850px;
 
     }
+    .hidden td {
+        color: rgba(0,0,0,0.5);
+        border-color: rgba(0,0,0,0.5);
+    }
     .edited_slug{
         font-weight: bold;
     }
@@ -178,6 +182,10 @@ function loadJF(){
             var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
             $("#main").append(divstr);
 
+            if(Q.hidden == "Yes"){
+                $("#"+Q.name).addClass("hidden");
+            }
+
             // if it's an editable type, then it gets a table layout treatment
             if(editableTypes.indexOf(Q.type)>=0){
 
@@ -288,12 +296,15 @@ function updateQ(qObj_name){
         if(editableTypes.indexOf(qToEdit.type)>=0){
             JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
 
-                console.log("UPDATED QUESTION:");
-
-                //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
                 console.log(response);
-                makeViewableTable(qToEdit);
-                setStatusMessage(qToEdit, "success", "sucessfully updated ["+qToEdit.name+"]")
+
+                    console.log("UPDATED QUESTION:");
+
+                    //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
+
+                    makeViewableTable(qToEdit);
+                    setStatusMessage(qToEdit, "success", "sucessfully updated ["+qToEdit.name+"]");
+
             });
         }
         else{
@@ -370,8 +381,10 @@ function makeViewableTable(Q){
     // so this effectively gets rid of the input field id_slug_div by replacing inner html
     // with just the text slug
     $(qId+" .edited_slug").remove();
-    //$("#matrix_2 .edited_slug").remove()
-    //console.log("attempting to call $(\""+qId+"_slug .edited_slug\").remove()");
+
+    if(Q.hidden=="Yes" && $(qId+"_hidden").length==0){
+        $(qId +"_slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
+    }
 
 
     // Show preamble if matrix question, otherwise hide top row
