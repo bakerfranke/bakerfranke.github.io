@@ -307,7 +307,7 @@ function updateQ(qObj_name){
                     //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
 
                     makeViewableTable(qToEdit);
-                    setStatusMessage(qToEdit, "success", "sucessfully updated ["+qToEdit.name+"]");
+                    setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
 
             });
         }
@@ -357,7 +357,8 @@ function makeQuestionTableTemplateHTML(Q){
     //var qid = "#"+Q.name;
 
     //[slug] with click to Edit
-    str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
+    // str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
+    str ="<div id='"+Q.name+"_slug_div'>[slug]</b></div>";
 
     // <table id=[slug]_table >
     str += "<table id='"+Q.name+"_table' class='qtable'>";
@@ -381,10 +382,7 @@ function makeViewableTable(Q){
     var qId = "#"+Q.name; //jquery dom id
 
     // SLUG AREA
-    // id_slug never changes when editable, but an input field is appened to id_slug_div
-    // so this effectively gets rid of the input field id_slug_div by replacing inner html
-    // with just the text slug
-    $(qId+" .edited_slug").remove();
+    $(qId+"_slug_div").html("<b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b>");
 
     if(Q.hidden=="Yes" && $(qId+"_hidden").length==0){
         $(qId +"_slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
@@ -437,14 +435,8 @@ function makeEditableTable(qname){
     var qId = "#"+Q.name; //jquery dom id
 
     // SLUG AREA
-    // -- Because click handler doesn't get disabled on slug text, this will
-    // keep appending text inputs on each click.  This if statment checks to 
-    // see if it's already there and adds if not.
-    if($(qId+" .edited_slug").val() == undefined){
-        var str = "<input type=text class='edited_slug' value='"+Q.name+"'/>"
-        $(qId+"_slug_div").append(str);
-    }
-    //$(qId+"_slug")[0].onclick = null;
+    var str = "[<input type=text class='edited_slug' value='"+Q.name+"' size='"+Math.max(20,(Q.name.length+2))+"'/>]"
+    $(qId+"_slug_div").html(str);
 
     // PREAMBLE AREA
     // Show preamble in text box if matrix question, otherwise hide top row
