@@ -38,7 +38,7 @@
         
     }
 
-    .qtable_footer{
+    .qfooter{
         text-align: right;
     }
 
@@ -94,6 +94,7 @@ var orderedQList = [];
 var allForms = [];
 var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
 var editableScales = ['control_matrix','control_radio','control_checkbox'];
+
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -323,17 +324,17 @@ function updateQ(qObj_name){
 function setStatusMessage(Q, code, msg){
 
     var id = "#"+Q.name; 
-    $(id+"_footer").html(code+": "+ msg);
-    $(id+"_footer").show();
+    $(id+" .qfooter").html(code+": "+ msg);
+    $(id+" .qfooter").show();
     if(code=="success"){
-        $(id+"_footer").css("background-color","#d8f9c2");
+        $(id+" .qfooter").css("background-color","#d8f9c2");
     }
     else { //if(code=="failure"){
-        $(id+"_footer").css("background-color","#f9c2c2");
+        $(id+" .qfooter").css("background-color","#f9c2c2");
     }
 
     setTimeout(function() {
-        $(id+"_footer").hide();
+        $(id+" .qfooter").hide();
     }, 5000);
 }
 
@@ -348,27 +349,29 @@ function cancelEdit(qObj_name){
 
 }
 
-// Create html for template of table that displays questions
-// set ids and classes of table cells.  Will be filled with text, or editable fields
-// i.e. it's text.  When you edit, it replaces cell contents with input fields. Then
-// you save and it replaces cell contents with text (html) again.
+// BAKER NOTE: 4.16.19 -- I modified this template to use class names for the table rows/cols
+// AND modified all code that edits the innerHTML of these table cells to use the class name selector
+// rather than the id.  i.e. WAS: $(qId+"_preamble")  NOW $(qId +" .qpreamble")
+// What's a little weird is that the class selector returns an array but $(qId +" .qpreamble").html("new html")
+// is working.  I think it's some Jquery magics that you can set the html this way and it automagically sets
+// the html for the 0th element or something.
 function makeQuestionTableTemplateHTML(Q){
     var short_type = Q.type.replace("control_","");
     //var qid = "#"+Q.name;
 
     //[slug] with click to Edit
     // str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
-    str ="<div id='"+Q.name+"_slug_div'>[slug]</b></div>";
+    str ="<div id='"+Q.name+"_slug_div' class='slug_div'>[slug]</b></div>";
 
     // <table id=[slug]_table >
     str += "<table id='"+Q.name+"_table' class='qtable'>";
     // hide top row unless matrix
-    str += "<tr><td colspan=2 id='"+Q.name+"_preamble'>[preamble]</td><tr>";
+    str += "<tr><td colspan=2 id='"+Q.name+"_preamble' class='qpreamble'>[preamble]</td><tr>";
     str += "<tr><td id='"+Q.name+"_qtext' class='qtext "+short_type+"'>[qtext or matrix rows]</td>"
-    str += "<td id='"+Q.name+"_scale'>[scale]</td></tr>";
+    str += "<td id='"+Q.name+"_scale' class='qscale'>[scale]</td></tr>";
 
     // bottom row stuff
-    str += "<tr><td colspan=2 id='"+Q.name+"_footer' class='qtable_footer'>footer</td></tr>";
+    str += "<tr><td colspan=2 id='"+Q.name+"_footer' class='qfooter'>footer</td></tr>";
     str += "</table>";
 
     //$(qid).append(str);
@@ -382,19 +385,19 @@ function makeViewableTable(Q){
     var qId = "#"+Q.name; //jquery dom id
 
     // SLUG AREA
-    $(qId+"_slug_div").html("<b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b>");
+    $(qId+" .slug_div").html("<b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b>");
 
     if(Q.hidden=="Yes" && $(qId+"_hidden").length==0){
-        $(qId +"_slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
+        $(qId +" .slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
     }
 
 
     // Show preamble if matrix question, otherwise hide top row
     if(Q.type=="control_matrix"){
-        $(qId+"_preamble").html(Q.text);
+        $(qId+" .qpreamble").html(Q.text);
     }
     else{
-        $(qId+"_preamble").hide();
+        $(qId+" .qpreamble").hide();
     }
 
     // Fill in question text.  If matrix then rows, otherwise qtext
@@ -405,11 +408,11 @@ function makeViewableTable(Q){
             str+="<li>"+rows[i];
         }
         str += "</ol>";
-        $(qId+"_qtext").html(str);
+        $(qId+" .qtext").html(str);
         item_response_count += rows.length; 
     }
     else{
-        $(qId+"_qtext").html(Q.text);
+        $(qId+" .qtext").html(Q.text);
         item_response_count++;
     }
 
@@ -420,10 +423,14 @@ function makeViewableTable(Q){
     for(var i in scalesArray){
         str += "- "+scalesArray[i]+"<br/>";
     }
-    $(qId+"_scale").html(str);
+    $(qId+" .qscale").html(str);
 
     // footer shows/hides based setStatusMessage
-    $(qId+"_footer").hide();
+    $(qId+" .qfooter").hide();
+}
+
+function showFooter(Q_name){
+    $("#"+Q_name+" .qfooter").show();
 }
 
 function makeEditableTable(qname){
@@ -435,17 +442,17 @@ function makeEditableTable(qname){
     var qId = "#"+Q.name; //jquery dom id
 
     // SLUG AREA
-    var str = "[<input type=text class='edited_slug' value='"+Q.name+"' size='"+Math.max(20,(Q.name.length+2))+"'/>]"
-    $(qId+"_slug_div").html(str);
+    var str = "[<input type=text onClick='showFooter(\""+Q.name+"\")' class='edited_slug' value='"+Q.name+"' size='"+Math.max(20,(Q.name.length+2))+"'/>]"
+    $(qId+" .slug_div").html(str);
 
     // PREAMBLE AREA
     // Show preamble in text box if matrix question, otherwise hide top row
     if(Q.type=="control_matrix"){
         var str = "<input type=text class='edited_qtext' value='"+Q.text+"'/>";
-        $(qId+"_preamble").html(str);
+        $(qId+" .qpreamble").html(str);
     }
     else{
-        $(qId+"_preamble").hide();
+        $(qId+" .qpreamble").hide();
     }
 
     // MAIN QUESTION TEXT AREA (or matrix rows)
@@ -462,7 +469,7 @@ function makeEditableTable(qname){
         str += Q.text;
     }
     str += "</textarea>";
-    $(qId+"_qtext").html(str);
+    $(qId+" .qtext").html(str);
 
 
     // SCALES AREA
@@ -472,18 +479,18 @@ function makeEditableTable(qname){
     for(var i in scalesArray){
         str += scalesArray[i]+"\n";
     }
-    $(qId+"_scale").html(str);
+    $(qId+" .qscale").html(str);
     $(qId+" .edited_scales").attr("rows", Math.max(5, scalesArray.length+1));
     if(editableScales.indexOf(Q.type)<0){
         $(qId+" .edited_scales").attr("readonly","readonly");
     }
 
     // FOOTER AREA
-    $(qId+"_footer").show();
+    $(qId+" .qfooter").show();
     str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
     str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
     str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
-    $(qId+"_footer").html(str);
+    $(qId+" .qfooter").html(str);
 }
 
 // helper function to turn any question response type (text, rows, scale, etc.)
