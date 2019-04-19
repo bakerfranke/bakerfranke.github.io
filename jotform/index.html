@@ -92,7 +92,7 @@ var allQs = {};
 var orderedQList = [];
 
 var allForms = [];
-var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale'];
 var editableScales = ['control_matrix','control_radio','control_checkbox'];
 
 
@@ -303,12 +303,12 @@ function updateQ(qObj_name){
 
                 console.log(response);
 
-                    console.log("UPDATED QUESTION:");
+                console.log("UPDATED QUESTION:");
 
-                    //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
+                //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
 
-                    makeViewableTable(qToEdit);
-                    setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
+                makeViewableTable(qToEdit);
+                setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
 
             });
         }
@@ -706,6 +706,7 @@ function showDumpToCSV(){
     </div>
     <div style="clear:both">
          form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a> <button id="dumpToCsv_btn" onClick="showDumpToCSV()">Dump to tsv</button>
+
     </div>
     <div id="csvDumpDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="csvDumpTextarea"></textarea></div>
 </div>
