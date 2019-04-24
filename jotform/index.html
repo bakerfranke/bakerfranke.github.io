@@ -366,12 +366,12 @@ function makeQuestionTableTemplateHTML(Q){
     // <table id=[slug]_table >
     str += "<table id='"+Q.name+"_table' class='qtable'>";
     // hide top row unless matrix
-    str += "<tr><td colspan=2 id='"+Q.name+"_preamble' class='qpreamble'>[preamble]</td><tr>";
+    str += "<tr class='qpreamble_tr'><td colspan=2 id='"+Q.name+"_preamble' class='qpreamble'>[preamble]</td></tr>";
     str += "<tr><td id='"+Q.name+"_qtext' class='qtext "+short_type+"'>[qtext or matrix rows]</td>"
     str += "<td id='"+Q.name+"_scale' class='qscale'>[scale]</td></tr>";
 
     // bottom row stuff
-    str += "<tr><td colspan=2 id='"+Q.name+"_footer' class='qfooter'>footer</td></tr>";
+    str += "<tr class='qfooter_tr'><td colspan=2 id='"+Q.name+"_footer' class='qfooter'>footer</td></tr>";
     str += "</table>";
 
     //$(qid).append(str);
@@ -397,7 +397,8 @@ function makeViewableTable(Q){
         $(qId+" .qpreamble").html(Q.text);
     }
     else{
-        $(qId+" .qpreamble").hide();
+        $(qId+" .qpreamble_tr").hide();
+        //$(qId+" .qpreamble").remove();
     }
 
     // Fill in question text.  If matrix then rows, otherwise qtext
@@ -452,7 +453,7 @@ function makeEditableTable(qname){
         $(qId+" .qpreamble").html(str);
     }
     else{
-        $(qId+" .qpreamble").hide();
+        //$(qId+" .qpreamble").hide();
     }
 
     // MAIN QUESTION TEXT AREA (or matrix rows)
