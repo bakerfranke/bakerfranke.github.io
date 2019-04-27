@@ -38,6 +38,11 @@
         
     }
 
+    .qtable .control_text{
+        border: solid 1px #DDDDDD;
+        
+    }
+
     .qfooter{
         text-align: right;
     }
@@ -54,6 +59,9 @@
     }
     .qtext{
         width: 66%;
+    }
+    .text{
+        border: solid 1px #DDDDDD;
     }
     .matrix_rows{
         width: 66%;
@@ -80,6 +88,11 @@
     .hiddenkey:hover{
         color: rgba(0,0,0,1);
     }
+    .head{
+        font-size: 2em; /* equiv to h1 */
+        font-family: sans-serif;
+    }
+
     ol{
         padding-inline-start: 20px;
     }
@@ -91,9 +104,10 @@ var my_formid = "";
 var item_response_count = 0;
 var allQs = {};
 var orderedQList = [];
+var questions_finsished_loading = false;
 
 var allForms = [];
-var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale'];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale','control_text','control_head',"control_button","control_email"];
 var editableScales = ['control_matrix','control_radio','control_checkbox'];
 
 
@@ -180,6 +194,8 @@ function loadJF(){
 // Makes the API call, loads questions and re-writes html on the screen. Need to rewrite HTML INSIDE
 // the callback, otherwise would have to write own wait or blocking function.
 function loadAllQs_andHTML(formid){
+
+    questions_finsished_loading = false;
     JF.getFormQuestions(formid, function(response){
 
         //console.table(response);
@@ -232,6 +248,7 @@ function loadAllQs_andHTML(formid){
         }
 
         loadHTML();
+        questions_finsished_loading = true;
 
 
     });
@@ -275,7 +292,7 @@ function loadHTML(){
 
 function updateSlug(Q, new_slug){
 
-
+    new_slug = new_slug.replace(/ /g,"_");
     // safety check. if the new slug is same as old, we have nothing to do.
     if(Q.name === new_slug){
         return;
@@ -288,7 +305,7 @@ function updateSlug(Q, new_slug){
     // if new_slug already exists..
     if(allQs[new_slug] !== undefined){
         new_slug += "_"+item_response_count+"_"+parseInt(Math.random()*100);
-        console.log("WARNING: attempting to make non-unique slug.  Changed to: "+new_slug);
+        alert("WARNING: you attempted to make non-unique slug.  Changed to: "+new_slug);
 
     }
 
@@ -296,16 +313,16 @@ function updateSlug(Q, new_slug){
     Q.name = new_slug; //object updated
 
 
-    allQs[new_slug] = Q;
-    delete(allQs[old_slug]);
+    // allQs[new_slug] = Q;
+    // delete(allQs[old_slug]);
 
-    // change id of question_container div to new
-    $("#"+old_slug).prop("id",new_slug);
+    // // change id of question_container div to new
+    // $("#"+old_slug).prop("id",new_slug);
 
 
-    // recreate question table HTML template -- since template has all the ids
-    $("#"+Q.name).html(makeQuestionTableTemplateHTML(Q)); // attach to div we made above.
-    makeViewableTable(Q);
+    // // recreate question table HTML template -- since template has all the ids
+    // $("#"+Q.name).html(makeQuestionTableTemplateHTML(Q)); // attach to div we made above.
+    // makeViewableTable(Q);
 
 }
 
@@ -316,6 +333,7 @@ function updateQ(qObj_name){
     var qToEdit = allQs[qObj_name]; // will update this object
     var qId = "#"+qObj_name;
     var orderChanged = false;
+    var slugChanged = false;
 
     //ONLY UPDATE qObj and POST if I know how to edit it
     if(editableTypes.indexOf(qToEdit.type) >= 0){
@@ -351,24 +369,28 @@ function updateQ(qObj_name){
             }
         }
 
-        //Update slug IF changed -- do it last because it re-writes the html table structure
-        // note: this if-statement is now overkill.  This is checked in updateSlug anyway
-        if(qToEdit.name !== $(qId+" .edited_slug").val()){
-            //console.log("THE SLUG HAS CHANGED!!!!");
-            updateSlug(qToEdit, $(qId+" .edited_slug").val());
-        }
-        else{
-            console.log("The slug has NOT changed");
-        }
-
-        if(qToEdit.order !== $(qId+" .edited_order").val()){
+         if(qToEdit.order !== $(qId+" .edited_order").val()){
             // TO DO: NEED TO FIX
             // you can clobber a question by overwriting its order -- YIPES
             // has to be an integer
             qToEdit.order = parseInt($(qId+" .edited_order").val());
 
             orderChanged = true;
+
         }
+
+        //Update slug IF changed -- do it last because it re-writes the html table structure
+        // note: this if-statement is now overkill.  This is checked in updateSlug anyway
+        if(qToEdit.name !== $(qId+" .edited_slug").val()){
+            //console.log("THE SLUG HAS CHANGED!!!!");
+            slugChanged = true;
+            updateSlug(qToEdit, $(qId+" .edited_slug").val());
+        }
+        else{
+            console.log("The slug has NOT changed");
+        }
+
+       
 
         if(editableTypes.indexOf(qToEdit.type)>=0){
             JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
@@ -377,15 +399,25 @@ function updateQ(qObj_name){
 
                 console.log("UPDATED QUESTION:");
 
-                //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
-
                 makeViewableTable(qToEdit);
-                setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
 
                 // if the order of a question changed, just repull and re-write page everything.
-                if(orderChanged){
+
+                if(orderChanged || slugChanged){
                     loadAllQs_andHTML(my_formid);
                 }
+
+                // block until new question html is written fully so we can set a status message apprpriately.
+                // Most of the time this interval wont even fire once.  In the case of order or slug changing 
+                // the API call to load all questions takes some small amount of time to return, so we wait.
+                var id = setInterval(function(){
+
+                    if(questions_finsished_loading === true){
+                        clearInterval(id);
+                        setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
+                    }
+
+                }, 100);
 
             });
         }
@@ -492,6 +524,10 @@ function makeViewableTable(Q){
         $(qId+" .qtext").html(str);
         item_response_count += rows.length; 
     }
+    else if(Q.type == "control_button"){
+        var str = "<button>"+Q.text+"</button>";
+        $(qId+" .qtext").html(str);
+    }
     else{
         $(qId+" .qtext").html(Q.text);
         item_response_count++;
@@ -505,6 +541,13 @@ function makeViewableTable(Q){
         str += "- "+scalesArray[i]+"<br/>";
     }
     $(qId+" .qscale").html(str);
+
+    // if it's a control_text hide scales
+    if(Q.type=="control_text" || Q.type == "control_head" || Q.type == "control_button"){
+        $(qId+" .qscale").hide();
+        $(qId+"_qtext").addClass("control_text")
+    }
+
 
     // footer shows/hides based setStatusMessage
     $(qId+" .qfooter").hide();
@@ -655,7 +698,7 @@ function deleteQ(qObj_name){
         });
     }
     else{
-
+        cancelEdit(qObj_name);
     }
 }
 
