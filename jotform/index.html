@@ -84,7 +84,8 @@
         padding-inline-start: 20px;
     }
     </style>
- <script>
+<script>
+
 var my_apikey = "";
 var my_formid = "";
 var item_response_count = 0;
@@ -170,55 +171,130 @@ function loadJF(){
 
     JF.getFormQuestions(my_formid, function(response){
 
-        // first put Qs in order they appear in in the form
+        loadAllQs_andHTML(my_formid);
+        
+    });
+}
+
+
+// Makes the API call, loads questions and re-writes html on the screen. Need to rewrite HTML INSIDE
+// the callback, otherwise would have to write own wait or blocking function.
+function loadAllQs_andHTML(formid){
+    JF.getFormQuestions(formid, function(response){
+
+        //console.table(response);
+
+        // BAKER NOTE: jotform allows collisions on the 'order' field. i.e. order is no unique, nor
+        // does it need to be maintained as unique. This was causing me to lose questions when I tried
+        // to use an array orderedQList[q.order] because collisions got overwritten and would appear lost.
+        // Yet we need to present the quesitons in order on the screen. Solution: read the dictionary
+        // of questions you get in the API call into an array by simply pushing them in.  Then, sort
+        // the array using a custom sorting function based on the 'order' property.
+
+        //first put Qs into an ARRAY 
         orderedQList = [];
         for(var i in response){
-            var obj = response[i];
-            orderedQList[obj.order] = obj;
-            allQs[obj.name] = obj;
+            orderedQList.push(response[i]);
         }
+    
+        // sort by 'order' property
+        orderedQList.sort(function(a, b){ 
+            var aVal = Number(a.order);
+            var bVal = Number(b.order);
+            if(aVal >= bVal){  //note: this means in the case of a tie, the original ordering wins
+                return 1;
+            }
+            else{ 
+                return -1;
+            }
+        });
 
-        //var outStr = "";
-        $("#main").empty();  
+        // Now make a dictionary keyed on the Question id (name)
+        // NOTE: We CANNOT allow for collisions on the question id. Yet, jotform allows for it.
+        // So on both reads (like here) we should throw warnings and on writes (like updateQ) 
+        // we should disallow it.
+
+        allQs = {};
+
         for(var i in orderedQList){
-            var Q = orderedQList[i];
+            var obj = orderedQList[i];
 
-            // every element from questions array gets its own div attached to #main
-            var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
-            $("#main").append(divstr);
-
-            if(Q.hidden == "Yes"){
-                $("#"+Q.name).addClass("hidden");
-            }
-
-            // if it's an editable type, then it gets a table layout treatment
-            if(editableTypes.indexOf(Q.type)>=0){
-
-                var tableHTML = makeQuestionTableTemplateHTML(Q); // create a table to display question
-                $("#"+Q.name).html(tableHTML); // attach to div we made above.
-
-                makeViewableTable(Q); // sets all the fields in the table template based on Q type
-            }
-            else if(Q.type == "control_pagebreak"){ // special display for a page break
-                $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
+            //check for collisions
+            if(allQs[obj.name] === undefined){
+                allQs[obj.name] = obj;
             }
             else{
-                $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+                console.log("COLLISION loading allQs. Tried to load: ")
+                console.table(obj);
+                console.log("\tcollided with existing element: ")
+                console.table(allQs[obj.name]);
             }
         }
-        //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
-        $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
-        //$("#main").html(outStr);
+
+        loadHTML();
+
 
     });
+}
 
-    
+// TODO: parameterize to use 
+function loadHTML(){
+       //var outStr = "";
+    $("#main").empty();  
+    item_response_count= 0;
+    for(var i in orderedQList){
+        var Q = orderedQList[i];
+
+        // every element from questions array gets its own div attached to #main
+        var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
+        $("#main").append(divstr);
+
+        if(Q.hidden == "Yes"){
+            $("#"+Q.name).addClass("hidden");
+        }
+
+        // if it's an editable type, then it gets a table layout treatment
+        if(editableTypes.indexOf(Q.type)>=0){
+
+            var tableHTML = makeQuestionTableTemplateHTML(Q); // create a table to display question
+            $("#"+Q.name).html(tableHTML); // attach to div we made above.
+
+            makeViewableTable(Q); // sets all the fields in the table template based on Q type
+        }
+        else if(Q.type == "control_pagebreak"){ // special display for a page break
+            $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
+        }
+        else{
+            $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+        }
+    }
+    //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
+    $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
+    //$("#main").html(outStr);
 }
 
 function updateSlug(Q, new_slug){
 
+
+    // safety check. if the new slug is same as old, we have nothing to do.
+    if(Q.name === new_slug){
+        return;
+    }
+
+    // new_slug SHOULD NOT already exist in allQs except in the case where it's not actually new for this Q
+
+    // it's theoretically possible this solution still causes a collision, but I don't want to 
+    // put while loops in here. ie. "while the new_slug not unique"
+    // if new_slug already exists..
+    if(allQs[new_slug] !== undefined){
+        new_slug += "_"+item_response_count+"_"+parseInt(Math.random()*100);
+        console.log("WARNING: attempting to make non-unique slug.  Changed to: "+new_slug);
+
+    }
+
     var old_slug = Q.name;
     Q.name = new_slug; //object updated
+
 
     allQs[new_slug] = Q;
     delete(allQs[old_slug]);
@@ -233,26 +309,13 @@ function updateSlug(Q, new_slug){
 
 }
 
-// function updateSlug_old(id, name){
-//     console.log("asked to update "+id+", "+name);
-//     var newSlug = $("#"+name).val();
-//     console.log("new slug: "+newSlug);
-
-
-//     question = { "name" : newSlug};
-
-//     JF.editFormQuestion(my_formid, id, question, function(response){
-//         console.log("name updated."+response);
-//     });
-// }
-
-
 // Update an edited question and POST to jotform
 // Currently there is no test for diffs on changes.  Simply grab what's in text boxes and post.
 function updateQ(qObj_name){
 
     var qToEdit = allQs[qObj_name]; // will update this object
     var qId = "#"+qObj_name;
+    var orderChanged = false;
 
     //ONLY UPDATE qObj and POST if I know how to edit it
     if(editableTypes.indexOf(qToEdit.type) >= 0){
@@ -289,13 +352,22 @@ function updateQ(qObj_name){
         }
 
         //Update slug IF changed -- do it last because it re-writes the html table structure
+        // note: this if-statement is now overkill.  This is checked in updateSlug anyway
         if(qToEdit.name !== $(qId+" .edited_slug").val()){
-            console.log("THE SLUG HAS CHANGED!!!!");
+            //console.log("THE SLUG HAS CHANGED!!!!");
             updateSlug(qToEdit, $(qId+" .edited_slug").val());
         }
         else{
             console.log("The slug has NOT changed");
+        }
 
+        if(qToEdit.order !== $(qId+" .edited_order").val()){
+            // TO DO: NEED TO FIX
+            // you can clobber a question by overwriting its order -- YIPES
+            // has to be an integer
+            qToEdit.order = parseInt($(qId+" .edited_order").val());
+
+            orderChanged = true;
         }
 
         if(editableTypes.indexOf(qToEdit.type)>=0){
@@ -309,6 +381,11 @@ function updateQ(qObj_name){
 
                 makeViewableTable(qToEdit);
                 setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
+
+                // if the order of a question changed, just repull and re-write page everything.
+                if(orderChanged){
+                    loadAllQs_andHTML(my_formid);
+                }
 
             });
         }
@@ -361,7 +438,7 @@ function makeQuestionTableTemplateHTML(Q){
 
     //[slug] with click to Edit
     // str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
-    str ="<div id='"+Q.name+"_slug_div' class='slug_div'>[slug]</b></div>";
+    str ="<div id='"+Q.name+"_slug_div'><span class='qorder'>[order]</span><span class='slug_div'>[slug]</span></div>";
 
     // <table id=[slug]_table >
     str += "<table id='"+Q.name+"_table' class='qtable'>";
@@ -383,6 +460,9 @@ function makeQuestionTableTemplateHTML(Q){
 function makeViewableTable(Q){
     var short_type = Q.type.replace("control_","");
     var qId = "#"+Q.name; //jquery dom id
+
+    // ORDER AREA
+    $(qId+" .qorder").html(Q.order+". ");
 
     // SLUG AREA
     $(qId+" .slug_div").html("<b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b>");
@@ -442,6 +522,10 @@ function makeEditableTable(qname){
     var short_type = Q.type.replace("control_","");
     var qId = "#"+Q.name; //jquery dom id
 
+    // ORDER AREA
+    var str = "<input type=text class='edited_order' value='"+Q.order+"' size=3>";
+    $(qId+" .qorder").html(str);
+
     // SLUG AREA
     var str = "[<input type=text onClick='showFooter(\""+Q.name+"\")' class='edited_slug' value='"+Q.name+"' size='"+Math.max(20,(Q.name.length+2))+"'/>]"
     $(qId+" .slug_div").html(str);
@@ -491,6 +575,8 @@ function makeEditableTable(qname){
     str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
     str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
     str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
+    str += "&nbsp; &nbsp; ";
+    str += "<button onClick='deleteQ(\""+Q.name+"\")'>delete</button>";
     $(qId+" .qfooter").html(str);
 }
 
@@ -553,13 +639,34 @@ function addQuestion(type){
 
 }
 
+function deleteQ(qObj_name){
+    var response = confirm("Are you sure you want to delete "+qObj_name+"?");
+
+    if(response==true){
+        JF.deleteFormQuestion(""+my_formid, allQs[qObj_name].qid, function(response){
+    
+            console.log("Deleted");
+            console.table(response);
+
+            // could probably safely do this without triggering an API call
+
+            //var obj
+            loadAllQs_andHTML(my_formid);
+        });
+    }
+    else{
+
+    }
+}
+
 function clone(qObj_name){
     item_response_count++;
     var q = allQs[qObj_name];
     q.name = q.type.replace("control_","")+item_response_count;
     q.text = "(COPY) "+q.text;
+    q.order++;
     delete(q["qid"]);
-    delete(q["order"]);
+    //delete(q["order"]);
     putNewQuestion([q]);
 }
 
@@ -570,7 +677,8 @@ function putNewQuestion(questionsArray){
          for(var i in response){
            console.log(response[i]);
         }
-        location.reload();
+        //location.reload();
+        loadAllQs_andHTML(my_formid);
     });
 
 }
