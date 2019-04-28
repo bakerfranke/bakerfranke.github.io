@@ -39,8 +39,12 @@
     }
 
     .qtable .control_text{
-        border: solid 1px #DDDDDD;
-        
+        border: none;       
+        border-top: solid 1px #DDDDDD;
+    }
+
+    .control_text td{
+        border: none;
     }
 
     .qfooter{
@@ -89,7 +93,7 @@
         color: rgba(0,0,0,1);
     }
     .head{
-        font-size: 2em; /* equiv to h1 */
+        font-size: 1.5em; /* equiv to h1 */
         font-family: sans-serif;
     }
 
@@ -122,11 +126,11 @@ function getParameterByName(name, url) {
 }
 
 function loadLocalstorage(){
-    if(localStorage["my_apikey"] !==undefined){
+    if(localStorage["my_apikey"] !== undefined){
         $("#apikey").val(localStorage["my_apikey"] );
         $("#makeapikey").hide();
     }
-    if(localStorage["my_formid"] !==undefined){
+    if(localStorage["my_formid"] !== undefined){
         $("#formid").val(localStorage["my_formid"] );
     }
 
@@ -137,6 +141,7 @@ function loadLocalstorage(){
     }
 }
 
+// delete api key from local storage
 function clearApikey(){
 
     delete(localStorage["my_apikey"]);
@@ -144,6 +149,7 @@ function clearApikey(){
     
     location.reload();
 }
+
 
 function loadJF(){
 
@@ -179,17 +185,12 @@ function loadJF(){
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
     $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
 
-
     // render all questions from loaded form to the screen
-    item_response_count = 0;
-
     JF.getFormQuestions(my_formid, function(response){
-
         loadAllQs_andHTML(my_formid);
         
     });
 }
-
 
 // Makes the API call, loads questions and re-writes html on the screen. Need to rewrite HTML INSIDE
 // the callback, otherwise would have to write own wait or blocking function.
@@ -311,18 +312,6 @@ function updateSlug(Q, new_slug){
 
     var old_slug = Q.name;
     Q.name = new_slug; //object updated
-
-
-    // allQs[new_slug] = Q;
-    // delete(allQs[old_slug]);
-
-    // // change id of question_container div to new
-    // $("#"+old_slug).prop("id",new_slug);
-
-
-    // // recreate question table HTML template -- since template has all the ids
-    // $("#"+Q.name).html(makeQuestionTableTemplateHTML(Q)); // attach to div we made above.
-    // makeViewableTable(Q);
 
 }
 
