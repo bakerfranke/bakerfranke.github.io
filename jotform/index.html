@@ -282,7 +282,7 @@ function loadHTML(){
             $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
         }
         else{
-            $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+            $("#"+Q.name).html(Q.order+". <b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
         }
     }
     //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
