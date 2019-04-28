@@ -382,7 +382,7 @@ function updateQ(qObj_name){
         //Update slug IF changed -- do it last because it re-writes the html table structure
         // note: this if-statement is now overkill.  This is checked in updateSlug anyway
         if(qToEdit.name !== $(qId+" .edited_slug").val()){
-            //console.log("THE SLUG HAS CHANGED!!!!");
+            console.log("THE SLUG HAS CHANGED!!!!");
             slugChanged = true;
             updateSlug(qToEdit, $(qId+" .edited_slug").val());
         }
@@ -530,7 +530,10 @@ function makeViewableTable(Q){
     }
     else{
         $(qId+" .qtext").html(Q.text);
-        item_response_count++;
+
+        if(Q.type != "control_text" && Q.type != "control_head"){
+            item_response_count++;
+        }
     }
 
     //fill scales
