@@ -317,12 +317,14 @@ function updateSlug(Q, new_slug){
 
 // Update an edited question and POST to jotform
 // Currently there is no test for diffs on changes.  Simply grab what's in text boxes and post.
+var hiddenChanged = false; // LAZY
 function updateQ(qObj_name){
 
     var qToEdit = allQs[qObj_name]; // will update this object
     var qId = "#"+qObj_name;
     var orderChanged = false;
     var slugChanged = false;
+    
 
     //ONLY UPDATE qObj and POST if I know how to edit it
     if(editableTypes.indexOf(qToEdit.type) >= 0){
@@ -610,10 +612,16 @@ function makeEditableTable(qname){
     str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
     str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
     str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
+    str += "<button onClick='hide(\""+Q.name+"\")'>";
+        if(Q.hidden == undefined) str+= "hide";
+        else str+= "show";
+    str += "</button>";
     str += "&nbsp; &nbsp; ";
     str += "<button onClick='deleteQ(\""+Q.name+"\")'>delete</button>";
     $(qId+" .qfooter").html(str);
 }
+
+
 
 // helper function to turn any question response type (text, rows, scale, etc.)
 // into an array for easy display formatting.
@@ -692,6 +700,23 @@ function deleteQ(qObj_name){
     else{
         cancelEdit(qObj_name);
     }
+}
+
+// toggle hidden
+// NOTE: adding and removing CSS .hidden class to avoid second api call to pull back down to reload HTML
+function hide(qObj_name){
+    var Q = allQs[qObj_name];
+    if(Q.hidden === undefined){
+        Q.hidden = "Yes";
+        $("#"+qObj_name).addClass("hidden");
+    }
+    else{
+        delete(Q.hidden);
+        $("#"+qObj_name).removeClass("hidden");
+
+    }
+
+    updateQ(qObj_name);
 }
 
 function clone(qObj_name){
