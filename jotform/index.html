@@ -13,10 +13,15 @@
         width: 850px;
 
     }
-    .hidden td {
+    .hidden {
         color: rgba(0,0,0,0.5);
+    }
+    .hidden td {
+         color: rgba(0,0,0,0.5);
+
         border-color: rgba(0,0,0,0.5);
     }
+   
     .edited_slug{
         font-weight: bold;
     }
@@ -350,6 +355,7 @@ function updateQ(qObj_name){
         if(editableScales.indexOf(qToEdit.type)>=0){
             var rows = $(qId+" .edited_scales").val();
             rows = $.trim(rows);
+
             var pipedRows = rows.replace(/\n/g,"|");
 
             if(qToEdit.type=='control_matrix'){
@@ -534,6 +540,11 @@ function makeViewableTable(Q){
     for(var i in scalesArray){
         str += "- "+scalesArray[i]+"<br/>";
     }
+    
+    // if "allow other" write-in field option is checked, display [Other] at end of scales list.
+    if(Q.allowOther !== undefined && Q.allowOther == "Yes"){
+        str += "[Other]<br/>";
+    }
     $(qId+" .qscale").html(str);
 
     // if it's a control_text hide scales
@@ -595,8 +606,9 @@ function makeEditableTable(qname){
 
 
     // SCALES AREA
+    // TO DO: add checkbox for "allow other" for radio and checkbox types. Right now if allowOther is checked it displays but you can't edit or change it.
     var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
-    //str = "("+short_type+")<br>";
+
     str = "<textarea class='edited_scales'>";
     for(var i in scalesArray){
         str += scalesArray[i]+"\n";
@@ -634,9 +646,14 @@ function makeScalesArray(Q){
     }
     else if(short_type=="radio" || short_type=="checkbox"){
         array = Q.options.split("|");
+       
     }
     else if(Q.type=="control_scale"){
-        array.push(Q.scaleFrom+" to "+Q.scaleAmount);
+        //array.push( Q.fromText+"("+Q.scaleFrom+") to "+Q.toText+"("+Q.scaleAmount+")");
+        array.push("<b>From:</b> ("+Q.scaleFrom+") "+Q.fromText);
+        array.push("<b>&nbsp;&nbspTo:</b> ("+Q.scaleAmount+") "+Q.toText);
+
+
     }
     else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
         //console.log("inside type tcheck");
