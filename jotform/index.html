@@ -430,8 +430,9 @@ function updateQ(qObj_name){
 function setStatusMessage(Q, code, msg){
 
     var id = "#"+Q.name; 
+    $(id+" .qfooter_tr").show();
+
     $(id+" .qfooter").html(code+": "+ msg);
-    $(id+" .qfooter").show();
     if(code=="success"){
         $(id+" .qfooter").css("background-color","#d8f9c2");
     }
@@ -440,7 +441,7 @@ function setStatusMessage(Q, code, msg){
     }
 
     setTimeout(function() {
-        $(id+" .qfooter").hide();
+        $(id+" .qfooter_tr").hide();
     }, 5000);
 }
 
@@ -559,7 +560,7 @@ function makeViewableTable(Q){
 }
 
 function showFooter(Q_name){
-    $("#"+Q_name+" .qfooter").show();
+    $("#"+Q_name+" .qfooter_tr").show();
 }
 
 function makeEditableTable(qname){
@@ -620,7 +621,8 @@ function makeEditableTable(qname){
     }
 
     // FOOTER AREA
-    $(qId+" .qfooter").show();
+    $(qId+" .qfooter_tr").show();
+
     str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
     str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
     str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
