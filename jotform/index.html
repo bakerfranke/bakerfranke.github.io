@@ -392,7 +392,7 @@ function updateQ(qObj_name){
         if(editableTypes.indexOf(qToEdit.type)>=0){
             JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
 
-                console.log(response);
+                console.table(response);
 
                 console.log("UPDATED QUESTION:");
 
@@ -735,7 +735,8 @@ function hide(qObj_name){
         $("#"+qObj_name).addClass("hidden");
     }
     else{
-        delete(Q.hidden);
+        //delete(Q.hidden);
+        Q.hidden = undefined; // changed this because jotform changed? maybe it never worked?
         $("#"+qObj_name).removeClass("hidden");
 
     }
