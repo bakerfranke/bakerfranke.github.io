@@ -292,7 +292,7 @@ function loadHTML(){
         }
     }
     //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
-    $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
+    $("#main").append("<br/><b>Total # response items: "+item_response_count+"</b>");
     //$("#main").html(outStr);
 }
 
@@ -521,6 +521,7 @@ function makeViewableTable(Q){
         str += "</ol>";
         $(qId+" .qtext").html(str);
         item_response_count += rows.length; 
+
     }
     else if(Q.type == "control_button"){
         var str = "<button>"+Q.text+"</button>";
@@ -529,7 +530,11 @@ function makeViewableTable(Q){
     else{
         $(qId+" .qtext").html(Q.text);
 
-        if(Q.type != "control_text" && Q.type != "control_head"){
+        var types_dont_contain_qs = ["control_text", "control_head", "control_widget", "control_button"];
+
+        // don't count it as a response item if it's not a q.type that contains response items
+        // and it's not hidden
+        if(types_dont_contain_qs.indexOf(Q.type) < 0 && Q.hidden!=="Yes"){
             item_response_count++;
         }
     }
