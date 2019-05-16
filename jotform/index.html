@@ -714,8 +714,8 @@ function setFormId(){
 
 function addQuestion(type){
     item_response_count++;
-    console.log("asked to add >>"+type+"<<");
-    var knowntypes = ["radio","checkbox","matrix","textbox","textarea","pagebreak"];
+    //console.log("asked to add >>"+type+"<<");
+    var knowntypes = ["radio","checkbox","matrix","textbox","textarea","pagebreak","text"];
     if(knowntypes.indexOf(type) < 0){
         return;
     }
@@ -757,6 +757,10 @@ function addQuestion(type){
         qObj["nextText"]="Next";
         qObj["nextVisi"]="Visible";
         qObj["pageInfo"]="";
+    }
+    else if(type == "text"){
+        qObj.name = "text_"+parseInt(Math.random()*10000);
+        qObj.text = "<span style='font-size: 14pt'><strong>Here is a heading</strong></span><p>Here is some text</p>";
     }
     //console.log("about to add");
     //console.log(qObj);
@@ -968,7 +972,7 @@ function showDumpToCSV(){
 </div>
 <hr>
 <div id="footer">
-    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> <button onClick="addQuestion('pagebreak')">Pagebreak</button>
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> <button onClick="addQuestion('pagebreak')">Pagebreak</button> <button onClick="addQuestion('text')">Text (html)</button>
     <br>(adds to bottom, causes page to refresh)
 </div>
  
