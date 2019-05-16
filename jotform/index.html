@@ -13,6 +13,7 @@
         width: 850px;
 
     }
+    
     .hidden {
         color: rgba(0,0,0,0.5);
     }
@@ -43,6 +44,13 @@
         
     }
 
+    .pagebreak td{
+        font-size: 12px;
+        padding: 0px;
+        border: solid 1px black;
+
+    }
+
     .qtable .control_text{
         border: none;       
         border-top: solid 1px #DDDDDD;
@@ -59,7 +67,7 @@
     .input{
         width: 100%;
     }
-    .edited_qtext, .edited_scales, .edited_rows{
+    .edited_qtext, .edited_scales, .edited_rows, .edited_pagebreak{
         width: 100%;
     }
 
@@ -79,10 +87,11 @@
         width: 50%;
     }
     .pagebreak{
-        text-align: right;
+        text-align: left;
         background-color: #d9f3f5;
         font-size: 8pt;
         padding: 1px;
+        padding-left: 10px;
         font-family: sans-serif;
     }
     #userinput{
@@ -116,7 +125,7 @@ var orderedQList = [];
 var questions_finsished_loading = false;
 
 var allForms = [];
-var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale','control_text','control_head',"control_button","control_email"];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale','control_text','control_head',"control_button","control_email","control_pagebreak"];
 var editableScales = ['control_matrix','control_radio','control_checkbox'];
 
 
@@ -188,7 +197,6 @@ function loadJF(){
     localStorage["my_formid"] = my_formid;
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
-    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
 
     // render all questions from loaded form to the screen
     JF.getFormQuestions(my_formid, function(response){
@@ -349,6 +357,13 @@ function updateQ(qObj_name){
             rows = $.trim(rows);
             var pipedRows = rows.replace(/\n/g,"|");
             qToEdit.mrows = pipedRows;
+        }
+
+        if(qToEdit.type == 'control_pagebreak'){
+            
+            qToEdit.backText = $("#pageBreak .edited_backText").val();
+            qToEdit.nextText = $("#pageBreak .edited_nextText").val();
+
         }
 
         // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
@@ -527,6 +542,12 @@ function makeViewableTable(Q){
         var str = "<button>"+Q.text+"</button>";
         $(qId+" .qtext").html(str);
     }
+    else if(Q.type == "control_pagebreak"){
+        var str = "Page Break &nbsp; &nbsp;";
+        str += "<button>"+Q.backText+"</button> <button>"+Q.nextText+"</button>";
+        $(qId+" .qtext").html(str);
+
+    }
     else{
         $(qId+" .qtext").html(Q.text);
 
@@ -554,7 +575,7 @@ function makeViewableTable(Q){
     $(qId+" .qscale").html(str);
 
     // if it's a control_text hide scales
-    if(Q.type=="control_text" || Q.type == "control_head" || Q.type == "control_button"){
+    if(Q.type=="control_text" || Q.type == "control_head" || Q.type == "control_button" || Q.type=="control_pagebreak"){
         $(qId+" .qscale").hide();
         $(qId+"_qtext").addClass("control_text")
     }
@@ -603,11 +624,25 @@ function makeEditableTable(qname){
             str+=rows[i]+"\n";
         }
     }
+    // else if(Q.type=="control_pagebreak"){
+    //     str += "pagebreak' rows=5>"+Q.backText+"\n"+Q.nextText;
+    // }
     else{
         str += "qtext' rows=5>"
         str += Q.text;
     }
     str += "</textarea>";
+
+    if(Q.type=="control_pagebreak"){ //forget general textarea. if it's a pagebreak, overwrite str
+        str = "Page Break. Set the button text. Note: Jotform automagically hides back button if it's first page.<br/>";
+        str += "<table><tr><td>Back Button Text</td><td>Next Button Text</td>";
+        str += "</tr><tr>";
+        str += "<td><input type=text class='edited_backText' value='"+Q.backText+"'></td>";
+        str += "<td><input type=text class='edited_nextText' value='"+Q.nextText+"'></td>";
+        str += "</tr></table>"
+    }
+
+
     $(qId+" .qtext").html(str);
 
 
@@ -680,7 +715,7 @@ function setFormId(){
 function addQuestion(type){
     item_response_count++;
 
-    var knowntypes = ["radio","checkbox","matrix","textbox"];
+    var knowntypes = ["radio","checkbox","matrix","textbox","textarea"];
     if(knowntypes.indexOf(type) < 0){
         return;
     }
@@ -690,7 +725,7 @@ function addQuestion(type){
         "type": qtype,
         "name": type+"_"+item_response_count,
         "text": "New Question Text"
-        
+
     };
 
     if(type=="matrix"){
@@ -701,6 +736,12 @@ function addQuestion(type){
     }
     else if(type == "radio" || type=="checkbox"){
         qObj["options"] = "option 1|option 2|option 3";
+    }
+    else if(type=="textarea"){
+        qObj["readonly"] = "no";
+        qObj["rows"]="4";
+        qObj["cols"]="60";
+        qObj["wysiwyg"]="Disable"
     }
     //console.log("about to add");
     //console.log(qObj);
@@ -912,7 +953,7 @@ function showDumpToCSV(){
 </div>
 <hr>
 <div id="footer">
-    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> 
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> 
     <br>(adds to bottom, causes page to refresh)
 </div>
  
