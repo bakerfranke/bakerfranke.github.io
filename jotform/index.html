@@ -714,8 +714,8 @@ function setFormId(){
 
 function addQuestion(type){
     item_response_count++;
-
-    var knowntypes = ["radio","checkbox","matrix","textbox","textarea"];
+    console.log("asked to add >>"+type+"<<");
+    var knowntypes = ["radio","checkbox","matrix","textbox","textarea","pagebreak"];
     if(knowntypes.indexOf(type) < 0){
         return;
     }
@@ -728,6 +728,8 @@ function addQuestion(type){
 
     };
 
+
+
     if(type=="matrix"){
         qObj["mrows"]="row 1|row 2|row 3";
         qObj["mcolumns"] = "col 1|col 2|col 3|col 4|col 5";
@@ -738,10 +740,23 @@ function addQuestion(type){
         qObj["options"] = "option 1|option 2|option 3";
     }
     else if(type=="textarea"){
+        console.log('asked to add a textarea inside if statement')
+
         qObj["readonly"] = "no";
         qObj["rows"]="4";
         qObj["cols"]="60";
         qObj["wysiwyg"]="Disable"
+    }
+    else if(type == "pagebreak"){
+        qObj["name"] = "pagebreak_"+parseInt(Math.random()*10000);
+        qObj["autoNext"]="No";
+        qObj["backText"]="Back";
+        qObj["backVisi"]="Visible";
+        qObj["buttonStyle"]="None";
+        qObj["hidden"]="No";
+        qObj["nextText"]="Next";
+        qObj["nextVisi"]="Visible";
+        qObj["pageInfo"]="";
     }
     //console.log("about to add");
     //console.log(qObj);
@@ -953,7 +968,7 @@ function showDumpToCSV(){
 </div>
 <hr>
 <div id="footer">
-    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> 
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> <button onClick="addQuestion('pagebreak')">Pagebreak</button>
     <br>(adds to bottom, causes page to refresh)
 </div>
  
