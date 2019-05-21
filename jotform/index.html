@@ -197,6 +197,8 @@ function loadJF(){
     localStorage["my_formid"] = my_formid;
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
+
 
     // render all questions from loaded form to the screen
     JF.getFormQuestions(my_formid, function(response){
