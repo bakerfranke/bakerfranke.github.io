@@ -270,6 +270,14 @@ function loadAllQs_andHTML(formid){
     });
 }
 
+function inspectItem(qName){
+    var result = console.table(allQs[qName]);
+
+    console.log("------------ result of console.table ------------");
+
+    console.log(result);
+}
+
 // TODO: parameterize to use 
 function loadHTML(){
        //var outStr = "";
@@ -363,8 +371,8 @@ function updateQ(qObj_name){
 
         if(qToEdit.type == 'control_pagebreak'){
             
-            qToEdit.backText = $("#pageBreak .edited_backText").val();
-            qToEdit.nextText = $("#pageBreak .edited_nextText").val();
+            qToEdit.backText = $(qId+" .edited_backText").val();
+            qToEdit.nextText = $(qId+" .edited_nextText").val();
 
         }
 
@@ -976,6 +984,7 @@ function showDumpToCSV(){
 <div id="footer">
     Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> <button onClick="addQuestion('pagebreak')">Pagebreak</button> <button onClick="addQuestion('text')">Text (html)</button>
     <br>(adds to bottom, causes page to refresh)
+    <button onClick="inspectItem('matrix_16')">inspect item</button>
 </div>
  
 </body>
