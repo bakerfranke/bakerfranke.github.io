@@ -123,11 +123,12 @@ var item_response_count = 0;
 var allQs = {};
 var orderedQList = [];
 var questions_finsished_loading = false;
+var SAFE_VIEW = false; // if true, prevents editing
+
 
 var allForms = [];
 var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale','control_text','control_head',"control_button","control_email","control_pagebreak"];
 var editableScales = ['control_matrix','control_radio','control_checkbox'];
-
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
@@ -152,6 +153,11 @@ function loadLocalstorage(){
     var param_formid = getParameterByName("formid");
     if(param_formid!==null){
          $("#formid").val(param_formid);
+    }
+
+    var safeview = getParameterByName("safeview");
+    if(safeview!==null && (safeview.toLowerCase()=="true" || safeview.toLowerCase().indexOf("t")==0)){
+        SAFE_VIEW = true;
     }
 }
 
@@ -600,6 +606,9 @@ function showFooter(Q_name){
 }
 
 function makeEditableTable(qname){
+
+
+    if(SAFE_VIEW===true) return;
 
     var Q = allQs[qname];
     if(editableTypes.indexOf(Q.type)<0) return;
