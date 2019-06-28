@@ -182,6 +182,7 @@ function loadJF(){
     JF.initialize( {apiKey: my_apikey} ); 
     localStorage["my_apikey"] = my_apikey;
 
+
     //get all forms available and populate pulldown menu sorted by updated_at
     JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
         allForms = response;
@@ -193,9 +194,25 @@ function loadJF(){
         dropdown.append('<option selected="true" disabled>Choose a form</option>');
         dropdown.prop('selectedIndex', 0);
 
+        var num_items = 0;
         for(var i=0; i<response.length; i++){
-            dropdown.append($('<option></option>').attr('value', response[i].id).text(response[i].title));
-            if(response[i].id == my_formid){ dropdown.prop('selectedIndex', i+1); }
+            if(response[i].status != "DELETED"){   //06.29.19 -- including this line cause dropdown to snap to first item rather than selected
+               var survey_title = response[i].title;
+               if(response[i].status !== "ENABLED"){
+                   survey_title += " ["+response[i].status+"]"
+               }
+                dropdown.append($('<option></option>').attr('value', response[i].id).text(survey_title));
+                num_items++;
+                if(response[i].id == my_formid){ 
+                    dropdown.prop('selectedIndex', num_items); 
+
+                    $("#updated_at").val(response[i].updated_at);
+                    $("#num_submissions").val(response[i].count);
+                    $("#last_submission").val(response[i].last_submission);
+
+
+                }
+            }
         }
     });
 
@@ -204,6 +221,7 @@ function loadJF(){
     $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
     $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
     $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
+
 
 
     // render all questions from loaded form to the screen
@@ -982,6 +1000,9 @@ function showDumpToCSV(){
     <div style="clear:both">
          form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a> <button id="dumpToCsv_btn" onClick="showDumpToCSV()">Dump to tsv</button>
 
+    </div>
+    <div>
+        Updated at: <input id="updated_at" type=text disabled value="YYYY-MM-DD"/> Num Submissions:<input type=text disabled id="num_submissions" value="1234" /> Last Submission:<input type=text disabled id="last_submission" value="1234" />
     </div>
     <div id="csvDumpDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="csvDumpTextarea"></textarea></div>
 </div>
