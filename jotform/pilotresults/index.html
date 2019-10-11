@@ -1,5 +1,1025 @@
-name	id	color
-Baker	1121	purple
-Andrea 1432	purple
-Brook	1111	grey
+<html>
+<head>
+         
+
+    <script src="https://js.jotform.com/JotForm.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+    <style>
+    body{
+        
+        padding-left: 40px;
+        font-size: 11pt;
+        width: 850px;
+
+    }
+    
+    .hidden {
+        color: rgba(0,0,0,0.5);
+    }
+    .hidden td {
+         color: rgba(0,0,0,0.5);
+
+        border-color: rgba(0,0,0,0.5);
+    }
+   
+    .edited_slug{
+        font-weight: bold;
+    }
+    .edited_scales:read-only{
+        background-color: #CCCCCC;
+        color: #999999;
+    }
+    .qtable{
+       
+        border-collapse: collapse;
+        font-size: 11pt;
+        width: 100%;
+
+    }
+    .qtable td{
+        vertical-align: top;
+        border: solid 1px black;
+        padding: 5px;
+        
+    }
+
+    .pagebreak td{
+        font-size: 12px;
+        padding: 0px;
+        border: solid 1px black;
+
+    }
+
+    .qtable .control_text{
+        border: none;       
+        border-top: solid 1px #DDDDDD;
+    }
+
+    .control_text td{
+        border: none;
+    }
+
+    .qfooter{
+        text-align: right;
+    }
+
+    .input{
+        width: 100%;
+    }
+    .edited_qtext, .edited_scales, .edited_rows, .edited_pagebreak{
+        width: 100%;
+    }
+
+    .question_container{
+        margin-bottom: 10px;
+    }
+    .qtext{
+        width: 66%;
+    }
+    .text{
+        border: solid 1px #DDDDDD;
+    }
+    .matrix_rows{
+        width: 66%;
+    }
+    .options{
+        width: 50%;
+    }
+    .pagebreak{
+        text-align: left;
+        background-color: #d9f3f5;
+        font-size: 8pt;
+        padding: 1px;
+        padding-left: 10px;
+        font-family: sans-serif;
+    }
+    #userinput{
+        background-color: #DDDDDD;
+        margin-bottom: 4px;
+    }
+    .hiddenkey{
+        color: rgba(0,0,0,0);
+        font-family: sans-serif;
+        font-size: 9pt;
+    }
+    .hiddenkey:hover{
+        color: rgba(0,0,0,1);
+    }
+    .head{
+        font-size: 1.5em; /* equiv to h1 */
+        font-family: sans-serif;
+    }
+
+    ol{
+        padding-inline-start: 20px;
+    }
+    </style>
+<script>
+
+var my_apikey = "";
+var my_formid = "";
+var item_response_count = 0;
+var allQs = {};
+var orderedQList = [];
+var questions_finsished_loading = false;
+var SAFE_VIEW = false; // if true, prevents editing
+
+
+var allForms = [];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea','control_scale','control_text','control_head',"control_button","control_email","control_pagebreak"];
+var editableScales = ['control_matrix','control_radio','control_checkbox'];
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function loadLocalstorage(){
+    if(localStorage["my_apikey"] !== undefined){
+        $("#apikey").val(localStorage["my_apikey"] );
+        $("#makeapikey").hide();
+    }
+    if(localStorage["my_formid"] !== undefined){
+        $("#formid").val(localStorage["my_formid"] );
+    }
+
+    // QUERY STRING FORM ID overrides local storage value
+    var param_formid = getParameterByName("formid");
+    if(param_formid!==null){
+         $("#formid").val(param_formid);
+    }
+
+    var safeview = getParameterByName("safeview");
+    if(safeview!==null && (safeview.toLowerCase()=="true" || safeview.toLowerCase().indexOf("t")==0)){
+        SAFE_VIEW = true;
+    }
+}
+
+// delete api key from local storage
+function clearApikey(){
+
+    delete(localStorage["my_apikey"]);
+    delete(localStorage["my_formid"]);
+    
+    location.reload();
+}
+
+
+function loadJF(){
+
+    $("#csvDumpDiv").hide();
+    
+    my_apikey = $("#apikey").val();
+    my_formid = $("#formid").val();
+
+    // Login and populate pulldown menu of surveys
+    JF.initialize( {apiKey: my_apikey} ); 
+    localStorage["my_apikey"] = my_apikey;
+
+
+    //get all forms available and populate pulldown menu sorted by updated_at
+    JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
+        allForms = response;
+     
+        var dropdown = $('#form-pulldown');
+
+        dropdown.empty();
+
+        dropdown.append('<option selected="true" disabled>Choose a form</option>');
+        dropdown.prop('selectedIndex', 0);
+
+        var num_items = 0;
+        for(var i=0; i<response.length; i++){
+            if(response[i].status != "DELETED"){   //06.29.19 -- including this line cause dropdown to snap to first item rather than selected
+               var survey_title = response[i].title;
+               if(response[i].status !== "ENABLED"){
+                   survey_title += " ["+response[i].status+"]"
+               }
+                dropdown.append($('<option></option>').attr('value', response[i].id).text(survey_title));
+                num_items++;
+                if(response[i].id == my_formid){ 
+                    dropdown.prop('selectedIndex', num_items); 
+
+                    $("#updated_at").val(response[i].updated_at);
+                    $("#num_submissions").val(response[i].count);
+                    $("#last_submission").val(response[i].last_submission);
+
+
+                }
+            }
+        }
+    });
+
+    // set cached jotform id and create links appropriately
+    localStorage["my_formid"] = my_formid;
+    $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
+    $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
+
+
+
+    // render all questions from loaded form to the screen
+    JF.getFormQuestions(my_formid, function(response){
+        loadAllQs_andHTML(my_formid);
+        
+    });
+}
+
+// Makes the API call, loads questions and re-writes html on the screen. Need to rewrite HTML INSIDE
+// the callback, otherwise would have to write own wait or blocking function.
+function loadAllQs_andHTML(formid){
+
+    questions_finsished_loading = false;
+    JF.getFormQuestions(formid, function(response){
+
+        //console.table(response);
+
+        // BAKER NOTE: jotform allows collisions on the 'order' field. i.e. order is no unique, nor
+        // does it need to be maintained as unique. This was causing me to lose questions when I tried
+        // to use an array orderedQList[q.order] because collisions got overwritten and would appear lost.
+        // Yet we need to present the quesitons in order on the screen. Solution: read the dictionary
+        // of questions you get in the API call into an array by simply pushing them in.  Then, sort
+        // the array using a custom sorting function based on the 'order' property.
+
+        //first put Qs into an ARRAY 
+        orderedQList = [];
+        for(var i in response){
+            orderedQList.push(response[i]);
+        }
+    
+        // sort by 'order' property
+        orderedQList.sort(function(a, b){ 
+            var aVal = Number(a.order);
+            var bVal = Number(b.order);
+            if(aVal >= bVal){  //note: this means in the case of a tie, the original ordering wins
+                return 1;
+            }
+            else{ 
+                return -1;
+            }
+        });
+
+        // Now make a dictionary keyed on the Question id (name)
+        // NOTE: We CANNOT allow for collisions on the question id. Yet, jotform allows for it.
+        // So on both reads (like here) we should throw warnings and on writes (like updateQ) 
+        // we should disallow it.
+
+        allQs = {};
+
+        for(var i in orderedQList){
+            var obj = orderedQList[i];
+
+            //check for collisions
+            if(allQs[obj.name] === undefined){
+                allQs[obj.name] = obj;
+            }
+            else{
+                console.log("COLLISION loading allQs. Tried to load: ")
+                console.table(obj);
+                console.log("\tcollided with existing element: ")
+                console.table(allQs[obj.name]);
+            }
+        }
+
+        loadHTML();
+        questions_finsished_loading = true;
+
+
+    });
+}
+
+function inspectItem(qName){
+    var result = console.table(allQs[qName]);
+
+    console.log("------------ result of console.table ------------");
+
+    console.log(result);
+}
+
+// TODO: parameterize to use 
+function loadHTML(){
+       //var outStr = "";
+    $("#main").empty();  
+    item_response_count= 0;
+    for(var i in orderedQList){
+        var Q = orderedQList[i];
+
+        // every element from questions array gets its own div attached to #main
+        var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
+        $("#main").append(divstr);
+
+        if(Q.hidden == "Yes"){
+            $("#"+Q.name).addClass("hidden");
+        }
+
+        // if it's an editable type, then it gets a table layout treatment
+        if(editableTypes.indexOf(Q.type)>=0){
+
+            var tableHTML = makeQuestionTableTemplateHTML(Q); // create a table to display question
+            $("#"+Q.name).html(tableHTML); // attach to div we made above.
+
+            makeViewableTable(Q); // sets all the fields in the table template based on Q type
+        }
+        else if(Q.type == "control_pagebreak"){ // special display for a page break
+            $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
+        }
+        else{
+            $("#"+Q.name).html(Q.order+". <b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+        }
+    }
+    //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
+    $("#main").append("<br/><b>Total # response items: "+item_response_count+"</b>");
+    //$("#main").html(outStr);
+}
+
+function updateSlug(Q, new_slug){
+
+    new_slug = new_slug.replace(/ /g,"_");
+    // safety check. if the new slug is same as old, we have nothing to do.
+    if(Q.name === new_slug){
+        return;
+    }
+
+    // new_slug SHOULD NOT already exist in allQs except in the case where it's not actually new for this Q
+
+    // it's theoretically possible this solution still causes a collision, but I don't want to 
+    // put while loops in here. ie. "while the new_slug not unique"
+    // if new_slug already exists..
+    if(allQs[new_slug] !== undefined){
+        new_slug += "_"+item_response_count+"_"+parseInt(Math.random()*100);
+        alert("WARNING: you attempted to make non-unique slug.  Changed to: "+new_slug);
+
+    }
+
+    var old_slug = Q.name;
+    Q.name = new_slug; //object updated
+
+}
+
+// Update an edited question and POST to jotform
+// Currently there is no test for diffs on changes.  Simply grab what's in text boxes and post.
+var hiddenChanged = false; // LAZY
+function updateQ(qObj_name){
+
+    var qToEdit = allQs[qObj_name]; // will update this object
+    var qId = "#"+qObj_name;
+    var orderChanged = false;
+    var slugChanged = false;
+    
+
+    //ONLY UPDATE qObj and POST if I know how to edit it
+    if(editableTypes.indexOf(qToEdit.type) >= 0){
+        // console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+        // console.log("QTEXT: "+qToEdit.text);
+        // console.log("ROWS: "+qToEdit.mrows);
+        // console.log("COLS: "+qToEdit.mcolumns);
+        // console.log("OPTIONS: "+qToEdit.options);
+
+
+        // update Q.text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
+        qToEdit.text = $(qId+" .edited_qtext").val();
+
+        // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
+        if(qToEdit.type=='control_matrix'){
+            var rows = $(qId+" .edited_rows").val();
+            rows = $.trim(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+            qToEdit.mrows = pipedRows;
+        }
+
+        if(qToEdit.type == 'control_pagebreak'){
+            
+            qToEdit.backText = $(qId+" .edited_backText").val();
+            qToEdit.nextText = $(qId+" .edited_nextText").val();
+
+        }
+
+        // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
+        if(editableScales.indexOf(qToEdit.type)>=0){
+            var rows = $(qId+" .edited_scales").val();
+            rows = $.trim(rows);
+
+            var pipedRows = rows.replace(/\n/g,"|");
+
+            if(qToEdit.type=='control_matrix'){
+                qToEdit.mcolumns = pipedRows;
+            }
+            else if(["control_radio","control_checkbox"].indexOf(qToEdit.type) >= 0){
+                qToEdit.options = pipedRows;
+            }
+        }
+
+         if(qToEdit.order !== $(qId+" .edited_order").val()){
+            // TO DO: NEED TO FIX
+            // you can clobber a question by overwriting its order -- YIPES
+            // has to be an integer
+            qToEdit.order = parseInt($(qId+" .edited_order").val());
+
+            orderChanged = true;
+
+        }
+
+        //Update slug IF changed -- do it last because it re-writes the html table structure
+        // note: this if-statement is now overkill.  This is checked in updateSlug anyway
+        if(qToEdit.name !== $(qId+" .edited_slug").val()){
+            console.log("THE SLUG HAS CHANGED!!!!");
+            slugChanged = true;
+            updateSlug(qToEdit, $(qId+" .edited_slug").val());
+        }
+        else{
+            console.log("The slug has NOT changed");
+        }
+
+       
+
+        if(editableTypes.indexOf(qToEdit.type)>=0){
+            JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
+
+                console.table(response);
+
+                console.log("UPDATED QUESTION:");
+
+                makeViewableTable(qToEdit);
+
+                // if the order of a question changed, just repull and re-write page everything.
+
+                if(orderChanged || slugChanged){
+                    loadAllQs_andHTML(my_formid);
+                }
+
+                // block until new question html is written fully so we can set a status message apprpriately.
+                // Most of the time this interval wont even fire once.  In the case of order or slug changing 
+                // the API call to load all questions takes some small amount of time to return, so we wait.
+                var id = setInterval(function(){
+
+                    if(questions_finsished_loading === true){
+                        clearInterval(id);
+                        setStatusMessage(qToEdit, "success", "updated ["+qToEdit.name+"]");
+                    }
+
+                }, 100);
+
+            });
+        }
+        else{
+            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+            makeViewableTable(qToEdit);
+            setStatusMessage(qToEdit, "failure", "UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+
+        }
+    }
+}
+
+function setStatusMessage(Q, code, msg){
+
+    var id = "#"+Q.name; 
+    $(id+" .qfooter_tr").show();
+
+    $(id+" .qfooter").html(code+": "+ msg);
+    if(code=="success"){
+        $(id+" .qfooter").css("background-color","#d8f9c2");
+    }
+    else { //if(code=="failure"){
+        $(id+" .qfooter").css("background-color","#f9c2c2");
+    }
+
+    setTimeout(function() {
+        $(id+" .qfooter_tr").hide();
+    }, 5000);
+}
+
+
+function cancelEdit(qObj_name){
+    console.log("CANCELLED edit on "+qObj_name);
+    var qToCancel = allQs[qObj_name];
+    console.log(qToCancel);
+    makeViewableTable(qToCancel);
+    //setStatusMessage(qToCancel,"Cancelled","question not updated.")
+
+
+}
+
+// BAKER NOTE: 4.16.19 -- I modified this template to use class names for the table rows/cols
+// AND modified all code that edits the innerHTML of these table cells to use the class name selector
+// rather than the id.  i.e. WAS: $(qId+"_preamble")  NOW $(qId +" .qpreamble")
+// What's a little weird is that the class selector returns an array but $(qId +" .qpreamble").html("new html")
+// is working.  I think it's some Jquery magics that you can set the html this way and it automagically sets
+// the html for the 0th element or something.
+function makeQuestionTableTemplateHTML(Q){
+    var short_type = Q.type.replace("control_","");
+    //var qid = "#"+Q.name;
+
+    //[slug] with click to Edit
+    // str ="<div id='"+Q.name+"_slug_div'><b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b></div>";
+    str ="<div id='"+Q.name+"_slug_div'><span class='qorder'>[order]</span><span class='slug_div'>[slug]</span></div>";
+
+    // <table id=[slug]_table >
+    str += "<table id='"+Q.name+"_table' class='qtable'>";
+    // hide top row unless matrix
+    str += "<tr class='qpreamble_tr'><td colspan=2 id='"+Q.name+"_preamble' class='qpreamble'>[preamble]</td></tr>";
+    str += "<tr><td id='"+Q.name+"_qtext' class='qtext "+short_type+"'>[qtext or matrix rows]</td>"
+    str += "<td id='"+Q.name+"_scale' class='qscale'>[scale]</td></tr>";
+
+    // bottom row stuff
+    str += "<tr class='qfooter_tr'><td colspan=2 id='"+Q.name+"_footer' class='qfooter'>footer</td></tr>";
+    str += "</table>";
+
+    //$(qid).append(str);
+    return str;
+}
+
+// Make viewable (read only) version of question
+// set html of div and table elements 
+function makeViewableTable(Q){
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
+
+    // ORDER AREA
+    $(qId+" .qorder").html(Q.order+". ");
+
+    // SLUG AREA
+    $(qId+" .slug_div").html("<b id='"+Q.name+"_slug' onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b>");
+
+    if(Q.hidden=="Yes" && $(qId+"_hidden").length==0){
+        $(qId +" .slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
+    }
+
+
+    // Show preamble if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        $(qId+" .qpreamble").html(Q.text);
+    }
+    else{
+        $(qId+" .qpreamble_tr").hide();
+        //$(qId+" .qpreamble").remove();
+    }
+
+    // Fill in question text.  If matrix then rows, otherwise qtext
+    if(Q.type=="control_matrix"){
+        var rows = Q.mrows.split("|");
+        var str = "<ol>";
+        for(var i in rows){
+            str+="<li>"+rows[i];
+        }
+        str += "</ol>";
+        $(qId+" .qtext").html(str);
+        item_response_count += rows.length; 
+
+    }
+    else if(Q.type == "control_button"){
+        var str = "<button>"+Q.text+"</button>";
+        $(qId+" .qtext").html(str);
+    }
+    else if(Q.type == "control_pagebreak"){
+        var str = "Page Break &nbsp; &nbsp;";
+        str += "<button>"+Q.backText+"</button> <button>"+Q.nextText+"</button>";
+        $(qId+" .qtext").html(str);
+
+    }
+    else{
+        $(qId+" .qtext").html(Q.text);
+
+        var types_dont_contain_qs = ["control_text", "control_head", "control_widget", "control_button"];
+
+        // don't count it as a response item if it's not a q.type that contains response items
+        // and it's not hidden
+        if(types_dont_contain_qs.indexOf(Q.type) < 0 && Q.hidden!=="Yes"){
+            item_response_count++;
+        }
+    }
+
+    //fill scales
+
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
+    var str = "("+short_type+")<br>"; 
+    for(var i in scalesArray){
+        str += "- "+scalesArray[i]+"<br/>";
+    }
+    
+    // if "allow other" write-in field option is checked, display [Other] at end of scales list.
+    if(Q.allowOther !== undefined && Q.allowOther == "Yes"){
+        str += "[Other]<br/>";
+    }
+    $(qId+" .qscale").html(str);
+
+    // if it's a control_text hide scales
+    if(Q.type=="control_text" || Q.type == "control_head" || Q.type == "control_button" || Q.type=="control_pagebreak"){
+        $(qId+" .qscale").hide();
+        $(qId+"_qtext").addClass("control_text")
+    }
+
+
+    // footer shows/hides based setStatusMessage
+    $(qId+" .qfooter_tr").hide();
+}
+
+function showFooter(Q_name){
+    $("#"+Q_name+" .qfooter_tr").show();
+}
+
+function makeEditableTable(qname){
+
+
+    if(SAFE_VIEW===true) return;
+
+    var Q = allQs[qname];
+    if(editableTypes.indexOf(Q.type)<0) return;
+
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
+
+    // ORDER AREA
+    var str = "<input type=text class='edited_order' value='"+Q.order+"' size=3>";
+    $(qId+" .qorder").html(str);
+
+    // SLUG AREA
+    var str = "[<input type=text onClick='showFooter(\""+Q.name+"\")' class='edited_slug' value='"+Q.name+"' size='"+Math.max(20,(Q.name.length+2))+"'/>]"
+    $(qId+" .slug_div").html(str);
+
+    // PREAMBLE AREA
+    // Show preamble in text box if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        var str = "<input type=text class='edited_qtext' value='"+Q.text+"'/>";
+        $(qId+" .qpreamble").html(str);
+    }
+    else{
+        //$(qId+" .qpreamble").hide();
+    }
+
+    // MAIN QUESTION TEXT AREA (or matrix rows)
+    str = "<textarea class='edited_"; // this is TRICKY -- setting class to be _qtext IF NOT a matrix question, since preamble in a matrix is Q.text in the jotform object
+    if(Q.type=="control_matrix"){
+        str += "rows' rows=10>"
+        var rows = Q.mrows.split("|");
+        for(var i in rows){
+            str+=rows[i]+"\n";
+        }
+    }
+    // else if(Q.type=="control_pagebreak"){
+    //     str += "pagebreak' rows=5>"+Q.backText+"\n"+Q.nextText;
+    // }
+    else{
+        str += "qtext' rows=5>"
+        str += Q.text;
+    }
+    str += "</textarea>";
+
+    if(Q.type=="control_pagebreak"){ //forget general textarea. if it's a pagebreak, overwrite str
+        str = "Page Break. Set the button text. Note: Jotform automagically hides back button if it's first page.<br/>";
+        str += "<table><tr><td>Back Button Text</td><td>Next Button Text</td>";
+        str += "</tr><tr>";
+        str += "<td><input type=text class='edited_backText' value='"+Q.backText+"'></td>";
+        str += "<td><input type=text class='edited_nextText' value='"+Q.nextText+"'></td>";
+        str += "</tr></table>"
+    }
+
+
+    $(qId+" .qtext").html(str);
+
+
+    // SCALES AREA
+    // TO DO: add checkbox for "allow other" for radio and checkbox types. Right now if allowOther is checked it displays but you can't edit or change it.
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
+
+    str = "<textarea class='edited_scales'>";
+    for(var i in scalesArray){
+        str += scalesArray[i]+"\n";
+    }
+    $(qId+" .qscale").html(str);
+    $(qId+" .edited_scales").attr("rows", Math.max(5, scalesArray.length+1));
+    if(editableScales.indexOf(Q.type)<0){
+        $(qId+" .edited_scales").attr("readonly","readonly");
+    }
+
+    // FOOTER AREA
+    $(qId+" .qfooter_tr").show();
+
+    str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
+    str += "<button onClick='hide(\""+Q.name+"\")'>";
+        if(Q.hidden == undefined) str+= "hide";
+        else str+= "show";
+    str += "</button>";
+    str += "&nbsp; &nbsp; ";
+    str += "<button onClick='deleteQ(\""+Q.name+"\")'>delete</button>";
+    $(qId+" .qfooter").html(str);
+}
+
+
+
+// helper function to turn any question response type (text, rows, scale, etc.)
+// into an array for easy display formatting.
+function makeScalesArray(Q){
+
+    var array = [];
+    var short_type = Q.type.replace("control_","");
+    if(short_type == "matrix"){
+        array = Q.mcolumns.split("|");
+    }
+    else if(short_type=="radio" || short_type=="checkbox"){
+        array = Q.options.split("|");
+       
+    }
+    else if(Q.type=="control_scale"){
+        //array.push( Q.fromText+"("+Q.scaleFrom+") to "+Q.toText+"("+Q.scaleAmount+")");
+        array.push("<b>From:</b> ("+Q.scaleFrom+") "+Q.fromText);
+        array.push("<b>&nbsp;&nbspTo:</b> ("+Q.scaleAmount+") "+Q.toText);
+
+
+    }
+    else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
+        //console.log("inside type tcheck");
+        array.push("[input_"+short_type+"]");
+        //outStr += makeSimpleTable(Q);
+    }
+    return array;
+}
+
+
+function setFormId(){
+    var selected_form_id = $("#form-pulldown")[0].options[$("#form-pulldown")[0].selectedIndex].value
+    $("#formid").val(selected_form_id);
+    loadJF();
+}
+
+function addQuestion(type){
+    item_response_count++;
+    //console.log("asked to add >>"+type+"<<");
+    var knowntypes = ["radio","checkbox","matrix","textbox","textarea","pagebreak","text"];
+    if(knowntypes.indexOf(type) < 0){
+        return;
+    }
+
+    var qtype = "control_"+type;
+    var qObj = {
+        "type": qtype,
+        "name": type+"_"+item_response_count,
+        "text": "New Question Text"
+
+    };
+
+
+
+    if(type=="matrix"){
+        qObj["mrows"]="row 1|row 2|row 3";
+        qObj["mcolumns"] = "col 1|col 2|col 3|col 4|col 5";
+        qObj["inputType"] = "Radio Button";
+        qObj["labelAlign"] = "Auto"
+    }
+    else if(type == "radio" || type=="checkbox"){
+        qObj["options"] = "option 1|option 2|option 3";
+    }
+    else if(type=="textarea"){
+        console.log('asked to add a textarea inside if statement')
+
+        qObj["readonly"] = "no";
+        qObj["rows"]="4";
+        qObj["cols"]="60";
+        qObj["wysiwyg"]="Disable"
+    }
+    else if(type == "pagebreak"){
+        qObj["name"] = "pagebreak_"+parseInt(Math.random()*10000);
+        qObj["autoNext"]="No";
+        qObj["backText"]="Back";
+        qObj["backVisi"]="Visible";
+        qObj["buttonStyle"]="None";
+        qObj["hidden"]="No";
+        qObj["nextText"]="Next";
+        qObj["nextVisi"]="Visible";
+        qObj["pageInfo"]="";
+    }
+    else if(type == "text"){
+        qObj.name = "text_"+parseInt(Math.random()*10000);
+        qObj.text = "<span style='font-size: 14pt'><strong>Here is a heading</strong></span><p>Here is some text</p>";
+    }
+    //console.log("about to add");
+    //console.log(qObj);
+    putNewQuestion([qObj]); 
+
+}
+
+function deleteQ(qObj_name){
+    var response = confirm("Are you sure you want to delete "+qObj_name+"?");
+
+    if(response==true){
+        JF.deleteFormQuestion(""+my_formid, allQs[qObj_name].qid, function(response){
+    
+            console.log("Deleted");
+            console.table(response);
+
+            // could probably safely do this without triggering an API call
+
+            //var obj
+            loadAllQs_andHTML(my_formid);
+        });
+    }
+    else{
+        cancelEdit(qObj_name);
+    }
+}
+
+// toggle hidden
+// NOTE: adding and removing CSS .hidden class to avoid second api call to pull back down to reload HTML
+function hide(qObj_name){
+    var Q = allQs[qObj_name];
+    if(Q.hidden === undefined){
+        Q.hidden = "Yes";
+        $("#"+qObj_name).addClass("hidden");
+    }
+    else{
+        //delete(Q.hidden);
+        Q.hidden = undefined; // changed this because jotform changed? maybe it never worked?
+        $("#"+qObj_name).removeClass("hidden");
+
+    }
+
+    updateQ(qObj_name);
+}
+
+function clone(qObj_name){
+    item_response_count++;
+    var q = allQs[qObj_name];
+    q.name = q.type.replace("control_","")+item_response_count;
+    q.text = "(COPY) "+q.text;
+    q.order++;
+    delete(q["qid"]);
+    //delete(q["order"]);
+    putNewQuestion([q]);
+}
+
+function putNewQuestion(questionsArray){
+    jsonData = JSON.stringify({ "questions" : questionsArray});
+
+    JF.createFormQuestions(my_formid, jsonData, function(response){
+         for(var i in response){
+           console.log(response[i]);
+        }
+        //location.reload();
+        loadAllQs_andHTML(my_formid);
+    });
+
+}
+
+function populateFormSelect(keyword){
+    console.log("searching for..."+keyword);
+    var formList = [];
+   
+    // Search through the pulldown list text
+    var allFormsOptions = $("#form-pulldown")[0].options;
+    var lower_keyword = keyword.toLowerCase();
+    for(var i in allFormsOptions){
+        var text = allFormsOptions[i].text;
+
+        // create an object with the index value in the main pulldown (index: i)
+        // so that we can set selectedIndex later without re-searching the list
+        if(text!==undefined && text.toLowerCase().indexOf(lower_keyword)>=0){
+            formList.push({index: i, value: allFormsOptions[i].value, text: allFormsOptions[i].text})
+        }
+    }
+    
+
+    var size = Math.min(10, formList.length);
+
+    var selectFormList = $("#listOfFormOptions");
+    selectFormList.empty();
+    selectFormList.css("display","block")
+    selectFormList.attr("size",size);
+
+    for(var i=0; i<formList.length; i++){
+        selectFormList.append($('<option></option>').attr('value', formList[i].index).text(formList[i].text));
+    }
+}
+
+function formOptionSelected(event, index){
+
+    //if(event.code=="Enter" || event.code=="Space"){
+        $("#listOfFormOptions").css("display","none");
+
+        //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
+        var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
+
+        $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
+        $("#searchval").val("");
+
+        setFormId();
+    //}
+}
+
+function dumpToCSV(){
+
+    var allRows =  "id\tpreamble\tquestion\tscale\torder";
+    for(var i in orderedQList){
+
+        var Q = orderedQList[i];
+        var line = "";
+
+        allRows += makeCSVRows(Q);
+
+    }
+
+    //console.log(allRows);
+    return allRows;
+
+}
+
+function makeCSVRows(Q){
+
+    if(["control_text", "control_pagebreak", "control_button"].indexOf(Q.type)>=0) {
+        return "";
+    }
+    // figure out the scale first
+    var scalesArray = makeScalesArray(Q);
+    var scaleStr = scalesArray[0];
+    if(scalesArray.length>1){
+        scaleStr = scalesArray.length+"pt "+scalesArray[0].slice(0,10)+" - "+scalesArray[scalesArray.length-1].slice(0,10);
+    }
+    
+
+
+    // if(Q.hidden=="Yes" && $(qId+"_hidden").length==0){
+    //     $(qId +"_slug_div").append("<span id='"+Q.name+"_hidden'> HIDDEN </span>");
+    // }
+
+    var ids = [Q.name];
+    var preambles = [""];
+    var rows =[Q.text]; 
+    var scales = [scaleStr];
+    var orders = [Q.order];
+    
+
+    // if it's a matrix you need one record per mrow
+    if(Q.type=="control_matrix"){
+        var mrows = Q.mrows.split("|");
+        for(var i in mrows){
+            ids[i] = Q.name+"_"+(parseInt(i));
+            preambles[i] = Q.text;
+            rows[i] = mrows[i];
+            scales[i] = scaleStr;
+            orders[i] = Q.order+"."+i;
+        }
+    }
+
+    var csvStr = "";
+    for(i in rows){
+        csvStr += "\n"+ids[i]+"\t"+preambles[i]+"\t"+rows[i]+"\t"+scales[i]+"\t"+orders[i];
+    }
+    //console.log(csvStr);
+
+    return csvStr;
+
+}
+
+function showDumpToCSV(){
+    $("#csvDumpDiv").toggle();
+
+    $("#csvDumpTextarea").val(dumpToCSV());
+}
+
+</script> 
+</head>
+<body onLoad="loadLocalstorage(); loadJF(); ">
+<div id="userinput">
+    jotform api key: <input type=text value="" size=30 id="apikey"> 
+    <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <button onClick="clearApikey()">clear API key</button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api" target="_blank">make/get api key</a>
+    <div id="form_selection">
+        <!--<div id="formpulldown_div" style="float:left">-->
+            form: <select id="form-pulldown" onChange="setFormId()"></select>
+        <!--</div>
+        <div id="search_div" style="float:left"> -->
+            search: <input id="searchval" oninput="populateFormSelect(this.value)" type=text value="" size=30/><br>
+            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onChange="formOptionSelected(event, this.selectedIndex)"></select>
+       <!-- </div>-->
+    </div>
+    <div style="clear:both">
+         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a> <button id="dumpToCsv_btn" onClick="showDumpToCSV()">Dump to tsv</button>
+
+    </div>
+    <div>
+        Updated at: <input id="updated_at" type=text disabled value="YYYY-MM-DD"/> Num Submissions:<input type=text disabled id="num_submissions" value="1234" /> Last Submission:<input type=text disabled id="last_submission" value="1234" />
+    </div>
+    <div id="csvDumpDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="csvDumpTextarea"></textarea></div>
+</div>
+
+<div id="main">
+
+</div>
+<hr>
+<div id="footer">
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> <button onClick="addQuestion('textarea')">Text Area</button> <button onClick="addQuestion('pagebreak')">Pagebreak</button> <button onClick="addQuestion('text')">Text (html)</button>
+    <br>(adds to bottom, causes page to refresh)
+    <button onClick="inspectItem('matrix_16')">inspect item</button>
+</div>
+ 
+</body>
+  
+
+</html>
 
