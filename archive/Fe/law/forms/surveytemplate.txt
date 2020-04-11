@@ -1,0 +1,3 @@
+This is a tab delimited text file:
+
+[name]	[email]	[search]	[addprog]	[moving]	[copying]	[renaming]	[deleting]	[memory]	[formatdisk]	[screensavers]	[shortcuts]	[recover]	[wpasswords]	[display]	[wordtool]	[wordopen]	[wordsave]	[wordheaders]	[footnotes]	[bullets]	[justify]	[wordprint]	[etool]	[calc]	[sort]	[eformat]	[data]	[eimport]	[egraph]	[eprint]	[eheaders]	[present]	[pimage]	[pchart]	[ptext]	[psave]	[network]	[internet]	[intranet]	[PH]	[ntool]	[URL]	[bookmark]	[preferences]	[engines]	[WWWnav]	[install]	[configure]	[eupassword]	[send]	[attach]	[reply]	[directories]	[mailboxes]	[address]	[nicknames]	[filters]	[context]	[login]	[postfiles]	[messages]	[conferences]	[first]	[second]	[third]	

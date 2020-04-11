@@ -1,0 +1,49 @@
+<html><head>
+<title>
+Complex sample for CGIexec: response
+</title>
+</head>
+<body bgcolor=#ffffff text=#000000>
+<table border=2 bgcolor=#fabb00>
+<tr>
+<td bgcolor=#000000><b><font size=+2 color=#ff0000>CGI</font><font size=+1 color=#fabb00>Executor</font></b></td>
+</tr>
+</table>
+<hr>
+<b>Response page for complex sample.</b>
+<hr>
+Please confirm entered information:
+<form method=POST action="http://localhost/cgiexec/bin/cgiexec.exe?../demo/complex/save.conf">
+<ul>
+<table>
+<tr>
+<td><b>First name: </b></td><td><%REQ.fname%></td>
+</tr>
+<tr>
+<td><b>Last name: </b></td><td><%REQ.lname%></td>
+</tr>
+<tr>
+<td><b>E-mail: </b></td><td><%email%></td>
+</tr>
+<tr>
+<td><b>Send Mail: </b></td><td><%sndmail%></td>
+</tr>
+<tr>
+<td><b>Comment: </b></td><td><%mssg%></td>
+</tr>
+</table>
+</ul>
+
+<input type=hidden name=REQ.fname value="<%REQ.fname%>">
+<input type=hidden name=REQ.lname value="<%REQ.lname%>">
+<input type=hidden name=email value="<%email%>">
+<input type=hidden name=sndmail value="<%sndmail%>">
+<input type=hidden name=mssg value="<%mssg%>">
+<input type=SUBMIT value="Save">
+</form>
+<hr>
+<font color=#ff0000>
+End Of Document
+</font>
+</body>
+</html>

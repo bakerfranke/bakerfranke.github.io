@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title> Errlvl sample for CGIexec </title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<table border="2" bgcolor="#FABB00">
+    <tr>
+        <td bgcolor="#000000"><font color="#FF0000" size="5"><b>CGI</b></font><font
+        color="#FABB00" size="4"><b>Executor</b></font></td>
+    </tr>
+</table>
+
+<hr>
+
+<p><font color="#FF0000">Last value: <%SYS.errlvl%></font> </p>
+
+<hr>
+
+<form
+action="http://www.tezcat.com/~bfranke/cgiexec/bin/cgiexec.exe?../response/response.txt"
+method="POST" enctype="text/plain">
+    <div align="center"><center><table border="1"
+    bgcolor="#000000">
+        <tr>
+            <td bgcolor="#FABB00">Enter return value: </td>
+            <td bgcolor="#FABB00"><input type="text" size="10"
+            name="err"></td>
+        </tr>
+        <tr>
+            <td bgcolor="#000000"><font color="#FABB00"><input
+            type="checkbox" name="check" value="CHECK"><b>Check
+            return value</b></font></td>
+            <td align="right"><input type="submit" value="Send"></td>
+        </tr>
+    </table>
+    </center></div>
+</form>
+
+<hr>
+
+<p><font color="#FF0000">End Of Document </font></p>
+</body>
+</html>

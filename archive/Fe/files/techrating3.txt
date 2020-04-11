@@ -1,0 +1,154 @@
+To:bfranke@tezcat.com
+Subject: computer knowledge
+From:LawSchoolForm
+
+Hello: [hello]
+
+Name: [required-name] E-mail address: [required-email]
+
+SUBJECT:			SCALE:
+
+Windows 95------------------------------------------ 
+	basics: [win95]
+Comments:
+[win95comments]
+----------------------------------------------------
+
+Internet----------
+	internet at NU:		[interNU]
+	intranet at NU:		[intraNU]
+	connecting to the network:[connecting]
+	cultural tips: 		[cultural]
+COMMENTS:
+[internetcomments]
+----------------------------------------------------
+
+
+Netscape---------
+	launch: 		[Nlaunch]
+	navigate: 		[Nnavigate]
+	specific URL:		[NURL]
+	bookmark: 		[Nbookmark]
+	search: 		[Nsearch]
+COMMENTS:
+[Ncomments]
+----------------------------------------------------
+
+
+Eudora----------
+	basics: 		[Ebasics]
+	launch: 		[Elaunch]
+	configure: 		[Econfigure]
+	password: 		[Epassword]
+	send: 			[Esend]
+	attatch: 		[Eattatch]
+	reply:			[Ereply]
+	use directory: 		[Edirectory]
+	close: 			[Eclose]
+	mailboxes: 		[Emailboxes]
+	address book: 		[Eaddressbook]
+	nicknames: 		[Enicknames]
+	filters: 		[Efilters]
+COMMENTS:
+[Ecomments]
+----------------------------------------------------
+
+
+FirstClass--------
+	context: 		[Fcontext]
+	launch: 		[Flaunch]
+	login: 			[Flogin]
+	post files: 		[Fpostfiles]
+	post messages: 		[Fpostmessages]
+	conferences: 		[Fconferences]
+COMMENTS:
+[Fcomments]
+----------------------------------------------------
+
+
+PowerPoint-------
+	basics: 		[Pbasics]
+	advanced: 		[Padvanced]
+COMMENTS:
+[Pcomments]
+----------------------------------------------------
+
+
+Materials----------------
+	materials: 		[scanning]
+	materials: 		[prepmaterials]
+COMMENTS:
+[materialcomments]
+----------------------------------------------------
+Thank You [name]
+
+
+----------------------------------------------------
+****************************************************
+----------------------------------------------------
+OFFICE USE ONLY:
+
+-----43 rows------
+[required-name] 
+[email]
+
+
+[win95]
+
+[interNU]
+[intraNU]
+[connecting]
+[cultural]
+
+[Nlaunch]
+[Nnavigate]
+[NURL]
+[Nbookmark]
+[Nsearch]
+
+[Ebasics]
+[Elaunch]
+[Econfigure]
+[Epassword]
+[Esend]
+[Eattatch]
+[Ereply]
+[Edirectory]
+[Eclose]
+[Emailboxes]
+[Eaddressbook]
+[Enicknames]
+[Efilters]
+
+[Fcontext]
+[Flaunch]
+[Flogin]
+[Fpostfiles]
+[Fpostmessages]
+[Fconferences]
+
+[Pbasics]
+[Padvanced]
+
+[scanning]
+[prepmaterials]
+-----------------------
+COMMENTS:
+
+Windows 95:
+[win95comments]
+
+Internet:
+[internetcomments]
+
+Eudora:
+[Ecomments]
+
+FirstClaas:	
+[Fcomments]
+
+Powerpoint:
+[Pcomments]
+
+Materials:
+[materialcomments]

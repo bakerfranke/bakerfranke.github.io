@@ -1,0 +1,135 @@
+<html><head>
+<title>
+CGIexecutor - Variables
+</title>
+<body bgcolor=#ffffff text=#000000>
+<a name="top">
+<table border=2 bgcolor=#fabb00>
+<tr>
+<td bgcolor=#000000><b><font size=+2 color=#ff0000>CGI</font><font size=+1 color=#fabb00>Executor</font></b></td>
+</tr>
+</table>
+<hr>
+<h1><b>
+<ul>
+Variable types
+</ul>
+</b></h1>
+
+<p>
+All variables managed by CGIexecutor appear in files in following form:
+<xmp>
+<%variable_name%>
+</xmp>
+and variable names are case sensitive which means, for example, that
+<i><b>MyVariable</b></i> and <i><b>myvariable</b></i> will be
+considered two different variables.
+
+There are three types of variables supported by CGIexecutor : 
+<ul>
+<li><a href="#sysvar"><i>system variables</i></a>
+<li><a href="#envvar"><i>environment variables</i></a>
+<li><a href="#usrvar"><i>user variables</i></a>
+</ul>
+</p>
+<hr>
+
+<p>
+<ul>
+<a name="sysvar">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>System variables</i></b>
+</td></tr>
+</table>
+System variables are provided to allow access to CGIexecutors internal variables.
+All system variable names begin with <i>SYS.</i> prefix and every variable with
+<i>SYS.</i> prefix is assumed to be an system variable. This variables are set
+internally by CGIexecutor, and You can affect their values only by setting appropriate
+variable in <a href="conffile.htm">configuration file</a>.<br>
+<b>Following are descriptions of system variables defined in CGIexecutor v1.01:</b>
+<br><br>
+<ul>
+<li><i>SYS.year, SYS.month, SYS.day, SYS.houres, SYS.minutes, SYS.seconds</i><br>
+Are provided for displaying local system's date and time.<br><br>
+
+<li><i>SYS.tmpdir</i><br>
+This variable will contain name of temporary directory and is set by setting 
+<b><i>tmpdir</i></b> variable in configuration file.<br><br>
+
+<li><i>SYS.template</i><br>
+SYS.template variable contains name of file which is used as template for creating
+response page. This value is set by setting <b><i>template</i></b> variable 
+in configuration file.<br><br>
+
+<li><i>SYS.errtemplate</i><br>
+SYS.errtemplate points to file used as template for creating answer page when an error
+occurs. It's value is set by setting <b><i>errtemplate</i></b> variable in configuration
+file.<br><br>
+
+<li><i>SYS.cmdintemplate</i><br>
+SYS.cmdintemplate variable contains name of file which will be used as template to create
+input file for program executed by CGIexecutor. This value is set by setting
+<b><i>cmdintemplate</i></b> variable in configuration file.<br><br>
+
+<li><i>SYS.cmdline</i><br>
+Contains command line to be executed by CGIexecutor and is set with <b><i>cmdline</i></b>
+variable in configuration file.<br><br>
+
+<li><i>SYS.infile, SYS.outfile</i><br>
+Are names of input and output file for executed program. This names are built dynamically
+when CGIexecutor is started and depends on <b><i>tmpdir</i></b>, <b><i>infext</i></b>
+and <b><i>outfext</i></b> variables in configuration file.<br><br>
+
+<li><i>SYS.stdin, SYS.stdout, SYS.stderr</i><br>
+Are names of files used to redirect input, output and errors from external program.
+See <b><i>STDIN, STDOUT, STDERR</i></b> variables in configuration file for more information.<br>
+<br>
+
+<li><i>SYS.input, SYS.output</i><br>
+When CGIexecutor sees this variables it will replace them with contents of files specified
+in SYS.infile or SYS.outfile.<br><br>
+
+<li><i>SYS.errlvl</i><br>
+SYS.errlvl variable will contain return value of executed process if <b><i>errlvl</i></b>
+variable in configuration file is not set to CHECK.<br><br>
+</ul>
+</ul>
+</p>
+
+<p>
+<ul>
+<a name="envvar">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>Environment variables</i></b>
+</td></tr>
+</table>
+Environment variable names begins with <i>ENV.</i> prefix and are used to access systems
+environment variables. When CGIexecutor sees variable beginning with <i>ENV.</i> prefix
+it will search for environment variable with same name.  Thus if You want to access TEMP
+variable which points to temporary directory on Your system just put ENV.TEMP variable
+instead.<br><br>
+
+</ul>
+</p>
+
+<p>
+<ul>
+<a name="usrvar">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>User variables</i></b>
+</td></tr>
+</table>
+User variables are only variables on which user can affect by typing their values on form.
+This variables are additionally divided to ordinary user variables and <b><i>required</i></b>.
+Required variable names begins with <i>REQ.</i> prefix and will cause CGIexecutor to generate
+an error if it finds required variable which has no value or it's value is an empty string.<br><br>
+</ul>
+</p>
+
+<hr>
+<a href="#top">[Top of page]</a><a href="default.htm">[Home]</a>
+</body>
+</html>

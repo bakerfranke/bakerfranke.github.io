@@ -1,0 +1,7 @@
+Tab Delimited Text File:
+
+Baker Franke	bfranke@tezcat.com	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	Yes	4	5	4	3	2	1	2	3	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes
+Joe Schmo	Joe@schmo.net	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	Yes	4	5	4	3	2	1	2	3	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes
+Bill Gates	billy@inthemoney.gat	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	Yes	4	5	4	3	2	1	2	3	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes
+dsgfsdaf	asdfasdf	2	2	3	3	3		4								4	3	4	3	2	3	4	3	3	4	3	3	3	No	4	4	3	3	3	3	3	3	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes
+Dr. King	King@weshallover.com	1	2	3	5		5	2	5	4	3	2	1	2	3	4	5	4	3	2	1	2	3	3	4	5	4	3	Yes	2	1	2	3	4	5	4	3	Yes	Yes	Yes	Yes	Yes	Yes				

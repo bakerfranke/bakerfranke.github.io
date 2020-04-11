@@ -1,0 +1,10 @@
+To: christelb@nwu.edu
+From:techquestion@ispage.edu
+Subject: IS info page question
+
+[name]
+[email]
+[question]
+------------------------------------
+
+Thank you [name]!

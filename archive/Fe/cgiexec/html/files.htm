@@ -1,0 +1,233 @@
+<html><head>
+<title>
+CGIexecutor - Files
+</title>
+<body bgcolor=#ffffff text=#000000>
+<a name="top">
+<table border=2 bgcolor=#fabb00>
+<tr>
+<td bgcolor=#000000><b><font size=+2 color=#ff0000>CGI</font><font size=+1 color=#fabb00>Executor</font></b></td>
+</tr>
+</table>
+<hr>
+<h1><b>
+<ul>
+Project files
+</ul>
+</b></h1>
+
+<p>
+Characteristically every project will use some or all of following project files.
+<ul>
+<li><a href="#config"><i>configuration file</i></a>
+<li><a href="#template"><i>template file</i></a>
+<li><a href="#errtemplate"><i>error template file</i></a>
+<li><a href="#cmdintemplate"><i>template for input file</i></a>
+</ul>
+</p>
+<hr>
+
+<p>
+<ul>
+<a name="config">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>Configuration file</i></b>
+</td></tr>
+</table>
+Every project must have project configuration file and name of project configuration
+file must be passed to CGIexec.exe as a command line parameter. For example if You have
+configuration file named MyConfig.conf You will put following tag in Your calling
+HTML page:
+<xmp>
+<form method=POST action="http://my_site_url/scripts/cgiexec.exe?MyConfig.conf">
+</xmp>
+If name of configuration file is not passed to cgiexec.exe program will send an error
+message as response.<br>
+All lines in configuration file are expected to have following form:<br>
+<br>
+VARIABLE_NAME=VALUE<br>
+<br>
+Additionally lines which begin with # can appear in configuration file
+for comments and will be ignored by CGIexecutor.
+<br>
+<br>
+Configuration file is used to set following variables:<br><br>
+<ul>
+<li><i>INFEXT, OUTFEXT</i><br>
+These two variables forces CGIexecutor to use their values as file extensions for input
+and output files which are going to be passed to executed program. For example, if You
+want to execute batch script by passing preprocessed script based on template to command.com,
+You will set value of <i>INFEXT</i> variable to <b>bat</b> to ensure that command.com
+will recognize it as batch file.<br><br>
+<li><i>TMPDIR</i><br>
+TMPDIR variable is used to set name of temporary directory where input and output file passed
+to executed program will be created.<br>
+<i>If this variable is not set than You can't pass any files to executed process, since
+CGIexecutor will not create them.</i><br><br>
+<li><i>TEMPLATE</i><br>
+TEMPLATE variable must contain name of <a href="#template">template file</a> which will be
+used to create page for response send to user.<br>
+<i>If this variable is not set than CGIexecutor will generate an error (error code 12).</i><br>
+<br>
+<li><i>ERRTEMPLATE</i><br>
+This variable points to <a href="#errtemplate">error template file</a> which will be used to
+create error messages.<br>
+<i>If this variable is not set then CGIexecutor uses internal set of error messages to inform
+about errors which may occur during the execution.</i><br><br>
+<li><i>CMDINTEMPLATE</i><br>
+If You want to pass an file preprocessed by CGIexecutor to executed program then You have to
+set this variable to point to file which will be used as template for it.<br>
+<i>If this variable is not set than CGIexecutor will create an empty file.</i><br>
+<br>
+<li><i>IOREDIRECT</i><br>
+If this variable is set to YES (default), than you can use STDIN, STDOUT and STDERR variables
+described below to set names of files you want to be used for input/output redirection.<br>
+<i>When starting PE executables (Win95/Nt 32-bit) from CMDLINE (see below) set this variable
+to YES only if you are using at least STDOUT redirection, since some programs (cmd.exe on NT)
+will refuse to run if IOREDIRECT is set to YES and STDOUT variable is not pointing to file.<br>
+If you are using 16-bit program with CGIExecutor (like command.com) you should live IOREDIRECT
+set to YES even if you are not using STDOUT/STDERR redirection, otherwise you may get mish-mashed
+output (on Win95 systems) or no output at all (WinNT).<br>
+If this variable is set to NO you can still use redirection operators (>, >> and <) to redirect
+input and output to files or you can pass names of files as command line parameters.</i><br>
+<br>
+<li><i>STDIN, STDOUT, STDERR</i><br>
+This variables are used for redirecting output of external program if IOREDIRECT variable is set
+to YES (default). STDIN should point to file wich will be used as input for external program,
+STDOUT should point to file in wich output will be redirected and STDERR should point to file
+where error messages will be written.<br>
+<br>
+<li><i>CMDLINE</i><br>
+To execute an external program set CMDLINE variable to represent command line for execution.
+Thus , if set, CMDLINE variable will contain name of program to execute along with command line
+parameters which will be passed to program (including input and output redirection if required).<br>
+<i>If this variable is not set CGIexecutor will assume that You want to use it just for
+processing response template. This means it will not generate an error.</i><br><br>
+<li><i>ERRLVL</i><br>
+If this variable is set to CHECK (ERRLVL=CHECK), than CGIexecutor checks return value of
+executed program and generates an error (error code 22) if return value is different than 0.
+If ERRLVL variable is not set then <i>SYS.errlvl</i> variable will be set to return value of
+executed program and no errors will be generated by CGIexecutor.<br><br>
+<li><i>TIMEOUT</i><br>
+You can specify how much seconds CGIExecutor should wait for external program to finish.
+If this variable is set to value different than 0 CGIExecutor will terminate external
+program and generate error (error code: 23) if program does not finish execution whithin
+TIMEOUT seconds. If TIMEOUT is set to 0 (by default) CGIExecutor waits "forever" for
+external program to finish.
+</ul>
+</ul>
+</p>
+
+<p>
+<ul>
+<a name="template">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>Template file</i></b>
+</td></tr>
+</table>
+Template file is used to create response page which will be sent to user if no errors
+are generated, otherwise CGIexecutor will send response based on
+<a href="#errtemplate">error template file</a> if ERRTEMPLATE variable is set in
+configuration file, or on internal error messages built in CGIexecutor.<br>
+CGIexecutor expects template file to be an HTML page containing CGIexecutor variables
+which will be replaced with corresponding values at run-time.<br>
+For example, if You want variable named <i>MyVariable</i> to be displayed Your HTML code
+will look like:
+<xmp>
+<h1><%MyVariable%></h1>
+</xmp>
+<i>Variables may appear anywhere in Your HTML code (inside or outside other tags).
+This way You can use them to set properties of other tags, or just to display them.</i>
+</ul>
+</p>
+
+<p>
+<ul>
+<a name="errtemplate">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>Error template file</i></b>
+</td></tr>
+</table>
+<i>For list of error codes click <a href="errors.htm">here</a>.</i><br>
+If ERRTEMPLATE variable is set in configuration file than this file will be used to
+create responses to user under errorous conditions (<i>i.e. if an error is generated
+by CGIexecutor</i>).
+CGIexecutor expects an HTML file with CGIexecutor error directives which will be used
+to denote which parts of file are going to be used for creating response to be sent to
+user. Error directive can be one of following:<br><br>
+<ul>
+
+<li><xmp>
+<%SYS.errorN%>
+</xmp>
+Where N represents error code between 0 and 24 which can be generated by CGIexecutor.<br>
+This directive is used to mark beginning of section of error template file which will
+be included in error message sent to user when an error with error code N is generated.<br><br>
+<li><xmp>
+<%SYS.errordefault%>
+</xmp>
+This directive is used to mark beginning of section of error template file which will be
+included in error message if there is no an appropriate error directive for error code
+which is generated.<br><br>
+<li><xmp>
+<%SYS.errorend%>
+</xmp>
+This directive is used to mark beginning of section of error template which will be
+attached to all error messages.<br><br>
+</ul>
+CGIexecutor will display following parts of error template file:<br><br>
+<ul>
+<li>Beginning of file until first error directive is reached.
+<li>Section which starts with an
+<xmp><%SYS.errorN%></xmp>
+and ends with another error directive if there is an appropriate directive for error code
+which is generated. Or section which starts with
+<xmp><%SYS.errordefault%></xmp>
+directive and ends with another error directive.
+<li>Anything what is placed after
+<xmp><%SYS.errorend%></xmp>
+directive until end of error template is reached.
+</ul>
+</ul>
+</p>
+
+<p>
+<ul>
+<a name="cmdintemplate">
+<table border=0 bgcolor=#ffffff>
+<tr><td bgcolor=#fabb00>
+<b><i>Template for input file</i></b>
+</td></tr>
+</table>
+If CMDINTEMPLATE variable is set in configuration file then this file will be used to
+create an input file for program which is to be executed by CGIexecutor.
+Name of input file based on this template must be passed to executed program as command
+line parameter, via STDIN variable in configuration file or by using input/output redirection
+operators ">", "<".
+For example, if You want to CGIexecutor execute program called MyProgram.exe Your
+CMDLINE variable in configuration file will be set like this:
+<xmp>
+CMDLINE=c:\my_programs_directory\MyProgram.exe <%SYS.infname%> > <%SYS.outfname%>
+</xmp>
+if You want to pass name of input file based on template as command line parameter, or
+<xmp>
+CMDLINE=c:\my_programs_directory\MyProgram.exe < <%SYS.infname%> > <%SYS.outfname%>
+</xmp>
+if MyProgram.exe expects input from STDIN (<i>i.e. console</i>).<br><br>
+<b><i>Note:</i></b> This examples suppose that MyProgram.exe is console based program
+and it is going to display it's output to console. If not so You can pass name of
+output file as command line parameter. Then Your CMDLINE variable is to be set like
+follows:<br>
+<xmp>
+CMDLINE=c:\my_programs_directory\MyProgram.exe <%SYS.infname%> <%SYS.outfname%>
+</xmp>
+</ul>
+</p>
+
+<hr>
+<a href="#top">[Top of page]</a><a href="default.htm">[Home]</a>
+</body>
+</html>

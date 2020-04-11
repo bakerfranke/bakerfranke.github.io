@@ -1,0 +1,1 @@
+[weekday]	[month]/[day]/98	[reghours]	[overtime]	[required-password]

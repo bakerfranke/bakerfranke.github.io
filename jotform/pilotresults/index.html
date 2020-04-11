@@ -170,6 +170,74 @@ function clearApikey(){
     location.reload();
 }
 
+// Pre-condition LoadJF has been called
+function loadSubmissions(){
+
+
+    //JF.initialize( {apiKey: my_apikey} );
+
+    var form_options = {limit: "1000"};
+
+    JF.getFormSubmissions(my_formid, form_options, function(response){
+    /**
+     successful response including submissions of form with given id
+     .
+     */
+     var allowed_types = ['control_radio','control_matrix','control_textarea','control_textbox'];
+     console.table(response[0])
+     console.log("This form has "+response.length+" submissions");
+
+     for(var r in response){
+     
+         var answers = response[r].answers;
+
+         //make dictionary of answers keyed on question_id (i.e. question "name")
+         var answer_dict = {};
+         for(var a in answers){
+            answer_dict[answers[a].name] = answers[a];
+         }
+
+         for(var a in answers){
+            if(allowed_types.indexOf(answers[a].type)>=0){
+                var linestr = answers[a].type+"\t"+answer_dict["uid"].answer+"\t"+answers[a].text;
+
+
+                if(answers[a].type=="control_matrix"){
+                   // console.log("\t\t ^^^ MATIX QUESTION");
+                    var qtext_keys = Object.keys(answers[a].answer);
+                   // console.log("\t\t"+typeof(qtext_keys)+" || keys are: "+qtext_keys);
+                    var ans_str ="";
+                    for(var k in qtext_keys){
+                        //console.log("\t\t\t"+qtext_keys[k]+" --> "+answers[a].answer[qtext_keys[k]]);
+
+                        ans_str = ">>"+qtext_keys[k]+"\t"+answers[a].answer[qtext_keys[k]];
+                        console.log(linestr+ans_str);
+                    }
+                    
+                    // for(var i in answers[a].answer){
+                    //     console.log("\t\t\t"+qtext_keys[i]+" --> "+answers[a].answer[i]);
+                    // }
+                }
+                else {
+                   console.log(linestr+"\t"+JSON.stringify(answers[a].answer));
+                }
+            }
+         }
+         console.log("-----------------\n------------------");
+     }
+
+     // console.log("keys are: "+JSON.stringify(keys));
+     // for(var k in keys){
+     //    console.log(keys[k]+": "+response[0][keys[k]]);
+     // }
+    
+
+    // for(var i=0; i<response.length; i++){
+    //     console.table(response[i].answers);
+    // } 
+});
+}
+
 
 function loadJF(){
 
@@ -1006,6 +1074,10 @@ function showDumpToCSV(){
         Updated at: <input id="updated_at" type=text disabled value="YYYY-MM-DD"/> Num Submissions:<input type=text disabled id="num_submissions" value="1234" /> Last Submission:<input type=text disabled id="last_submission" value="1234" />
     </div>
     <div id="csvDumpDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="csvDumpTextarea"></textarea></div>
+</div>
+<div id='submissions'>
+    <textarea style="width:100%; font-family: monospace" rows=20 id="resultsArea"></textarea>
+
 </div>
 
 <div id="main">

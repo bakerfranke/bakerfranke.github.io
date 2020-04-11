@@ -1,0 +1,642 @@
+<html>
+<head>
+         
+
+    <script src="https://js.jotform.com/JotForm.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+    <style>
+    body{
+        
+        padding-left: 40px;
+        font-size: 11pt;
+        width: 850px;
+
+    }
+    .editedScaleItems:read-only{
+        background-color: #CCCCCC;
+        color: #999999;
+    }
+    .matrix_table{
+       
+        border-collapse: collapse;
+        font-size: 11pt;
+        width: 100%;
+
+    }
+    .matrix_table td{
+        vertical-align: top;
+        border: solid 1px black;
+        padding: 5px;
+        
+    }
+    .matrix_rows{
+        width: 66%;
+    }
+    .options{
+        width: 50%;
+    }
+    .pagebreak{
+        text-align: right;
+        background-color: #d9f3f5;
+        font-size: 8pt;
+        padding: 1px;
+        font-family: sans-serif;
+    }
+    #userinput{
+        background-color: #DDDDDD;
+        margin-bottom: 4px;
+    }
+    .hiddenkey{
+        color: rgba(0,0,0,0);
+        font-family: sans-serif;
+        font-size: 9pt;
+    }
+    .hiddenkey:hover{
+        color: rgba(0,0,0,1);
+    }
+    ol{
+        padding-inline-start: 20px;
+    }
+    </style>
+ <script>
+var my_apikey = "";
+var my_formid = "";
+var item_response_count = 0;
+var allQs = {};
+var allForms = [];
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function loadLocalstorage(){
+    if(localStorage["my_apikey"] !==undefined){
+        $("#apikey").val(localStorage["my_apikey"] );
+        $("#makeapikey").hide();
+    }
+    if(localStorage["my_formid"] !==undefined){
+        $("#formid").val(localStorage["my_formid"] );
+    }
+
+    // QUERY STRING FORM ID overrides local storage value
+    var param_formid = getParameterByName("formid");
+    if(param_formid!==null){
+         $("#formid").val(param_formid);
+    }
+}
+
+function clearApikey(){
+
+    delete(localStorage["my_apikey"]);
+    delete(localStorage["my_formid"]);
+    
+    location.reload();
+}
+
+function loadJF(){
+    
+    my_apikey = $("#apikey").val();
+    my_formid = $("#formid").val();
+
+    //JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
+
+    // Login and populate pulldown menu of surveys
+    JF.initialize( {apiKey: my_apikey} ); 
+    localStorage["my_apikey"] = my_apikey;
+
+    //get all forms available and populate pulldown menu sorted by updated_at
+    JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
+        allForms = response;
+     
+        var dropdown = $('#form-pulldown');
+
+        dropdown.empty();
+
+        dropdown.append('<option selected="true" disabled>Choose a form</option>');
+        dropdown.prop('selectedIndex', 0);
+
+        for(var i=0; i<response.length; i++){
+            dropdown.append($('<option></option>').attr('value', response[i].id).text(response[i].title));
+            if(response[i].id == my_formid){ dropdown.prop('selectedIndex', i+1); }
+        }
+    });
+
+    // set cached jotform id and create links appropriately
+    localStorage["my_formid"] = my_formid;
+    $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
+    $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
+
+
+    // render all questions from loaded form to the screen
+    item_response_count = 0;
+
+    JF.getFormQuestions(my_formid, function(response){
+
+        // first put Qs in order they appear in in the form
+        var orderedQList = [];
+        for(var i in response){
+            var obj = response[i];
+            orderedQList[obj.order] = obj;
+            allQs[obj.name] = obj;
+            //document.write(response[i].qid+" "+response[i].text+"<br/>");
+        }
+
+        //compose a giant HTML string of all questions formatted according to type
+        //Baker thoughts: change this to: for each question (1) add a div container where id=qname (2) fill div with appropriate html
+        var outStr = "";
+        $("#main").empty();
+        for(var i in orderedQList){
+            var Q = orderedQList[i];
+
+            //make a div for this question
+            var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
+            $("#main").append(divstr);
+
+
+            //var questionHtml = makeQuestionTable(Q);
+
+
+            if(Q.type=="control_matrix"){
+                //document.write(makeMatrixTable(Q));
+                //outStr+=makeMatrixTable(Q);
+                $("#"+Q.name).html(makeMatrixTable(Q));
+            }
+            else if(Q.type=="control_radio" || Q.type=="control_checkbox"){
+                //document.write(makeSimpleTable(Q));
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
+            }
+            else if(Q.type == "control_pagebreak"){
+                //document.write("<hr>page break<hr>");
+                //outStr += "<div class='pagebreak'>page break</div>";
+                $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
+            }
+            else if(Q.type == "control_text"){
+                //document.write(Q.text);
+                //outStr += Q.text +"<br/>";
+                $("#"+Q.name).html(Q.text +"<br/>");
+            }
+            else if(Q.type=="control_scale"){
+                //HACK to make my simpleTable thing work
+                Q.options = Q.scaleFrom+" to "+Q.scaleAmount;
+                //document.write(makeSimpleTable(Q));
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
+            }
+            else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
+                //console.log("inside type tcheck");
+                Q.options = "[input_"+Q.type.replace("control_","")+"]";
+                //outStr += makeSimpleTable(Q);
+                $("#"+Q.name).html(makeSimpleTable(Q));
+
+            }
+            else{
+                // document.write("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text);
+                // document.write("<br/>")
+                //outStr += "<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>"
+                $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+
+
+            }
+
+
+        }
+        //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
+        $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
+        //$("#main").html(outStr);
+
+    });
+
+    
+}
+
+function updateSlug(id, name){
+    console.log("asked to update "+id+", "+name);
+    var newSlug = $("#"+name).val();
+    console.log("new slug: "+newSlug);
+
+
+    question = { "name" : newSlug};
+
+    JF.editFormQuestion(my_formid, id, question, function(response){
+        // *
+        //  successful response including question with given id of form with given id
+        //  .
+         
+        console.log("name updated."+response);
+    });
+
+}
+
+
+function makeMatrixTable(qObj){
+    // var str = "<div id='"+qObj.name+"' class='question_container'>";
+    str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+    str+= qObj.text;
+    str+="</td></tr><tr><td class='matrix_rows'><ol>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+        item_response_count++;
+    }
+    str+="</ol></td><td class='matrix_options'>";
+    var cols = qObj.mcolumns.split("|");
+    str += "("+cols.length+"pt)<br/>"
+    for(var i in cols){
+        str += "- "+cols[i]+"<br/>";
+    }
+    str += "</td></tr></table>";
+    //str += "</div>";
+    str += "<br>";
+
+    return str;
+}
+
+
+// BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
+// with question type so can swap readonly and editable.
+function updateQ(qObj_name){
+
+    var qToEdit = allQs[qObj_name];
+
+ 
+    var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
+
+
+    //ONLY UPDATE qObj and POST if I know how to edit it
+    if(editableTypes.indexOf(qToEdit.type) >= 0){
+        console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+        console.log("QTEXT: "+qToEdit.text);
+        console.log("ROWS: "+qToEdit.mrows);
+        console.log("COLS: "+qToEdit.mcolumns);
+        console.log("OPTIONS: "+qToEdit.options);
+
+        qToEdit.text = $("#"+qObj_name+" .editedQText").val();
+
+        // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
+        if(qToEdit.type=='control_matrix'){
+            //   console.log("Edited Rows are:");
+            var rows = $("#"+qObj_name+" .editedRows").val();
+            rows = $.trim(rows);
+            // console.log(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+            //  console.log(pipedRows);
+            qToEdit.mrows = pipedRows;
+        }
+
+
+        // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
+        if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)>=0){
+            var rows = $("#"+qObj_name+" .editedScaleItems").val();
+            rows = $.trim(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+
+            if(qToEdit.type=='control_matrix'){
+                qToEdit.mcolumns = pipedRows;
+            }
+            else if(["control_radio","control_checkbox"].indexOf(qToEdit.type) >= 0){
+                qToEdit.options = pipedRows;
+            }
+        }
+
+        //if(qToEdit.type=="control_matrix"){
+        if(editableTypes.indexOf(qToEdit.type)>=0){
+            JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
+
+                console.log("UPDATED QUESTION:");
+                console.log(response);
+            });
+        }
+        else{
+            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list")
+        }
+    }
+
+    redrawTable(qToEdit);
+
+
+
+}
+
+function cancelEdit(qObj_name){
+    console.log("CANCELLED edit on "+qObj_name);
+    var qToCancel = allQs[qObj_name];
+    console.log(qToCancel);
+    redrawTable(allQs[qObj_name]);
+}
+
+
+
+// This should replace redrawTable AND initial setup 
+function makeQuestionTable(Q){
+
+    // LAYOUT:
+    //[slug] with click to Edit
+    // <table id=[slug]_table >
+
+    // IF MATRIX
+    // <tr><td colspan=2 id=[slug]_premable> Q.question text </td></tr>
+
+    // <tr>
+        // <td id=[slug]_qtext width=66%>
+            // IF MATRIX
+                // <ol> for every mrow: <li> mrow.text </ol>
+            // ELSE
+                // Q.question text
+        // </td><td id=[slug]_scale>
+            // getScaleRows(Q)
+        // </td>
+    // </tr>
+    // <tr><td colspan=2> bottom row stuff </td></tr></table>
+
+}
+
+function redrawTable(qToEdit){
+
+    var qObj_name = qToEdit.name;
+    if(qToEdit.type=="control_matrix"){
+        // copy/paste of makeMatrixTable MINUS the question container.  Fix this later.
+        var str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+        str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+        str+= qObj.text;
+        str+="</td></tr><tr><td class='matrix_rows'><ol>";
+        // TODO: split on pipes
+        var rows = qObj.mrows.split("|");
+        for(var i in rows){
+            str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+            item_response_count++;
+        }
+        str+="</ol></td><td class='matrix_options'>";
+        var cols = qObj.mcolumns.split("|");
+        str += "("+cols.length+"pt)<br/>"
+        for(var i in cols){
+            str += "- "+cols[i]+"<br/>";
+        }
+        str += "</td></tr></table><br>";
+
+        $("#"+qObj_name).html(str);
+        //return str;
+    }
+    else{
+        // copy/paste of makeSimpleTable MINUS the question container.  Fix this later.
+
+        var str ="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+        str+="<table class='matrix_table' ><tr><td>";
+        str+= qObj.text;
+        str+="</td><td class='options'>";
+        var options = qObj.options.split("|");
+        //str += options.length+"pt<br/><br/>"
+        // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
+        // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
+        str += "("+qObj.type.replace("control_","")+")<br/>";
+
+        for(var i in options){
+            str += "- "+options[i]+"<br/>";
+        }
+        str += "</td></tr></table></div><br>";
+
+        $("#"+qObj_name).html(str);
+    }
+}
+
+function makeEditableMatrixTable(qObj_name){
+
+    qObj = allQs[qObj_name];
+
+    var str="<b>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+    str+= "<input type=text value=\""+qObj.text+"\" style='width: 90%' class='editedQText'>";
+    str+="</td></tr><tr><td class='matrix_rows'><textarea rows=10 style='width: 100%' class='editedRows'>";
+    // TODO: split on pipes
+    var rows = qObj.mrows.split("|");
+    for(var i in rows){
+        str += rows[i]+"\n"; //+"</li>";
+    }
+    str+="</textarea></td><td class='matrix_options'>";
+    var cols = qObj.mcolumns.split("|");
+    str+="<textarea rows="+(cols.length+2)+" style='width: 100%' class='editedScaleItems'>"
+    for(var i in cols){
+        str += cols[i]+"\n";
+    }
+    
+    //str = $.trim(str); //remove trailing \n
+    str += "</textarea></td></tr>";
+        str+="</td></tr>";
+    str += "<tr><td align=right colspan=2>";
+    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
+    str +="</td></tr></table><br>";
+
+    $("#"+qObj.name).html(str);
+
+    //return str;
+
+}
+
+function makeEditableSimpleTable(qObj_name){
+    qObj = allQs[qObj_name];
+
+    var str ="<b >["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table' ><tr><td>";
+    str+= "<textarea rows=5 style='width: 90%' class='editedQText'>"+qObj.text+"</textarea>";
+    str+="</td><td class='options'>";
+
+    var options = qObj.options.split("|");
+    str+="<textarea rows="+(options.length+2)+" style='width: 100%' class='editedScaleItems'"; // leave open inorder to write readonly if nec
+
+    if(['control_matrix','control_radio','control_checkbox'].indexOf(qObj.type)<0){
+        str+=" readonly>";
+    }
+    else{
+        str+=">"
+    }
+
+    for(var i in options){
+        str += options[i]+"\n";
+    }
+    str += "</textarea>";
+    str+="</td></tr>";
+    str += "<tr><td align=right colspan=2>";
+    str += "<button onClick='updateQ(\""+qObj.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+qObj.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+qObj.name+"\")'>clone</button>";
+    str +="</td></tr></table><br>";
+
+    $("#"+qObj.name).html(str);
+}
+
+function makeSimpleTable(qObj){
+    
+    var str = "<div id='"+qObj.name+"' class='question_container'>";
+
+    str +="<b onClick='makeEditableSimpleTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+    str+="<table class='matrix_table' ><tr><td>";
+    str+= qObj.text;
+    str+="</td><td class='options'>";
+    var options = qObj.options.split("|");
+    //str += options.length+"pt<br/><br/>"
+    // if(qObj.type.indexOf("checkbox")>=0) str+= "(select all that apply)<br/>";
+    // else if(qObj.type.indexOf("radio")>=0) str+= "(single select)<br/>";
+    str += "("+qObj.type.replace("control_","")+")<br/>";
+
+    for(var i in options){
+        str += "- "+options[i]+"<br/>";
+    }
+    str += "</td></tr></table></div><br>";
+    item_response_count++;
+    return str;
+
+}
+
+function setFormId(){
+    var selected_form_id = $("#form-pulldown")[0].options[$("#form-pulldown")[0].selectedIndex].value
+    $("#formid").val(selected_form_id);
+    loadJF();
+}
+
+function addQuestion(type){
+    item_response_count++;
+
+    var knowntypes = ["radio","checkbox","matrix","textbox"];
+    if(knowntypes.indexOf(type) < 0){
+        return;
+    }
+
+    var qtype = "control_"+type;
+    var qObj = {
+        "type": qtype,
+        "name": type+"_"+item_response_count,
+        "text": "New Question Text"
+
+    };
+
+    if(type=="matrix"){
+        qObj["mrows"]="row 1|row 2|row 3";
+        qObj["mcolumns"] = "col 1|col 2|col 3|col 4|col 5";
+    }
+    else if(type == "radio" || type=="checkbox"){
+        qObj["options"] = "option 1|option 2|option 3";
+    }
+    //console.log("about to add");
+    //console.log(qObj);
+    putNewQuestion([qObj]); 
+
+}
+
+function clone(qObj_name){
+    item_response_count++;
+    var q = allQs[qObj_name];
+    q.name = q.type.replace("control_","")+item_response_count;
+    delete(q["qid"]);
+    delete(q["order"]);
+    putNewQuestion([q]);
+}
+
+function putNewQuestion(questionsArray){
+    jsonData = JSON.stringify({ "questions" : questionsArray});
+
+    JF.createFormQuestions(my_formid, jsonData, function(response){
+         for(var i in response){
+           console.log(response[i]);
+        }
+        location.reload();
+    });
+
+}
+
+function populateFormSelect(keyword){
+    console.log("searching for..."+keyword);
+    var formList = [];
+   
+    // Search through the pulldown list text
+    var allFormsOptions = $("#form-pulldown")[0].options;
+    var lower_keyword = keyword.toLowerCase();
+    for(var i in allFormsOptions){
+        var text = allFormsOptions[i].text;
+
+        // create an object with the index value in the main pulldown (index: i)
+        // so that we can set selectedIndex later without re-searching the list
+        if(text!==undefined && text.toLowerCase().indexOf(lower_keyword)>=0){
+            formList.push({index: i, value: allFormsOptions[i].value, text: allFormsOptions[i].text})
+        }
+    }
+    
+   
+    // console.log("--FORMS LIST--");
+    // console.log(formList);
+
+    var size = Math.min(10, formList.length);
+
+    var selectFormList = $("#listOfFormOptions");
+    selectFormList.empty();
+    selectFormList.css("display","block")
+    selectFormList.attr("size",size);
+
+    for(var i=0; i<formList.length; i++){
+        selectFormList.append($('<option></option>').attr('value', formList[i].index).text(formList[i].text));
+    }
+}
+
+function formOptionSelected(event, index){
+    console.log(event);
+    // console.log("index "+index);
+    // console.log("option selected!!!!");
+    if(event.code=="Enter" || event.code=="Space"){
+        $("#listOfFormOptions").css("display","none");
+
+        //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
+        var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
+
+        $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
+        $("#searchval").val("");
+
+        setFormId();
+    }
+}
+
+</script> 
+</head>
+<body onLoad="loadLocalstorage(); loadJF();">
+<div id="userinput">
+    jotform api key: <input type=text value="" size=30 id="apikey"> 
+    <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <button onClick="clearApikey()">clear API key</button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api" target="_blank">make/get api key</a>
+    <div id="form_selection">
+        <!--<div id="formpulldown_div" style="float:left">-->
+            form: <select id="form-pulldown" onChange="setFormId()"></select>
+        <!--</div>
+        <div id="search_div" style="float:left"> -->
+            search: <input id="searchval" oninput="populateFormSelect(this.value)" type=text value="" size=30/><br>
+            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onKeyUp="formOptionSelected(event, this.selectedIndex)"></select>
+       <!-- </div>-->
+    </div>
+    <div style="clear:both">
+         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a>
+    </div>
+</div>
+
+<div id="main">
+
+</div>
+<hr>
+<div id="footer">
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> 
+    <br>(adds to bottom, causes page to refresh)
+</div>
+ 
+</body>
+  
+
+</html>
+

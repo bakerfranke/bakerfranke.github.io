@@ -1,0 +1,68 @@
+To: bfranke@tezcat.com
+From: stephen@faq.questions.form
+Subject: IS FAQ
+
+Thank you STEPHEN!
+
+Include the following sections:
+	-[email]
+	-[eudora]
+	-[ftp]
+	-[laptop]
+	-[network]
+	-[newsgroups]
+	-[software]
+	-[word]
+	-[onetopic]
+	-[twotopic]
+	-[threetopic]
+	-[fourtopic]
+
+Ask this question about:
+
+		Email:
+[emailq]
+---------------------------------------
+
+		Eudora:
+[eudoraq]
+---------------------------------------
+
+		FTP:
+[ftpq]
+---------------------------------------
+
+		Laptops
+[laptopq]
+---------------------------------------
+
+		The Network
+[networkq]
+---------------------------------------
+
+		Newsgroups
+[newsgroupsq]
+---------------------------------------
+
+		MS Word 97
+[wordq]
+---------------------------------------
+
+		Other Software
+[softwareq]
+---------------------------------------
+
+		[onetopic]
+[oneq]
+---------------------------------------
+
+		[twotopic]
+[twoq]
+---------------------------------------
+	
+		[threetopic]
+[threeq]
+---------------------------------------
+
+		[fourtopic]
+[fourq]

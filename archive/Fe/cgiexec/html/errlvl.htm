@@ -1,0 +1,36 @@
+<html><head>
+<title>
+Errlvl sample for CGIexec
+</title>
+</head>
+<body bgcolor=#ffffff text=#000000>
+<table border=2 bgcolor=#fabb00>
+<tr>
+<td bgcolor=#000000><b><font size=+2 color=#ff0000>CGI</font><font size=+1 color=#fabb00>Executor</font></b></td>
+</tr>
+</table>
+<hr>
+<font color=#ff0000><b>Description: </b></font>This sample shows how to check
+return value of external program executed by <b>CGIexec</b>.
+To generate an error sample uses <b>errlvl.exe</b> program distributed within
+this package along with <b><i>SYS.errlvl</i></b> variable in configuration file.<br>
+<b>To see project files check <u>errlvl</u> directory.</b><br><br>
+<hr>
+<form method=POST action="http://localhost/cgiexec/bin/cgiexec.exe?../demo/errlvl/errlvl.conf">
+<center>
+<table border bgcolor=#000000>
+<tr>
+<td bgcolor=#fabb00>Enter return value: </td><td bgcolor=#fabb00><input size=10 name=err></td>
+</tr>
+<td bgcolor=#000000><font color=#fabb00><input type=CHECKBOX name=check value=CHECK><b>Check return value</b></font></td><td align=right><input type=SUBMIT value=Send></td>
+<tr>
+</tr>
+</table>
+</center>
+</form>
+<hr>
+<font color=#ff0000>
+End Of Document
+</font>
+</body>
+</html>

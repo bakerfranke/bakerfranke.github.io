@@ -1,0 +1,172 @@
+
+This is the explanation of the 3D menu. V 2.01
+
+In the last version there was a bug. When going back to the menu, it stopped.
+Now this is working. ( I am sorry for the late notice of this. )
+
+New feature ( frames, it version 2.0 I did not thought about frames. )
+The parameter WHERE0, WHERE1, WHERE2, etc. can be used to define a location where to load 
+the document.
+
+	http://www.van-der-schaar.demon.nl/
+	Java@van-der-schaar.demon.nl
+
+Maximum links = 6, because a cube has only 6 sides.
+
+What can we change?
+
+Almost anything.
+
+	-Background Image
+	-Background Color
+	-Images on the sides of the cube
+	-The links or no links.
+new is:
+	-Size of the Cube
+	-Size of depth
+
+*********************************************************************************
+<PARAM NAME="I1" VALUE="jsanim.gif">
+<PARAM NAME="I1A" VALUE="17">
+<PARAM NAME="REF1" VALUE="">
+<PARAM NAME="TEXT1" VALUE="SIDE 2">
+<PARAM NAME="CUBESIZE" VALUE="100">
+<PARAM NAME="FACTOR" VALUE="150">
+<PARAM NAME="WHERE0" VALUE="home.html">
+
+
+All images in this applet must be a gif format with a size of 100x100 pixels.
+When an animtion is used store the images, in one file. ( see jsanim.gif )
+
+parameters :
+	
+	In 	(n= 1..6)	fill in name of the image
+	InA	(n= 1..6)	fill in number of images in the imagefile. 
+	REFn	(n= 1..6)	fill in link to a webpage ("http://www.van-der-schaar.demon.nl/index.html")
+				if you don't want to use a link than leave blank.
+	TEXTn	(n= 1..6)	fill in the text that must be showed on the bottom of the screen.				
+
+	
+*********************************************************************************
+Background stuff.
+
+<PARAM NAME="BACKCOLOR" VALUE="0">
+
+	the color of the background, must be ( r*65536 + g*256 + b )
+
+<PARAM NAME="BACKIMAGE" VALUE="back.gif">
+
+	if you want to use a background image than this is the name of the image.
+
+<PARAM NAME="BACKOFFSETX" VALUE="50">
+<PARAM NAME="BACKOFFSETY" VALUE="20">
+
+	the offset of where the background image should be drawn for the first time.
+
+*********************************************************************************
+
+For the rest I don't know what to tell you more.
+
+I hope you will enjoy this free applet.
+
+*********************************************************************************
+Cube Size
+
+<PARAM NAME="CUBESIZE" VALUE="100">
+
+Just fill in a size.
+
+*********************************************************************************
+Depth
+
+<PARAM NAME="FACTOR" VALUE="150">
+
+Fill in a number between 100..999
+
+100 is no depth. 
+999 is : Is that a cube?
+
+*********************************************************************************
+
+<PARAM NAME="WHERE0" VALUE="home.html">
+
+
+The location where the document must loaded.
+
+ _self	show in current frame  
+_parent	show in parent frame  
+_top	show in top-most frame  
+_blank	show in new unnamed top-level window  	
+******* show in new top-level window named 
+
+example  index.html contains 2 frames :
+
+	select.html name of frame is select
+	home.html name of frame is home
+
+	in select.html is the cube.
+
+	in the WHERE0 parameter we place "HOME"
+
+When clicking on side 1 the document will load int the frame called home.
+So the menu will always be available.
+
+
+
+
+*********************************************************************************
+
+
+<html>
+<head>
+<title>3D Menu V2.0 by Java Solutions</title>
+</head>
+<body>
+<hr>
+<p align=center><applet
+    code=jsmenu.class
+    id=jsmenu
+    width=283		
+    height=183>		
+<PARAM NAME="CUBESIZE" VALUE="100">
+<PARAM NAME="FACTOR" VALUE="150">
+<PARAM NAME="I0" VALUE="pic2.gif">
+<PARAM NAME="I1" VALUE="jsanim.gif">
+<PARAM NAME="I2" VALUE="pic1.gif">
+<PARAM NAME="I3" VALUE="pic2.gif">
+<PARAM NAME="I4" VALUE="pic3.gif">
+<PARAM NAME="I5" VALUE="jsanim.gif">
+<PARAM NAME="I0A" VALUE="1">
+<PARAM NAME="I1A" VALUE="17">
+<PARAM NAME="I2A" VALUE="1">
+<PARAM NAME="I3A" VALUE="1">
+<PARAM NAME="I4A" VALUE="1">
+<PARAM NAME="I5A" VALUE="1">
+<PARAM NAME="REF0" VALUE="">
+<PARAM NAME="REF1" VALUE="">
+<PARAM NAME="REF2" VALUE="">
+<PARAM NAME="REF3" VALUE="">
+<PARAM NAME="REF4" VALUE="">
+<PARAM NAME="REF5" VALUE="">
+<PARAM NAME="WHERE0" VALUE="home.html">
+<PARAM NAME="WHERE1" VALUE="">
+<PARAM NAME="WHERE2" VALUE="">
+<PARAM NAME="WHERE3" VALUE="">
+<PARAM NAME="WHERE4" VALUE="">
+<PARAM NAME="WHERE5" VALUE="">
+<PARAM NAME="BACKCOLOR" VALUE="10000">
+<PARAM NAME="BACKIMAGE" VALUE="back.gif">
+<PARAM NAME="BACKOFFSETX" VALUE="50">
+<PARAM NAME="BACKOFFSETY" VALUE="20">
+<PARAM NAME="TEXT0" VALUE="SIDE 1">
+<PARAM NAME="TEXT1" VALUE="SIDE 2">
+<PARAM NAME="TEXT2" VALUE="SIDE 3">
+<PARAM NAME="TEXT3" VALUE="SIDE 4">
+<PARAM NAME="TEXT4" VALUE="SIDE 5">
+<PARAM NAME="TEXT5" VALUE="SIDE 6">
+</applet>
+<hr>
+</body>
+</html>
+
+

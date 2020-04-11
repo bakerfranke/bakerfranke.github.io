@@ -1,0 +1,631 @@
+<html>
+<head>
+         
+
+    <script src="https://js.jotform.com/JotForm.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+    <style>
+    body{
+        
+        padding-left: 40px;
+        font-size: 11pt;
+        width: 850px;
+
+    }
+    .edited_scales:read-only{
+        background-color: #CCCCCC;
+        color: #999999;
+    }
+    .qtable{
+       
+        border-collapse: collapse;
+        font-size: 11pt;
+        width: 100%;
+
+    }
+    .qtable td{
+        vertical-align: top;
+        border: solid 1px black;
+        padding: 5px;
+        
+    }
+
+    .qtable_footer{
+        text-align: right;
+    }
+
+    .input{
+        width: 100%;
+    }
+    .edited_qtext, .edited_scales, .edited_rows{
+        width: 100%;
+    }
+
+    .question_container{
+        margin-bottom: 10px;
+    }
+    .qtext{
+        width: 66%;
+    }
+    .matrix_rows{
+        width: 66%;
+    }
+    .options{
+        width: 50%;
+    }
+    .pagebreak{
+        text-align: right;
+        background-color: #d9f3f5;
+        font-size: 8pt;
+        padding: 1px;
+        font-family: sans-serif;
+    }
+    #userinput{
+        background-color: #DDDDDD;
+        margin-bottom: 4px;
+    }
+    .hiddenkey{
+        color: rgba(0,0,0,0);
+        font-family: sans-serif;
+        font-size: 9pt;
+    }
+    .hiddenkey:hover{
+        color: rgba(0,0,0,1);
+    }
+    ol{
+        padding-inline-start: 20px;
+    }
+    </style>
+ <script>
+var my_apikey = "";
+var my_formid = "";
+var item_response_count = 0;
+var allQs = {};
+var allForms = [];
+var editableTypes = ['control_matrix','control_radio','control_checkbox','control_number','control_textbox','control_textarea'];
+var editableScales = ['control_matrix','control_radio','control_checkbox'];
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function loadLocalstorage(){
+    if(localStorage["my_apikey"] !==undefined){
+        $("#apikey").val(localStorage["my_apikey"] );
+        $("#makeapikey").hide();
+    }
+    if(localStorage["my_formid"] !==undefined){
+        $("#formid").val(localStorage["my_formid"] );
+    }
+
+    // QUERY STRING FORM ID overrides local storage value
+    var param_formid = getParameterByName("formid");
+    if(param_formid!==null){
+         $("#formid").val(param_formid);
+    }
+}
+
+function clearApikey(){
+
+    delete(localStorage["my_apikey"]);
+    delete(localStorage["my_formid"]);
+    
+    location.reload();
+}
+
+function loadJF(){
+    
+    my_apikey = $("#apikey").val();
+    my_formid = $("#formid").val();
+
+    //JF.initialize( {apiKey: "db67fed2f8281454859dcb1687a04fbf"} ); 
+
+    // Login and populate pulldown menu of surveys
+    JF.initialize( {apiKey: my_apikey} ); 
+    localStorage["my_apikey"] = my_apikey;
+
+    //get all forms available and populate pulldown menu sorted by updated_at
+    JF.getForms({limit: "1000", orderby: "updated_at"}, function(response){
+        allForms = response;
+     
+        var dropdown = $('#form-pulldown');
+
+        dropdown.empty();
+
+        dropdown.append('<option selected="true" disabled>Choose a form</option>');
+        dropdown.prop('selectedIndex', 0);
+
+        for(var i=0; i<response.length; i++){
+            dropdown.append($('<option></option>').attr('value', response[i].id).text(response[i].title));
+            if(response[i].id == my_formid){ dropdown.prop('selectedIndex', i+1); }
+        }
+    });
+
+    // set cached jotform id and create links appropriately
+    localStorage["my_formid"] = my_formid;
+    $("#preview_link").attr("href", "https://form.jotform.com/"+my_formid);
+    $("#build_link").attr("href", "https://www.jotform.com/build/"+my_formid);
+    $("#thislink").attr("href", "https://bakerfranke.github.io/jotform/?formid="+my_formid);
+
+
+    // render all questions from loaded form to the screen
+    item_response_count = 0;
+
+    JF.getFormQuestions(my_formid, function(response){
+
+        // first put Qs in order they appear in in the form
+        var orderedQList = [];
+        for(var i in response){
+            var obj = response[i];
+            orderedQList[obj.order] = obj;
+            allQs[obj.name] = obj;
+            //document.write(response[i].qid+" "+response[i].text+"<br/>");
+        }
+
+        //compose a giant HTML string of all questions formatted according to type
+        //Baker thoughts: change this to: for each question (1) add a div container where id=qname (2) fill div with appropriate html
+        var outStr = "";
+        $("#main").empty();
+        for(var i in orderedQList){
+            var Q = orderedQList[i];
+
+            // TODO: every element from questions array should get its own div and attach to #main
+            var divstr = "<div id='"+Q.name+"' class='question_container'>foo</div>";
+            $("#main").append(divstr);
+
+            // if it's an editable type, then it gets a table layout treatment
+            if(editableTypes.indexOf(Q.type)>=0){
+
+                var tableHTML = makeQuestionTableTemplateHTML(Q); // creates a table to display question
+                $("#"+Q.name).html(tableHTML); // attach to div we made above.
+
+                makeViewableTable(Q); // sets all the fields in the table template based on Q type
+            }
+            else if(Q.type == "control_pagebreak"){ // special display for a page break
+                $("#"+Q.name).html("<div class='pagebreak'>page break</div>");
+            }
+            else{
+                $("#"+Q.name).html("<b>[" +Q.name+"]</b> ["+Q.type+"] <br/> "+Q.text+"<br/>");
+            }
+        }
+        //outStr += "<br/><b>Total items: "+item_response_count+"</b>";
+        $("#main").append("<br/><b>Total items: "+item_response_count+"</b>");
+        //$("#main").html(outStr);
+
+    });
+
+    
+}
+
+function updateSlug(id, name){
+    console.log("asked to update "+id+", "+name);
+    var newSlug = $("#"+name).val();
+    console.log("new slug: "+newSlug);
+
+
+    question = { "name" : newSlug};
+
+    JF.editFormQuestion(my_formid, id, question, function(response){
+        // *
+        //  successful response including question with given id of form with given id
+        //  .
+         
+        console.log("name updated."+response);
+    });
+
+}
+
+
+// function makeMatrixTable(qObj){
+//     // var str = "<div id='"+qObj.name+"' class='question_container'>";
+//     str ="<b onClick='makeEditableMatrixTable(\""+qObj.name+"\")'>["+qObj.name+"]</b><br>";
+//     str+="<table class='matrix_table'><tr><td colspan='2' class='preamble'>";
+//     str+= qObj.text;
+//     str+="</td></tr><tr><td class='matrix_rows'><ol>";
+//     // TODO: split on pipes
+//     var rows = qObj.mrows.split("|");
+//     for(var i in rows){
+//         str += "<li> "+rows[i]+"<br/>"; //+"</li>";
+//         item_response_count++;
+//     }
+//     str+="</ol></td><td class='matrix_options'>";
+//     var cols = qObj.mcolumns.split("|");
+//     str += "("+cols.length+"pt)<br/>"
+//     for(var i in cols){
+//         str += "- "+cols[i]+"<br/>";
+//     }
+//     str += "</td></tr></table>";
+//     //str += "</div>";
+//     str += "<br>";
+
+//     return str;
+// }
+
+
+// // BAKER NOTE: ToDO -- in inital layout of questions, build question containers, then fill inner html
+// // with question type so can swap readonly and editable.
+function updateQ(qObj_name){
+
+    var qToEdit = allQs[qObj_name]; // will update this object
+    var qId = "#"+qObj_name;
+
+    //ONLY UPDATE qObj and POST if I know how to edit it
+    if(editableTypes.indexOf(qToEdit.type) >= 0){
+        // console.log("PREVIOUS QTEXT, ROWS, and COLUMNS");
+        // console.log("QTEXT: "+qToEdit.text);
+        // console.log("ROWS: "+qToEdit.mrows);
+        // console.log("COLS: "+qToEdit.mcolumns);
+        // console.log("OPTIONS: "+qToEdit.options);
+
+        // update text field.  NOTE: due to trickeration edited_qtext will be premable for matrix Qs, or the actualQ.text for other types
+        qToEdit.text = $(qId+" .edited_qtext").val();
+
+        // THIS IS ONLY MEANINGFUL FOR MATRIX Qs
+        if(qToEdit.type=='control_matrix'){
+            //   console.log("Edited Rows are:");
+            var rows = $(qId+" .edited_rows").val();
+            rows = $.trim(rows);
+            // console.log(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+            //  console.log(pipedRows);
+            qToEdit.mrows = pipedRows;
+        }
+
+
+        // SCALES ONLY EDITABLE FOR matrix, radio, checkbox
+        if(editableScales.indexOf(qToEdit.type)>=0){
+            var rows = $(qId+" .edited_scales").val();
+            rows = $.trim(rows);
+            var pipedRows = rows.replace(/\n/g,"|");
+
+            if(qToEdit.type=='control_matrix'){
+                qToEdit.mcolumns = pipedRows;
+            }
+            else if(["control_radio","control_checkbox"].indexOf(qToEdit.type) >= 0){
+                qToEdit.options = pipedRows;
+            }
+        }
+
+        if(editableTypes.indexOf(qToEdit.type)>=0){
+            JF.editFormQuestion(my_formid, qToEdit.qid, qToEdit, function(response){
+
+                console.log("UPDATED QUESTION:");
+
+                //BAKER NOTE: should I be replacing the object in allQs with this one from the response?
+                console.log(response);
+                makeViewableTable(qToEdit);
+                setStatusMessage(qToEdit, "success", "sucessfully updated ["+qToEdit.name+"]")
+            });
+        }
+        else{
+            console.log("UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+            makeViewableTable(qToEdit);
+            setStatusMessage(qToEdit, "failure", "UPDATE NOT SENT TO JOTFORM. \n "+qToEdit.type+" questions not in approved edit list");
+
+        }
+    }
+}
+
+function setStatusMessage(Q, code, msg){
+
+    var id = "#"+Q.name; 
+    $(id+"_footer").html(code+": "+ msg);
+    $(id+"_footer").show();
+    if(code=="success"){
+        $(id+"_footer").css("background-color","#d8f9c2");
+    }
+    else { //if(code=="failure"){
+        $(id+"_footer").css("background-color","#f9c2c2");
+    }
+
+    setTimeout(function() {
+        $(id+"_footer").hide();
+    }, 5000);
+}
+
+
+function cancelEdit(qObj_name){
+    console.log("CANCELLED edit on "+qObj_name);
+    var qToCancel = allQs[qObj_name];
+    console.log(qToCancel);
+    makeViewableTable(qToCancel);
+    //setStatusMessage(qToCancel,"Cancelled","question not updated.")
+
+
+}
+
+// This should replace redrawTable AND initial setup 
+// appends question div to main
+// appends table template for question display to div
+function makeQuestionTableTemplateHTML(Q){
+    var short_type = Q.type.replace("control_","");
+    //var qid = "#"+Q.name;
+
+    //[slug] with click to Edit
+    str ="<b onClick='makeEditableTable(\""+Q.name+"\")'>["+Q.name+"]</b><br>";
+
+    // <table id=[slug]_table >
+    str += "<table id='"+Q.name+"_table' class='qtable'>";
+    // hide top row unless matrix
+    str += "<tr><td colspan=2 id='"+Q.name+"_preamble'>[preamble]</td><tr>";
+    str += "<tr><td id='"+Q.name+"_qtext' class='qtext "+short_type+"'>[qtext or matrix rows]</td>"
+    str += "<td id='"+Q.name+"_scale'>[scale]</td></tr>";
+
+    // bottom row stuff
+    str += "<tr><td colspan=2 id='"+Q.name+"_footer' class='qtable_footer'>footer</td></tr>";
+    str += "</table>";
+
+    //$(qid).append(str);
+    return str;
+}
+
+// Make viewable (read only) version of question
+// set html of div and table elements 
+function makeViewableTable(Q){
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
+
+    // Show preamble if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        $(qId+"_preamble").html(Q.text);
+    }
+    else{
+        $(qId+"_preamble").hide();
+    }
+
+    // Fill in question text.  If matrix then rows, otherwise qtext
+    if(Q.type=="control_matrix"){
+        var rows = Q.mrows.split("|");
+        var str = "<ol>";
+        for(var i in rows){
+            str+="<li>"+rows[i];
+        }
+        str += "</ol>";
+        $(qId+"_qtext").html(str);
+        item_response_count += rows.length; 
+    }
+    else{
+        $(qId+"_qtext").html(Q.text);
+        item_response_count++;
+    }
+
+    //fill scales
+
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
+    
+
+
+    //var cols = Q.options.split("|");
+    //var str = "("+scalesArray.length+"pt)<br/>"
+    var str = "("+short_type+")<br>"; // item 0 is a title/label thing
+    for(var i in scalesArray){
+        str += "- "+scalesArray[i]+"<br/>";
+    }
+    $(qId+"_scale").html(str);
+
+    // ToDo: show/hide footer if there is a status message
+    $(qId+"_footer").hide();
+}
+
+function makeEditableTable(qname){
+
+    var Q = allQs[qname];
+    if(editableTypes.indexOf(Q.type)<0) return;
+
+    var short_type = Q.type.replace("control_","");
+    var qId = "#"+Q.name; //jquery dom id
+
+    // PREAMBLE AREA
+    // Show preamble in text box if matrix question, otherwise hide top row
+    if(Q.type=="control_matrix"){
+        var str = "<input type=text class='edited_qtext' value='"+Q.text+"'/>";
+        $(qId+"_preamble").html(str);
+    }
+    else{
+        $(qId+"_preamble").hide();
+    }
+
+    // MAIN QUESTION TEXT AREA (or matrix rows)
+    str = "<textarea class='edited_"; // this is TRICKY -- setting class to be _qtext IF NOT a matrix question, since preamble in a matrix is Q.text in the jotform object
+    if(Q.type=="control_matrix"){
+        str += "rows' rows=10>"
+        var rows = Q.mrows.split("|");
+        for(var i in rows){
+            str+=rows[i]+"\n";
+        }
+    }
+    else{
+        str += "qtext' rows=5>"
+        str += Q.text;
+    }
+    str += "</textarea>";
+    $(qId+"_qtext").html(str);
+
+
+    // SCALES AREA
+    var scalesArray = makeScalesArray(Q); //helper function to return whatever should be shown in scale area as an array
+    //str = "("+short_type+")<br>";
+    str = "<textarea class='edited_scales'>";
+    for(var i in scalesArray){
+        str += scalesArray[i]+"\n";
+    }
+    $(qId+"_scale").html(str);
+    $(qId+" .edited_scales").attr("rows", Math.max(5, scalesArray.length+1));
+    if(editableScales.indexOf(Q.type)<0){
+        $(qId+" .edited_scales").attr("readonly","readonly");
+    }
+
+    // FOOTER AREA
+    $(qId+"_footer").show();
+    str = "<button onClick='updateQ(\""+Q.name+"\")'>save</button>";
+    str += "<button onClick='cancelEdit(\""+Q.name+"\")'>cancel</button>";
+    str += "<button onClick='clone(\""+Q.name+"\")'>clone</button>";
+    $(qId+"_footer").html(str);
+}
+
+function makeScalesArray(Q){
+
+    var array = [];
+    var short_type = Q.type.replace("control_","");
+    if(short_type == "matrix"){
+        array = Q.mcolumns.split("|");
+    }
+    else if(short_type=="radio" || short_type=="checkbox"){
+        array = Q.options.split("|");
+    }
+    else if(Q.type=="control_scale"){
+        array.push(Q.scaleFrom+" to "+Q.scaleAmount);
+    }
+    else if(["control_number","control_textbox","control_textarea"].indexOf(Q.type) >= 0){
+        //console.log("inside type tcheck");
+        array.push("[input_"+short_type+"]");
+        //outStr += makeSimpleTable(Q);
+    }
+    return array;
+}
+
+
+function setFormId(){
+    var selected_form_id = $("#form-pulldown")[0].options[$("#form-pulldown")[0].selectedIndex].value
+    $("#formid").val(selected_form_id);
+    loadJF();
+}
+
+function addQuestion(type){
+    item_response_count++;
+
+    var knowntypes = ["radio","checkbox","matrix","textbox"];
+    if(knowntypes.indexOf(type) < 0){
+        return;
+    }
+
+    var qtype = "control_"+type;
+    var qObj = {
+        "type": qtype,
+        "name": type+"_"+item_response_count,
+        "text": "New Question Text"
+
+    };
+
+    if(type=="matrix"){
+        qObj["mrows"]="row 1|row 2|row 3";
+        qObj["mcolumns"] = "col 1|col 2|col 3|col 4|col 5";
+    }
+    else if(type == "radio" || type=="checkbox"){
+        qObj["options"] = "option 1|option 2|option 3";
+    }
+    //console.log("about to add");
+    //console.log(qObj);
+    putNewQuestion([qObj]); 
+
+}
+
+function clone(qObj_name){
+    item_response_count++;
+    var q = allQs[qObj_name];
+    q.name = q.type.replace("control_","")+item_response_count;
+    q.text = "(COPY) "+q.text;
+    delete(q["qid"]);
+    delete(q["order"]);
+    putNewQuestion([q]);
+}
+
+function putNewQuestion(questionsArray){
+    jsonData = JSON.stringify({ "questions" : questionsArray});
+
+    JF.createFormQuestions(my_formid, jsonData, function(response){
+         for(var i in response){
+           console.log(response[i]);
+        }
+        location.reload();
+    });
+
+}
+
+function populateFormSelect(keyword){
+    console.log("searching for..."+keyword);
+    var formList = [];
+   
+    // Search through the pulldown list text
+    var allFormsOptions = $("#form-pulldown")[0].options;
+    var lower_keyword = keyword.toLowerCase();
+    for(var i in allFormsOptions){
+        var text = allFormsOptions[i].text;
+
+        // create an object with the index value in the main pulldown (index: i)
+        // so that we can set selectedIndex later without re-searching the list
+        if(text!==undefined && text.toLowerCase().indexOf(lower_keyword)>=0){
+            formList.push({index: i, value: allFormsOptions[i].value, text: allFormsOptions[i].text})
+        }
+    }
+    
+
+    var size = Math.min(10, formList.length);
+
+    var selectFormList = $("#listOfFormOptions");
+    selectFormList.empty();
+    selectFormList.css("display","block")
+    selectFormList.attr("size",size);
+
+    for(var i=0; i<formList.length; i++){
+        selectFormList.append($('<option></option>').attr('value', formList[i].index).text(formList[i].text));
+    }
+}
+
+function formOptionSelected(event, index){
+
+    //if(event.code=="Enter" || event.code=="Space"){
+        $("#listOfFormOptions").css("display","none");
+
+        //var selectedFormName = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].text
+        var selectedFormIndex = $("#listOfFormOptions")[0].options[$("#listOfFormOptions")[0].selectedIndex].value;
+
+        $("#form-pulldown")[0].selectedIndex=selectedFormIndex;
+        $("#searchval").val("");
+
+        setFormId();
+    //}
+}
+
+</script> 
+</head>
+<body onLoad="loadLocalstorage(); loadJF();">
+<div id="userinput">
+    jotform api key: <input type=text value="" size=30 id="apikey"> 
+    <!-- <input type=text value="cbcc52e76debcf9102798e18f6098e32" size=30 id="apikey"> -->
+    <!-- <input type=text value="db67fed2f8281454859dcb1687a04fbf" size=30 id="apikey"> --> <button onClick="loadJF()"> Load </button> <button onClick="clearApikey()">clear API key</button> <a id="makeapikey" href="https://www.jotform.com/myaccount/api" target="_blank">make/get api key</a>
+    <div id="form_selection">
+        <!--<div id="formpulldown_div" style="float:left">-->
+            form: <select id="form-pulldown" onChange="setFormId()"></select>
+        <!--</div>
+        <div id="search_div" style="float:left"> -->
+            search: <input id="searchval" oninput="populateFormSelect(this.value)" type=text value="" size=30/><br>
+            <select size=10 id="listOfFormOptions" style="width: 100%; display: none" onChange="formOptionSelected(event, this.selectedIndex)"></select>
+       <!-- </div>-->
+    </div>
+    <div style="clear:both">
+         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a>
+    </div>
+</div>
+
+<div id="main">
+
+</div>
+<hr>
+<div id="footer">
+    Add a new question: <button onClick="addQuestion('matrix')">Matrix</button> <button onClick="addQuestion('radio')">Single Select MC</button> <button onClick="addQuestion('checkbox')">Check all</button> <button onClick="addQuestion('textbox')">Textbox</button> 
+    <br>(adds to bottom, causes page to refresh)
+</div>
+ 
+</body>
+  
+
+</html>
+

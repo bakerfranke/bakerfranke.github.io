@@ -1,0 +1,105 @@
+To:bfranke@tezcat.com
+Subject: computer knowledge
+
+SUBJECT				SCALE:
+Name: [name] E-mail address: [email]
+
+SUBJECT:			SCALE:
+	Win95 basics: [win95]
+Internet
+	internet at NU:		[interNU]
+	intranet at NU:		[intraNU]
+	connecting to the network:[connecting]
+	cultural tips: 		[cultural]
+Netscape
+	launch: 		[Nlaunch]
+	navigate: 		[Nnavigate]
+	specific URL:		[NURL]
+	bookmark: 		[Nbookmark]
+	search: 		[Nsearch]
+Eudora
+	basics: 		[Ebasics]
+	launch: 		[Elaunch]
+	configure: 		[Econfigure]
+	password: 		[Epassword]
+	send: 			[Esend]
+	attatch: 		[Eattatch]
+	reply:			[Ereply]
+	use directory: 		[Edirectory]
+	close: 			[Eclose]
+	mailboxes: 		[Emailboxes]
+	address book: 		[Eaddressbook]
+	nicknames: 		[Enicknames]
+	filters: 		[Efilters]
+FirstClass
+	context: 		[Fcontext]
+	launch: 		[Flaunch]
+	login: 			[Flogin]
+	post files: 		[Fpostfiles]
+	post messages: 		[Fpostmessages]
+	conferences: 		[Fconferences]
+PowerPoint
+	basics: 		[Pbasics]
+	advanced: 		[Padvanced]
+materials
+	materials: 		[scanning]
+	materials: 		[prepmaterials]
+COMMENTS:
+Windows 95:	[win95comments]
+Internet:	[internetcomments]
+Eudora:		[Ecomments]
+FirstClaas:	[Fcomments]
+Powerpoint:	[Pcomments]
+Materials:	[materialcomments]
+
+______________________________________________
+OFFICE USE ONLY:-------------
+Name: [name] E-mail address: [email]
+
+[win95]
+
+[interNU]
+[intraNU]
+[connecting]
+[cultural]
+
+[Nlaunch]
+[Nnavigate]
+[NURL]
+[Nbookmark]
+[Nsearch]
+
+[Ebasics]
+[Elaunch]
+[Econfigure]
+[Epassword]
+[Esend]
+[Eattatch]
+[Ereply]
+[Edirectory]
+[Eclose]
+[Emailboxes]
+[Eaddressbook]
+[Enicknames]
+[Efilters]
+
+[Fcontext]
+[Flaunch]
+[Flogin]
+[Fpostfiles]
+[Fpostmessages]
+[Fconferences]
+
+[Pbasics]
+[Padvanced]
+
+[scanning]
+[prepmaterials]
+
+COMMENTS:
+Windows 95:	[win95comments]
+Internet:	[internetcomments]
+Eudora:		[Ecomments]
+FirstClaas:	[Fcomments]
+Powerpoint:	[Pcomments]
+Materials:	[materialcomments]

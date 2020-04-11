@@ -1,0 +1,7 @@
+To: bfranke@tezcat.com
+Subject: ratings
+
+Program number 1?	[prog1]
+Program number 2?	[prog2]
+Program number 3?	[prog3]
+Program number 4?	[prog4]

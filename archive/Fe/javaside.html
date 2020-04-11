@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<TITLE>sidebar</TITLE>
+
+<SCRIPT LANGUAGE = "JavaScript">
+<!--
+	browserName = navigator.appName;
+   browserVer = parseInt(navigator.appVersion);
+	if (browserName == "Netscape" && !(browserVer < 3)) {
+		version = "n3";
+	} else {
+		version = "x";
+	}
+	if (version == "n3") {
+		toc1on = new Image(100, 94);
+		toc1on.src = "http://www.tezcat.com/~bfranke/images/xfralogo.gif";
+		toc2on = new Image(100, 54);
+		toc2on.src = "http://www.tezcat.com/~bfranke/icons/myart.gif";
+		toc3on = new Image(100, 54);
+		toc3on.src = "http://www.tezcat.com/~bfranke/icons/starpics.gif";
+		toc4on = new Image(100, 54);
+		toc4on.src = "http://www.tezcat.com/~bfranke/icons/quotes.gif";
+		toc5on = new Image(100, 54);
+		toc5on.src = "http://www.tezcat.com/~bfranke/icons/plink.gif";
+		toc1off = new Image(100,94);
+		toc1off.src = "http://www.tezcat.com/~bfranke/icons/fralogo.gif";
+		toc2off = new Image(100, 54);
+		toc2off.src = "http://www.tezcat.com/~bfranke/images/xmyart.gif";
+		toc3off = new Image(100, 54);
+		toc3off.src = "http://www.tezcat.com/~bfranke/images/xstarpics.gif";
+		toc4off = new Image(100, 54);
+		toc4off.src = "http://www.tezcat.com/~bfranke/images/xquotes.gif";
+		toc5off = new Image(100, 54);
+		toc5off.src = "http://www.tezcat.com/~bfranke/images/xplink.gif";
+		
+	}
+
+function img_act(imgName) {
+	if (version == "n3") {
+		imgOn = eval(imgName + "on.src");
+		document [imgName].src = imgOn;
+	}
+}
+
+function img_inact(imgName) {
+	if (version == "n3") {
+		imgOff = eval(imgName + "off.src");
+		document [imgName].src = imgOff;
+	}
+}
+// -->
+</script>
+   
+</HEAD>
+
+
+<BODY BGCOLOR = "000000" TEXT = "#636363" LINK = "#660011" VLINK = "#660011">
+
+
+
+<TABLE BORDER=0 CELLPADDING="0" CELLSPACING="1" ALIGN="LEFT" BGCOLOR="#000000" >
+<TR><TD><a href = "http://www.tezcat.com/~bfranke/front.html"
+onMouseover = "img_act('toc1')" 
+onMouseout = "img_inact('toc1')" target="display">
+<IMG SRC = "http://www.tezcat.com/~bfranke/images/fralogo.gif" 
+border = 0 
+name = "toc1" 
+alt = "Enterprises Logo" height = 94 width = 100></a><BR></tr>
+<TR>
+<TD>
+
+<a href = "http://www.tezcat.com/~bfranke/myart.html"
+onMouseover = "img_act('toc2')" 
+onMouseout = "img_inact('toc2')" target="display">
+<IMG SRC = "http://www.tezcat.com/~bfranke/images/myart.gif" 
+border = 0 
+name = "toc2" 
+alt = "My Art" height = 54 width = 100></a><BR>
+   
+
+<a href = "http://www.tezcat.com/~bfranke/pics.html"
+onMouseover = "img_act('toc3')" 
+onMouseout = "img_inact('toc3')" target="display">
+<IMG SRC = "http://www.tezcat.com/~bfranke/images/starpics.gif" 
+border = 0 
+name = "toc3"
+alt = "Starwars Pictures" height = 54 width = 100></a><BR>
+
+
+<a href = "http://www.tezcat.com/~bfranke/quotes.html"
+onMouseover = "img_act('toc4')" 
+onMouseout = "img_inact('toc4')" target="display">
+<IMG SRC = "http://www.tezcat.com/~bfranke/images/quotes.gif" 
+border = 0 
+name = "toc4"
+alt = "quotes" height = 54 width = 100></a><BR>
+
+
+<a href = "http://www.fwparker.org"
+onMouseover = "img_act('toc5')" 
+onMouseout = "img_inact('toc5')" target="top">
+<IMG SRC = "http://www.tezcat.com/~bfranke/images/plink.gif" 
+border = 0 
+name = "toc5"
+alt = "Parker" height = 54 width = 100></a><BR>
+
+
+</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

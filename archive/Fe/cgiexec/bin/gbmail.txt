@@ -1,0 +1,105 @@
+GBMailer for Windows 95/NT
+February 1998 version 1.10
+
+Author:
+Goran Boban
+gboban@cursor.net
+
+Freeware.
+Permition to freely use and distribute GBMailer version 1.10 is granted.
+
+
+
+	1. Description
+	--------------
+
+GBMailer is command-line mailer wich will send an text file as mail.
+It is written to be executed from CGI-scripts, but it can be ussed for 
+any other purpose.
+
+See history.txt for list of removed bugs in this revision.
+See todo.txt for list of things I want to implement in future.
+
+NOTE:	Be sure to read Bugs section (section 2.) of this readme file before
+	mailing bug reports or questions about using GBMailer
+
+USSAGE:
+
+gbmail [-v] -file <filename> [-h <smtp.server.name>] [-p <port_number>]
+	[-from <address>] -to <address list...> [-cc <address list...>]
+	[-bcc <address list>] [-s <Subject>] [-t <timeout>]
+
+
+OPTIONS:
+
+	-v	verbose output.
+
+	-file	REQUIRED	Name of text file to send as message body.
+				If this option is not set GBMailer will
+				report an error.
+
+	-h	Name of SMTP server to connect. If this option is not set
+		GBMailer will assume 'localhost'.
+
+	-p	Port number for SMTP protocol. Port is set to 25 by default.
+
+	-from	An optional e-mail ddress of sender. If not set GBMailer
+		will try to assume an e-mail address by combinating name of
+		current user and name of local machine.
+		You should set this option in most cases.
+
+	-to	REQUIRED	E-mail addres (or addresses) of recipient(s).
+				At least one address must cast after -to switch.
+
+	-cc	(carbon copy) E-mail addresses of recipients which will be listed
+		in Cc: field.
+
+	-bcc	(blind carbon copy) E-mail addresses of recipients which you don't
+		want to be listed in message which will be sent.
+
+	-s	Subject of message.
+
+	-t	Timeout for socket operations (in seconds). Set to 300 secs by
+		default.
+
+
+EXAMPLE:
+
+gbmail -file message.txt -h smtp.server.com -from me@my.machine.com -to you@your.machine.com -s "Hello there"
+
+
+	2. Bugs
+	-------
+	- Some people have reported that subject is not passed correctly on some systems
+	when subject contains more then one word (-s "Hello there" and got only "Hello").
+	Since I have tried this on Windows95 and WindowsNT4.0 and everything worked fine
+	I don't have a clue what this is all about, so if you have such problem please try
+	to include as much as posible information about OS type and version and verrsion
+	of CRTDLL.DLL you have installed on your system.
+	You will find CRTDLL.DLL in your \windows\system directory if you are using Win95
+	or in \winnt\system32 directory if you are using WinNT.
+	Also if you have an idea what can be done please feel free to mail me.
+
+
+	Please send bug reports and sugestions to:
+
+	gboban@cursor.net
+
+	IMPORTANT NOTE: When sending bug reports or questions on using GBMailer please
+	be sure to include following information:
+
+		- Program name (GBMailer in this case)
+		- Program version (1.10)
+		- OS you are using
+		- Version of OS you are using (you can include build number and service
+		pack number)
+		- How did you invoke gbmail.exe (from command-line or from script, if
+		from script please send me name of interpreter and version)
+		- Problem you want to report
+
+	You may include any other information you find relevant (or you think it may be
+	relevant) for this problem.
+	Also be sure to use correct e-mail address (in From: or Reply to: field) so I
+	can send you answer.
+
+

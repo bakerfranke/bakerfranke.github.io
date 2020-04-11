@@ -1,0 +1,14 @@
+To:bfranke@tezcat.com
+Subject: computer knowledge
+
+Win95 basics: [win95]
+internet at NU: [interNU]
+intranet at NU: [intraNU]
+connecting to the network: [connecting]
+cultural tips: [cultural]
+Netscape launch: [Nlaunch]
+Netscape navigate: [Nnavigate]
+Netscape specific URL: [NURL]
+Netscape bookmark: [Nbookmark]
+Netscape search: [Nsearch]
+

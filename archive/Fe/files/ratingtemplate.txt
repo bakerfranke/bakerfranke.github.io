@@ -1,0 +1,4 @@
+
+[required-Name]	[required-Email]	[WinInstall]	[explorer]	[CtrlPanel]	[Network]	[Internet]	[Intranet]	[PH]	[WWWNav]	[Bookmarks]	[Search]	[URLs]	[EInstall]	[EConfigure]	[EPassword]	[ESend]	[EAttach]	[EReply]	[EDirectories]	[EMailboxes]	[EAddress]	[ENickname
+s]	[EFilters]	[FContext]	[FLogin]	[FPostfiles]	[FPostmessages]	[FConferences]	[WordSwitch]	[WFormatting]	[ExSpread]	[ExData]	[ExFormatting]	[Scanning]	[HTMLEditor]	[Uploading]	[Listserv]	[Win95Training]	[InternetTraining]	[NetscapeTraining]	[EudoraTrainin
+g]	[FirstclassTraining]	[WordTraining]	[ExcelTraining]	[PowerpointTraining]	[ScanTraining]	[HTMLTraining]	[Need]

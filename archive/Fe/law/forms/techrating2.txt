@@ -1,0 +1,44 @@
+To:bfranke@tezcat.com
+Subject: computer knowledge
+
+Name: [name]
+E-mail address: [email]
+	Win95 basics: [win95]
+Internet
+	internet at NU: [interNU]
+	intranet at NU: [intraNU]
+	connecting to the network: [connecting]
+	cultural tips: [cultural]
+Netscape
+	Netscape launch: [Nlaunch]
+	Netscape navigate: [Nnavigate]
+	Netscape specific URL: [NURL]
+	Netscape bookmark: [Nbookmark]
+	Netscape search: [Nsearch]
+Eudora
+	Eudora basics: [Ebasics]
+	Eudora launch: [Elaunch]
+	Eudora configure: [Econfigure]
+	Eudora password: [Epassword]
+	Eudora send: [Esend]
+	Eudora attatch: [Eattatch]
+	Eudora reply: [Ereply]
+	Eudora use directory: [Edirectory]
+	Eudora close: [Eclose]
+	Eudora mailboxes: [Emailboxes]
+	Eudora address book: [Eaddressbook]
+	Eudora nicknames: [Enicknames]
+	Eudora filters: [Efilters]
+FirstClass
+	Firstclass context: [Fcontext]
+	Firstclass launch: [Flaunch]
+	Firstclass login: [Flogin]
+	Firstclass post files: [Fpostfiles]
+	Firstclass post messages: [Fpostmessages]
+	Firstclass conferences: [Fconferences]
+PowerPoint
+	PowerPoint basics: [Pbasics]
+	PowerPoint advanced: [Padvanced]
+materials
+	scanning materials: [scanning]
+	preparing materials: [prepmaterials]
