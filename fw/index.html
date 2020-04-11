@@ -3,7 +3,7 @@
 <html>
     <head>
         <style type="text/css">
-            td, p{
+            td, p, body{
                 font-family: sans-serif;
                 font-size: 12px;
                 vertical-align: bottom;
@@ -84,6 +84,16 @@
             var canvX = 0;
             var scrollPause=false;
             var cspframework = {};
+
+            //below are same colors defined in CSS -- TODO: drive CSS from this code instead
+            var euColor = {hex: {value: "#70C1B3", constrast: "#000000"}};
+            var loColor = {hex: {value: "#B2DBBF", constrast: "#000000"}};
+            var ekColor = {hex: {value: "#E1EDD3", constrast: "#000000"}};
+
+            var colors = new Array(8).fill(ekColor); // fill it with *something*
+            colors[2] = euColor;
+            colors[4] = loColor;
+
             function toggleScrollPause(){
                 scrollPause = !scrollPause;
             }
@@ -214,18 +224,18 @@
             }
             
             function drawEK(g, x, y){
-                drawLine(g, [x,y], [9,1], "#469BA2");
-                drawLine(g, [x,y], [9,1], "#97DAC9");
-                drawLine(g, [x,y], [55,1], "#E1EDD3");
+                drawLine(g, [x,y], [9,1], getBg("eu"));
+                drawLine(g, [x,y], [9,1], getBg("lo"));
+                drawLine(g, [x,y], [55,1], getBg("ek"));
             }
             
             function drawLO(g, x, y){
-                drawLine(g, [x,y], [9,1], "#469BA2");
-                drawLine(g, [x,y], [65, 1], "#97DAC9");
+                drawLine(g, [x,y], [9,1], getBg("eu"));
+                drawLine(g, [x,y], [65, 1], getBg("lo"));
             }
             
             function drawEU(g, x, y){
-                drawLine(g, [x,y], [75,1], "#469BA2");
+                drawLine(g, [x,y], [75,1], getBg("eu"));
 
             }
             
@@ -244,10 +254,13 @@
                 return type;
             }
             
-            function getColor(type){
-                if(type=="EU") return "#FFFFAA";
-                else if(type=="LO") return "#AAFFAA";
-                else return "#FFAAAAA";
+            // type must be "eu","lo","ek"
+            function getBg(type){
+                return $(type).css("background-color");
+
+                // if(type=="EU") return $("eu").css("bak")
+                // else if(type=="LO") return "#AAFFAA";
+                // else return "#FFAAAAA";
             }
             
             function drawLine(ctx, from, wh, color){
@@ -267,14 +280,40 @@
                     drawFramework();
                 }
              }
+
+             function buildDefaultColors(){
+                            //below are same colors defined in CSS -- TODO: drive CSS from this code instead
+                var euColor = {hex: {value: "#70C1B3"}, contrast: {value: "#000000"}};
+                var loColor = {hex: {value: "#B2DBBF"}, contrast: {value: "#000000"}};
+                var ekColor = {hex: {value: "#E1EDD3"}, contrast: {value: "#000000"}};
+
+                var colorList = new Array(8).fill(ekColor); // fill it with *something*
+                colorList[2] = euColor;
+                colorList[4] = loColor;
+                return {colors: colorList};
+             }
              
              //Grab all the keys from the cspframework array and sort so they're in order
              function setup(){
+                console.log("\tsetup")
                  if(localStorage['cspframework']!=null){
                     console.log("loading framework from local storage")
                     cspframework= JSON.parse(localStorage['cspframework'])
                  }
                  allCSPCodes = Object.keys(cspframework).sort();
+
+                 if(localStorage['colors']==null){
+                    console.log("no colors in local storage - setting to defaults")
+                    localStorage['colors']=JSON.stringify(buildDefaultColors());
+
+                }
+
+               
+                console.log("loading colors from local storage");
+                loadColorData(JSON.parse(localStorage['colors']));
+                
+
+                 drawFramework();
              }
              
              //figure out which entry in the framework is the one highlighted on the canvas
@@ -309,6 +348,12 @@
                  var scrollPos = document.getElementById("highlight").offsetTop
                  document.getElementById("fwTextarea").scrollTop = scrollPos-150;
 
+                 // BAKER NOTE: I don't know why I have to call loadColorData every time for it to work.
+                 if(localStorage['colors']!=null){
+                    console.log("loading colors from local storage");
+                    loadColorData(JSON.parse(localStorage['colors']));
+                 }
+
              }
            $(document).ready(function(){
 
@@ -326,7 +371,7 @@
                 localStorage['cspframework'] = JSON.stringify(allQs);
                 console.log("csp framework saved to local storage")
                 setup();
-                drawFramework();
+               
             }
 
             function handleFileSelect(evt){
@@ -338,13 +383,59 @@
 
             function toggleScroller(){
                 $("#fw_scroller").toggle();
+
+               
+            }
+
+            function setColorScheme(val){
+                console.log(val);
+                var cleanHex = val.slice(1,7); //strips off #
+
+                 var request = new XMLHttpRequest();
+
+                // Open a new connection, using the GET request on the URL endpoint
+                var reqStr = 'http://www.thecolorapi.com/scheme?hex='+cleanHex+'&mode=monochrome&count=8&format=json';
+                console.log(reqStr);
+                request.open('GET', reqStr, true);
+
+                request.onload = function () {
+                  // Begin accessing JSON data here
+                  var data = JSON.parse(this.response);
+                  //console.log(data);
+                  console.debug(data);
+                  loadColorData(data);
+                 
+
+                  // save to local storage as pref
+                  localStorage['colors'] = JSON.stringify(data);
+                  drawFramework();
+
+                }
+                request.send();
+            }
+
+            function loadColorData(data){
+                 if(data.colors[0]==null) return;
+
+                  setCSS("eu",data.colors[2].hex.value, data.colors[2].contrast.value);
+                  setCSS("lo",data.colors[4].hex.value, data.colors[4].contrast.value);
+                  setCSS("ek",data.colors[6].hex.value, data.colors[6].contrast.value);
+
+                  //console.log("colors loaded?")
+                 // drawFramework();
+
+            }
+
+            function setCSS(tag, bg, fg){
+                 $(tag).css({'background-color': bg, 'color':fg});
             }
 
     </script>
     </head>
     <body onLoad="setup(); drawFramework()">
 
-        <input id='qfile' type=file>
+        <input id='qfile' type=file> | 
+        Choose color: <input type="color" id="baseColor" oninput="setColorScheme(this.value)"> <button id="resetColors" onclick="delete(localStorage['colors']); setup(); drawFramework();"> Reset Colors </button>
 
 <P> 
     <h3>Search</h3>
