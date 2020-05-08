@@ -174,6 +174,7 @@ function clearApikey(){
 function loadJF(){
 
     $("#csvDumpDiv").hide();
+    $("#surveyjsDiv").hide();
     
     my_apikey = $("#apikey").val();
     my_formid = $("#formid").val();
@@ -729,8 +730,8 @@ function makeScalesArray(Q){
     }
     else if(Q.type=="control_scale"){
         //array.push( Q.fromText+"("+Q.scaleFrom+") to "+Q.toText+"("+Q.scaleAmount+")");
-        array.push("<b>From:</b> ("+Q.scaleFrom+") "+Q.fromText);
-        array.push("<b>&nbsp;&nbspTo:</b> ("+Q.scaleAmount+") "+Q.toText);
+        array.push("From: ("+Q.scaleFrom+") "+Q.fromText);
+        array.push("To: ("+Q.scaleAmount+") "+Q.toText);
 
 
     }
@@ -982,6 +983,189 @@ function showDumpToCSV(){
     $("#csvDumpTextarea").val(dumpToCSV());
 }
 
+function showConvertToSurveysJS(){
+
+    $("#surveyjsDiv").toggle();
+
+    $("#surveyjsTextarea").val(JSON.stringify(jotform_to_surveysjs(),null,"  "));
+
+
+}
+
+
+/*   STUFF FOR SURVEYS.JS  */
+
+// given a jotform question Object, Qobj, return a list of surveys.js style colums
+// [ {value: "1", text: "Strongly Disagree"}, {value: ___, text:____}, ...]
+function matrix_cols_to_obj_list(Qobj){
+
+    var objlist = [];
+    var colsplit = Qobj.mcolumns.split("|");
+    for(var i=0; i<colsplit.length; i++){
+        var obj = {};
+        obj.value=""+(i+1);
+        obj.text = colsplit[i];
+        objlist.push(obj);
+    }
+    return objlist;
+
+
+}
+
+function matrix_rows_to_obj_list(Qobj){
+    var objlist = [];
+    var rowsplit = Qobj.mrows.split("|");
+    for(var i=0; i<rowsplit.length; i++){
+        var obj = {};
+        obj.value= rowsplit[i].slice(0,25); //first 25 chars
+        obj.text = rowsplit[i];
+        objlist.push(obj);
+    }
+    return objlist;
+
+}
+
+function matrix_to_surveysjs_format(Qobj){
+    var matrixObj = {};
+    matrixObj.type = "matrix";
+    matrixObj.name = Qobj.name;
+    matrixObj.title = Qobj.text;
+    matrixObj.rows = matrix_rows_to_obj_list(Qobj);
+    matrixObj.columns = matrix_cols_to_obj_list(Qobj);
+    matrixObj.visible = hidden_to_visible(Qobj);
+
+    return matrixObj;
+
+}
+
+function html_to_surveysjs_format(Qobj){
+    var htmlObj = {};
+    htmlObj.type = "html"
+    htmlObj.name = Qobj.name;
+    htmlObj.html = Qobj.text;
+    htmlObj.visible = hidden_to_visible(Qobj);
+    return htmlObj;
+}
+
+function scale_to_surveysjs_format(Qobj){
+    var scaleObj = {};
+    scaleObj.type = "rating";
+    scaleObj.name = Qobj.name;
+    scaleObj.title = Qobj.text;
+    scaleObj.rateMin = parseInt(Qobj.scaleFrom);
+    scaleObj.rateMax = parseInt(Qobj.scaleAmount);
+    scaleObj.rateStep = 1
+    scaleObj.minRateDescription = Qobj.fromText;
+    scaleObj.maxRateDescription = Qobj.toText;
+        scaleObj.visible = hidden_to_visible(Qobj);
+
+    return scaleObj;
+
+}
+
+function radio_to_surveysjs_format(Qobj){
+    var radioObj = {};
+    radioObj.type = "radiogroup";
+    radioObj.name = Qobj.name;
+    radioObj.title = Qobj.text;
+    radioObj.choices = Qobj.options.split("|");
+    radioObj.colCount = 1;
+    radioObj.visible = hidden_to_visible(Qobj);
+
+    return radioObj;
+}
+
+/*
+ {
+     "type": "comment",
+     "name": "question2",
+     "width": "20",
+     "title": "This is a long form text input area question",
+     "cols": 20,
+     "rows": 3
+    },*/
+
+function textarea_to_surveysjs_format(Qobj){
+    var textObj = {};
+    textObj.type = "comment";
+    textObj.name = Qobj.name;
+    textObj.title = Qobj.text;
+    textObj.rows = parseInt(Qobj.rows);
+    textObj.cols = parseInt(Qobj.cols);
+    textObj.visible = hidden_to_visible(Qobj);
+
+
+    return textObj;
+}
+
+function textbox_to_surveysjs_format(Qobj){
+    var textObj = {};
+    textObj.type = "text";
+    textObj.name = Qobj.name;
+    textObj.title = Qobj.text;
+    textObj.visible = hidden_to_visible(Qobj);
+    //textObj.placeHolder
+    //textObj.size
+    textObj.inputType = "text";  // other options: date, time, email, password, etc.  check GUI for options.
+    return textObj;
+}
+
+// check the "hidden" property of a jotform question object and convert yes->false, no->true. default true.
+function hidden_to_visible(Qobj){
+
+    if(Qobj.hidden == "Yes") return false;
+
+    if(Qobj.hidden == "No") return true;
+
+    return true;
+}
+
+function jotform_to_surveysjs_type(Qobj){
+    var parseableTypes = ["control_text", "control_textbox","control_matrix", "control_textarea", "control_scale", "control_radio"];
+
+      if(parseableTypes.indexOf(Qobj.type) >= 0){
+
+        if(Qobj.type=="control_matrix") return matrix_to_surveysjs_format(Qobj);
+        else if(Qobj.type=="control_radio") return radio_to_surveysjs_format(Qobj);
+        else if(Qobj.type=="control_scale") return scale_to_surveysjs_format(Qobj);
+        else if(Qobj.type == "control_text") return html_to_surveysjs_format(Qobj);
+        else if(Qobj.type == "control_textarea") return textarea_to_surveysjs_format(Qobj);
+        else if(Qobj.type == "control_textbox") return textbox_to_surveysjs_format(Qobj);
+        else return null; // should be unreachable
+      }
+      else return null;
+
+}
+
+function jotform_to_surveysjs(){
+
+   
+    var elements = [];
+
+    for(var i in allQs){
+
+        var surveyObj = jotform_to_surveysjs_type(allQs[i]);
+        if(surveyObj!=null){
+            elements.push(surveyObj);
+        }
+
+    }
+
+    var obj = {};
+    obj.title = "converted from jotform";
+
+
+    var page = {};
+    page.title = "converted questions";
+    page.name = "page 1";
+    page.elements = elements;
+
+    obj.pages = [];
+    obj.pages.push(page);
+
+    return obj;
+}
+
 </script> 
 </head>
 <body onLoad="loadLocalstorage(); loadJF(); ">
@@ -999,13 +1183,14 @@ function showDumpToCSV(){
        <!-- </div>-->
     </div>
     <div style="clear:both">
-         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a> <button id="dumpToCsv_btn" onClick="showDumpToCSV()">Dump to tsv</button>
+         form_id: <input type=text value="" size=20 id="formid"> <a id="build_link" target="_blank" href="">[build link]</a> <a  target="_blank" id="preview_link" href="">[preview link]</a> <a id="thislink" href="https://bakerfranke.github.io/jotform/">[this link]</a> <button id="dumpToCsv_btn" onClick="showDumpToCSV()">Dump to tsv</button> <button id="convertToSurveysjs_btn" onClick="showConvertToSurveysJS()">Surveys.js JSON</button>
 
     </div>
     <div>
         Updated at: <input id="updated_at" type=text disabled value="YYYY-MM-DD"/> Num Submissions:<input type=text disabled id="num_submissions" value="1234" /> Last Submission:<input type=text disabled id="last_submission" value="1234" />
     </div>
     <div id="csvDumpDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="csvDumpTextarea"></textarea></div>
+    <div id="surveyjsDiv"><textarea style="width:100%; font-family: monospace" rows=20 id="surveyjsTextarea"></textarea></div>
 </div>
 
 <div id="main">
