@@ -446,12 +446,12 @@
       },
       {
        "type": "comment",
-       "name": "k5_facilitator_did_well",
+       "name": "facilitator_did_well",
        "title": "What were two things {panel.facilitatorName} did well?"
       },
       {
        "type": "comment",
-       "name": "k5_facilitator_could_improve",
+       "name": "facilitator_could_improve",
        "title": "What were two things {panel.facilitatorName} could do better?"
       }
      ],
