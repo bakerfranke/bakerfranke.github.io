@@ -1017,7 +1017,7 @@ function matrix_rows_to_obj_list(Qobj){
     var rowsplit = Qobj.mrows.split("|");
     for(var i=0; i<rowsplit.length; i++){
         var obj = {};
-        obj.value= rowsplit[i].slice(0,25); //first 25 chars
+        obj.value= rowsplit[i].slice(0,25).replace(/ /g,"_"); //first 25 chars
         obj.text = rowsplit[i];
         objlist.push(obj);
     }
@@ -1075,6 +1075,18 @@ function radio_to_surveysjs_format(Qobj){
     return radioObj;
 }
 
+
+function checkbox_to_surveysjs_format(Qobj){
+    var checkObj = {};
+    checkObj.type = "checkbox";
+    checkObj.name = Qobj.name;
+    checkObj.title = Qobj.text;
+    checkObj.choices = Qobj.options.split("|");
+    checkObj.colCount = 1;
+    checkObj.visible = hidden_to_visible(Qobj);
+
+    return checkObj;
+}
 /*
  {
      "type": "comment",
@@ -1121,7 +1133,7 @@ function hidden_to_visible(Qobj){
 }
 
 function jotform_to_surveysjs_type(Qobj){
-    var parseableTypes = ["control_text", "control_textbox","control_matrix", "control_textarea", "control_scale", "control_radio"];
+    var parseableTypes = ["control_text", "control_textbox","control_matrix", "control_textarea", "control_scale", "control_radio","control_checkbox"];
 
       if(parseableTypes.indexOf(Qobj.type) >= 0){
 
@@ -1131,6 +1143,8 @@ function jotform_to_surveysjs_type(Qobj){
         else if(Qobj.type == "control_text") return html_to_surveysjs_format(Qobj);
         else if(Qobj.type == "control_textarea") return textarea_to_surveysjs_format(Qobj);
         else if(Qobj.type == "control_textbox") return textbox_to_surveysjs_format(Qobj);
+        else if(Qobj.type == "control_checkbox") return checkbox_to_surveysjs_format(Qobj);
+
         else return null; // should be unreachable
       }
       else return null;
