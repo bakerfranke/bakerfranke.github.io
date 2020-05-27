@@ -1,0 +1,153 @@
+<html>
+<head>
+	<style type="text/css">
+
+		body{
+			width: 900px;
+		}
+			table { 
+			width: 800px; 
+			border-collapse: collapse;
+			
+		}
+		td {
+			border: solid 1px black;
+			vertical-align: top;
+			padding: 10px;
+		}
+
+	</style>
+	<title>SurveysJS viewer tool</title>
+	  <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+	<script type="text/javascript">
+		var survey;
+		function pulljson(){
+
+			survey = JSON.parse($("#surveyjs_json").val());
+			console.log("loaded json. saved in local storage");
+			localStorage["survey_json"] = JSON.stringify(survey,null,"   ");
+		}
+
+		function dumpQuestions(){
+			var str = "";
+			for(p in survey.pages){
+				str += "<hr>";
+				str += "<h2>PAGE: "+survey.pages[p].name+"</h2>";
+				str += "<hr>";
+
+				str += processPage(survey.pages[p]);
+			}
+
+			$("#output").html(str);
+
+		}
+
+		function processPage(page){
+			var str = "";
+			for(e in page.elements){
+				var item = page.elements[e];
+				str += "<br/>["+item.name+"]<br/>";
+				if(item.type=="html"){
+					str+=item.html;
+				}
+				else if(item.type=="matrix"){
+					str += "<table><tr><td colspan=2>";
+					str += item.title;
+					str += "</td></tr><tr><td width='66%'><ol>";
+					for(var i in item.rows){
+						str+="<li>"+item.rows[i].text+"</li>";
+					}
+					str += "</ol></td><td>";
+					for(var i in item.columns){
+						str += "<li>"+item.columns[i].text+"</li>";
+					}
+					str += "</td></tr></table>";
+				}
+				else if(item.type == "panel"){
+					str += "<div style='background-color: #F7F7F7; border: dotted 4px #BBBBBB; margin-left: 5px; padding: 10px'>";
+					if(item.visibleIf!=undefined){
+						str += "<p style='background-color: #00FFFF'> Visible If: "+item.visibleIf+"</p>";
+					}
+					str += processPage(item);  //recursion!
+					str += "</div>";
+				}
+				else if(item.type == "paneldynamic"){
+					str += "<div style='background-color: #F7F7F7; border: dotted 4px #BBBBBB; margin-left: 5px'>";
+					str += "<h3>"+item.description+"</h3>";
+					var foo = item;
+					foo.type = "panel"; //hack to make it work like a panel
+					foo.elements = item.templateElements; 
+					str += processPage(foo);  //recursion!
+					str += "</div>";
+				}
+				else if(item.type == "comment"){
+					str += "<p>"+item.title+"</p>";
+					str += "<p style='border: solid 1px black; width: 600px; height: 100px; margin-left: 10px'>[Free response] </p>";
+				}
+				else if(item.type == "rating"){
+					if(item.titleLocation != "hidden"){
+						str += "<p>"+item.title+"</p>";
+					}
+					str += "Rating scale:  <br/>";
+					str += "<p style='margin: auto; width: 50%; text-align: center'>";
+					if(item.rateMin==undefined){ str += "(1) "}
+					else str+= "("+item.rateMin+") ";
+
+					str += item.minRateDescription;
+					str+=" <---> ";
+
+					if(item.rateMax==undefined){ str += "(5) "}
+					else str+= item.rateMax;
+
+					str += item.maxRateDescription;
+					str += "</p><br/>"
+				}
+				else if(item.type == 'checkbox' || item.type=='radiogroup'){
+					str += "<p>"+item.title+"</p>";
+					str += "["+item.type+"]<br/>";
+					for(var i in item.choices){
+						str+="<li>"+item.choices[i].text;
+					}
+					str+="<br/>";
+				}
+
+				else{
+					str +="<li>"+item.type+": "+item.title;
+				}
+			}
+
+			return str;
+		}
+
+
+
+		function loadFromLocalStorage(){
+
+			if(localStorage["survey_json"] !== undefined){
+
+		    	$("#surveyjs_json").val(localStorage["survey_json"]);
+		    	pulljson();
+		    	dumpQuestions();
+		    }
+		    	
+
+    	}
+	
+
+
+	</script>
+</head>
+<body onLoad="loadFromLocalStorage()">
+
+	<textarea id="surveyjs_json" cols=80 rows=20></textarea><br>
+	<button id="load_btn" onClick="pulljson()">Load</button>
+	<hr>
+	<div id="output">
+
+
+	</div>
+
+
+</body>
+</html>
