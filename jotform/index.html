@@ -1012,6 +1012,24 @@ function matrix_cols_to_obj_list(Qobj){
 
 }
 
+// choice_list_text assumes a pipe-separated list: A | B| C
+// reutrns an array of [ {value:"A", text:"A"}, {value:"B", text:"B"}, ...]
+// DEBT-CLEANUP -- this and matrix_cols_to_obj_list, and matrix_rows_to_obj_list have a lot of duplicate code. could be merged.
+function choices_to_obj_list(choice_list_text){
+
+    var objlist = [];
+    var choices = choice_list_text.split("|");
+    for(var i=0; i<choices.length; i++){
+        var obj = {};
+        obj.value= choices[i].slice(0,25).replace(/[ -.,?'":;\[\]{}|+=@#$%^&*()]/g,"_").toLowerCase();
+        obj.text = choices[i];
+        objlist.push(obj);
+    }
+    return objlist;
+
+
+}
+
 function matrix_rows_to_obj_list(Qobj){
     var objlist = [];
     var rowsplit = Qobj.mrows.split("|");
@@ -1068,7 +1086,7 @@ function radio_to_surveysjs_format(Qobj){
     radioObj.type = "radiogroup";
     radioObj.name = Qobj.name;
     radioObj.title = Qobj.text;
-    radioObj.choices = Qobj.options.split("|");
+    radioObj.choices = choices_to_obj_list(Qobj.options);
     radioObj.colCount = 1;
     radioObj.visible = hidden_to_visible(Qobj);
 
@@ -1081,7 +1099,7 @@ function checkbox_to_surveysjs_format(Qobj){
     checkObj.type = "checkbox";
     checkObj.name = Qobj.name;
     checkObj.title = Qobj.text;
-    checkObj.choices = Qobj.options.split("|");
+    checkObj.choices = choices_to_obj_list(Qobj.options);
     checkObj.colCount = 1;
     checkObj.visible = hidden_to_visible(Qobj);
 

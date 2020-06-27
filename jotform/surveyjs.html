@@ -43,6 +43,23 @@
 
 		}
 
+		function makeTable(title, options){
+				str += "<table><tr><td colspan=2>";
+					str += title;
+					str += "</td></tr><tr><td width='66%'><ol>";
+					for(var i in options){
+						str+="<li>"+options[i]+"</li>";
+					}
+					str += "</ol></td><td><ul>";
+					for(var i in scale){
+						str += "<li>"+scale+"</li>";
+					}
+					str += "</ul></td></tr></table>";
+
+				return str;
+
+		}
+
 		function processPage(page){
 			var str = "";
 			for(e in page.elements){
@@ -58,11 +75,11 @@
 					for(var i in item.rows){
 						str+="<li>"+item.rows[i].text+"</li>";
 					}
-					str += "</ol></td><td>";
+					str += "</ol></td><td><ul>";
 					for(var i in item.columns){
 						str += "<li>"+item.columns[i].text+"</li>";
 					}
-					str += "</td></tr></table>";
+					str += "</ul></td></tr></table>";
 				}
 				else if(item.type == "panel"){
 					str += "<div style='background-color: #F7F7F7; border: dotted 4px #BBBBBB; margin-left: 5px; padding: 10px'>";
@@ -104,16 +121,28 @@
 					str += "</p><br/>"
 				}
 				else if(item.type == 'checkbox' || item.type=='radiogroup'){
-					str += "<p>"+item.title+"</p>";
-					str += "["+item.type+"]<br/>";
+
+					str += "<table><tr><td width='66%'>";
+					str += item.title;
+					str += "</td><td>";
+					str += "["+item.type+"]<br/><ul>";
 					for(var i in item.choices){
-						str+="<li>"+item.choices[i].text;
+						str+="<li>"+item.choices[i].text+"</li>";
 					}
-					str+="<br/>";
+					str += "</ul></td></tr></table>";
+
+					//makeTable(item.title)
+					// str += "<p>"+item.title+"</p>";
+					// str += "["+item.type+"]<br/>";
+					// str += "<ul>";
+					// for(var i in item.choices){
+					// 	str+="<li>"+item.choices[i].text;
+					// }
+					// str+="</ul><br/>";
 				}
 
 				else{
-					str +="<li>"+item.type+": "+item.title;
+					str +="<ul><li>"+item.type+": "+item.title+"</li></ul>";
 				}
 			}
 
