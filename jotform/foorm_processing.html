@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	 <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+	<script type="text/javascript">
+
+		var foorm = {}; // JSON of the survey, parsed into Javascript Object (similar to python dictionary)
+		var allRecords = []; // will be filled with records as code processes;
+
+		// list of types I know how to process so far.
+		var known_types = ['html','rating','radiogroup','comment','matrix','panel','paneldynamic','checkbox'];
+
+		/*
+		HOW THIS WORKS:
+		
+		This code parses a survey json page by page, element by element.
+		It starts by defining a template of a foorm_question record as an Object with one field per column.
+		For each survey element it:
+			- makes a clone of the record template
+			- populates the fields of the object/record as necessary
+			- appends the record to a growing list of "allRecords"
+		At the end it dumps the list of records as a tsv into a text area.
+
+
+		Nuances:
+			- Each page has a list of elements
+			- An element may be a "panel" -- a panel also has a list of elements
+			- A matrix element is exploded into one-record-per-row-of-matrix
+
+		General theory:
+			- Since constructing the record might require burrowing deeper into the JSON structure, we
+			- create new record template at the top of the hierarchy, and pass it "down" into helper
+			- functions which can futher populate it or clone if necessary.
+			- This is particularly useful since many records have duplicate info.  For example,
+			- all of the elements on page 0, whille have the same form name, page number, page_name, and so on.
+			- This is also useful for matrix questions which share all of the same properities execpt for question_name, and question_text which differ by row.
+		*/
+
+		function make_new_record_from_template(){
+
+			// create an object with all the fields you expect.  Most start as null.
+			var record_obj = {};
+				record_obj.id = null;
+				record_obj.form_id= '12345';  //form_id and _name are not properties of the survey JSON itself, will have to come from dashboard.
+				record_obj.form_name= '[some_form_name]';
+				record_obj.library_name= null;
+				record_obj.page_number= null;
+				record_obj.page_name= null;
+				record_obj.question_order= null;
+				record_obj.question_name= null;
+				record_obj.question_type = null;
+				record_obj.question_text = null;
+				record_obj.matrix_question_name = null; //'';
+				record_obj.matrix_question_text = null;
+				record_obj.panel_name = null;
+				record_obj.panel_text = null;
+				record_obj.visibleIf = null;
+				record_obj.answer_values = null;
+				record_obj.answer_texts = null;
+				record_obj.min_value = null;
+				record_obj.max_value = null;
+				record_obj.num_answer_options = null;
+
+			return record_obj;
+
+		}
+
+		function parse(){
+			// save JSON from input area into local storage -- IGNORE this is a feature of my widget.
+			foorm = JSON.parse($("#json").val());
+			localStorage['foorm'] = JSON.stringify(foorm,null,"   ");
+			
+			// process each page
+			for(var p in foorm.pages){
+				var r = make_new_record_from_template();
+				r.page_number = p;
+
+				process_page(foorm.pages[p], r);  //process page p, and pass the record templat
+			}
+			console.table(allRecords);
+			display();
+		}
+
+		function process_page(page, record){
+
+			record.page_name = page.name;
+			process_elements(page, record);
+		}
+
+		function process_panel(panel, record){
+			record.panel_name = panel.name;
+			record.panel_text = panel.title; //this might not be a thing we need
+
+			process_elements(panel, record);
+
+		}
+
+		// update question_order number at time of cloning.
+		function clone_record(record){
+			var new_record = {};
+			Object.assign(new_record, record);
+			new_record.question_order = allRecords.length+1;
+			return new_record;
+		}
+			
+
+		function process_elements(parent, record){ //parent is either a page or a panel
+
+			for(var e in parent.elements){
+				var item = parent.elements[e];
+				//console.log(item.type);
+
+
+				if(known_types.indexOf(item.type) >= 0){
+				
+
+					// for each element, clone of current state of the record, then pass it to the
+					// handler based on question type.
+					var new_record = clone_record(record);
+					
+
+					if(item.type=="radiogroup")process_radiogroup(item, new_record);
+					else if(item.type=='html') process_html(item, new_record);
+					else if(item.type=='comment') process_comment(item,new_record);
+					else if(item.type=='matrix') process_matrix(item, new_record);
+					else if(item.type=='panel' || item.type=="paneldynamic") process_panel(item, new_record);
+					else if(item.type=='checkbox') process_checkbox(item,new_record);
+					else if(item.type=='rating') process_rating(item,new_record);
+					else{
+						console.error("ERROR: item type: "+item.type+" is in known types list but no known processing function exists.\nDid not handle: "+JSON.stringify(item));
+
+					}
+				}
+				else{
+					console.error("ERROR: unkown item type.  Did not handle: "+JSON.stringify(item));
+				}
+
+			}
+
+		}
+
+		
+
+		function process_checkbox(item, record){ //very similar to radio group, but no min-max
+			record.question_name = item.name;
+			record.question_type = item.type;
+			record.question_text = item.title;
+
+			var values = [];
+			var texts = [];
+			for(var c in item.choices){
+				values.push( item.choices[c].value);
+				texts.push(item.choices[c].texts);
+			}
+			record.answer_values = values.toString();
+			record.answer_texts = texts.toString();
+			
+			record.num_answer_options = item.choices.length;
+
+			allRecords.push(record);
+
+
+		}
+
+		function process_matrix(item,record){
+
+			//populate record with parent matrix info
+			// for a matrix question the: name, question_text and answer options are the same for every row
+			record.matrix_question_name = item.name;
+			record.matrix_question_text = item.title;
+			record.question_type = item.type;
+
+			var values = [];
+			var texts = [];
+			for(var c in item.columns){
+				values.push(item.columns[c].value);
+				texts.push(item.columns[c].text);
+			}
+
+			record.answer_values = values.toString();
+			record.answer_texts = texts.toString();
+			record.min_value = item.columns[0].value;
+			record.max_value = item.columns[item.columns.length-1].value;
+			record.num_answer_options = item.columns.length;
+			
+
+			// for each row, clone the record and set the row value and text.
+			// ie. a matrix with 7 rows produces 7 records.
+			for(var r in item.rows){
+				
+				// for each // clone
+				var new_r = clone_record(record);
+				new_r.question_name = item.rows[r].value;
+				new_r.question_text = item.rows[r].text;
+
+				allRecords.push(new_r);
+			}
+
+		}
+
+		function process_comment(item,record){
+			record.question_name = item.name;
+			record.question_type = item.type;
+			record.question_text = item.title;
+
+			allRecords.push(record);
+		}
+
+
+		function process_html(item,record){
+
+			record.question_name = item.name;
+			record.question_type = item.type;
+			record.question_text = JSON.stringify(item.html);
+
+			allRecords.push(record);
+		}
+
+		function process_radiogroup(item, record){
+			record.question_name = item.name;
+			record.question_type = item.type;
+			record.question_text = item.title;
+
+			var values = [];
+			var texts = [];
+			for(var c in item.choices){
+				values.push( item.choices[c].value);
+				texts.push(item.choices[c].texts);
+			}
+			record.answer_values = values.toString();
+			record.answer_texts = texts.toString();
+			record.min_value = item.choices[0].value;
+			record.max_value = item.choices[item.choices.length-1].value;
+			record.num_answer_options = item.choices.length;
+
+			allRecords.push(record);
+
+		}
+
+		function process_rating(item, record){
+
+			//console.table(item);
+			record.question_name = item.name;
+			record.question_type = item.type;
+			record.question_text = item.title;
+
+			//THIS ONE IS PROBLEMATIC
+			// 1.Surveys JS default rating to 1-5, but if using default there are no fields for min/max/step  values.
+			// 2. dilemma - for answer values on a rating, if min/max is 1/10 should we produce string "1,2,3,4,5,...10"?
+			// might consider updating field names for this one.
+
+
+		}
+
+		function load_from_localStorage(){
+			if(localStorage['foorm']!==undefined){
+				$("#json").val(localStorage['foorm'])
+			}
+		}
+
+		function display(){
+			var keys = Object.keys(allRecords[0]);
+			var str = "";
+			for(var k in keys){
+				str += keys[k]+"\t";
+			}
+			str+="\n";
+
+			for(var r in allRecords){
+				var keys = Object.keys(allRecords[r]);
+				for(var k in keys){
+					str += allRecords[r][keys[k]] +"\t";
+				}
+				str += "\n";
+			}
+			$("#textarea_output").val(str);
+		}
+
+	</script>
+	<style type="text/css">
+		pre {
+			tab-size: 2;
+		}
+	</style>
+</head>
+<body onload="load_from_localStorage()">
+	<textarea id="json" rows=6 cols=80></textarea>
+	<button id='go' onClick='parse()'>Go / Parse</button>
+	<hr>
+	<p>TSV'd data goes here. Copy/paste this into g-sheet.
+	<textarea id='textarea_output' rows=8 cols=80></textarea>
+
+</body>
+</html>
