@@ -18,7 +18,7 @@
 		This code parses a survey json page by page, element by element.
 		It starts by defining a template of a foorm_question record as an Object with one field per column.
 		For each survey element the code encounters it:
-			- makes a clone of the record template
+			- makes a clone of the record template Object
 			- populates the appropriate fields of the object/record
 			- appends the record to a growing list of "allRecords"
 		At the end it dumps the list of records as a tsv into a text area.
@@ -30,14 +30,11 @@
 			- A matrix element is exploded into one-record-per-row-of-matrix
 
 		General theory:
-			- Since constructing the record might require burrowing deeper into the JSON structure, we
-			- create new record template at the top of the hierarchy, and pass it "down" into helper
-			- functions which can futher populate it or clone if necessary.
-			- This is particularly useful since many records have duplicate info.  For example,
-			- all of the elements on page 0, whille have the same form name, page number, page_name, and so on.
-			- This is also useful for matrix questions which share all of the same properities execpt for question_name, and question_text which differ by row.
-		*/
-
+			- Each function that handles/processes a question type accepts an object representing the database record as a parameter.
+			- The fields of that object are updated as necessary
+			- Sometimes that object is cloned multiple times in the case where multiple records have a lot of duplicate info save for a few fields (see: matrix)
+			- 
+*/
 		function make_new_record_from_template(){
 
 			// create an object with all the fields you expect.  Most start as null.
@@ -74,45 +71,47 @@
 			
 			// process each page
 			for(var p in foorm.pages){
-				var r = make_new_record_from_template();
+
+				var r = make_new_record_from_template(); 
 				r.page_number = p;
 
-				process_page(foorm.pages[p], r);  //process page p, and pass the record templat
+				process_page(foorm.pages[p], r);  //process page p, and pass the record template as well.
 			}
-			console.table(allRecords);
-			display();
+
+			console.table(allRecords); // dump all records to developer's console.
+			display(); // update the textarea .tsv display
 		}
 
 		function process_page(page, record){
 
-			record.page_name = page.name;
+			record.page_name = page.name;  //update the record with this page's name
 			process_elements(page, record);
 		}
 
 		function process_panel(panel, record){
-			record.panel_name = panel.name;
+			record.panel_name = panel.name; // update the record with this panel's name
 			record.panel_text = panel.title; //this might not be a thing we need
 
 			process_elements(panel, record);
 
 		}
 
-		// update question_order number at time of cloning.
+
 		function clone_record(record){
 			var new_record = {};
 			Object.assign(new_record, record);
-			new_record.question_order = allRecords.length+1;
+			new_record.question_order = allRecords.length+1;  	// update question_order number at time of cloning.
 			return new_record;
 		}
-			
 
+
+		// Each page, panel, or paneldynamic is comprised of a list of 'elements'
+		// This function examines each element, calls the appropriate helper function to process it.
 		function process_elements(parent, record){ //parent is either a page or a panel
 
 			for(var e in parent.elements){
 				var item = parent.elements[e];
 				//console.log(item.type);
-
-
 				if(known_types.indexOf(item.type) >= 0){
 				
 
@@ -121,16 +120,14 @@
 					var new_record = clone_record(record);
 					
 
-					if(item.type=="radiogroup")process_radiogroup(item, new_record);
+					if(item.type=='panel' || item.type=="paneldynamic") process_panel(item, new_record); //note: this one is different - it's not flat. It will end up calling this function (process_eleements) for the 'elements' that are part of the panel.
 					else if(item.type=='html') process_html(item, new_record);
 					else if(item.type=='comment') process_comment(item,new_record);
 					else if(item.type=='matrix') process_matrix(item, new_record);
-					else if(item.type=='panel' || item.type=="paneldynamic") process_panel(item, new_record);
 					else if(item.type=='checkbox') process_checkbox(item,new_record);
 					else if(item.type=='rating') process_rating(item,new_record);
 					else{
-						console.error("ERROR: item type: "+item.type+" is in known types list but no known processing function exists.\nDid not handle: "+JSON.stringify(item));
-
+						console.error("ERROR: item type: "+item.type+" is in known in known_types list but no processing function exists.\nDid not handle: "+JSON.stringify(item));
 					}
 				}
 				else{
@@ -140,8 +137,6 @@
 			}
 
 		}
-
-		
 
 		function process_checkbox(item, record){ //very similar to radio group, but no min-max
 			record.question_name = item.name;
@@ -160,9 +155,8 @@
 			record.num_answer_options = item.choices.length;
 
 			allRecords.push(record);
-
-
 		}
+
 
 		function process_matrix(item,record){
 
@@ -251,8 +245,11 @@
 			// 2. dilemma - for answer values on a rating, if min/max is 1/10 should we produce string "1,2,3,4,5,...10"?
 			// might consider updating field names for this one.
 
+			allRecords.push(record);
+
 		}
 
+		// web page stuff (remeber what we last parsed)
 		function load_from_localStorage(){
 			if(localStorage['foorm']!==undefined){
 				$("#json").val(localStorage['foorm'])
