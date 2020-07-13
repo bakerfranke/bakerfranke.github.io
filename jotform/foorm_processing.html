@@ -17,9 +17,9 @@
 		
 		This code parses a survey json page by page, element by element.
 		It starts by defining a template of a foorm_question record as an Object with one field per column.
-		For each survey element it:
+		For each survey element the code encounters it:
 			- makes a clone of the record template
-			- populates the fields of the object/record as necessary
+			- populates the appropriate fields of the object/record
 			- appends the record to a growing list of "allRecords"
 		At the end it dumps the list of records as a tsv into a text area.
 
@@ -166,8 +166,8 @@
 
 		function process_matrix(item,record){
 
-			//populate record with parent matrix info
-			// for a matrix question the: name, question_text and answer options are the same for every row
+			// populate record with matrix info pertinent to all rows.
+			// name, question_text and answer options are the same for every row
 			record.matrix_question_name = item.name;
 			record.matrix_question_text = item.title;
 			record.question_type = item.type;
@@ -246,11 +246,10 @@
 			record.question_type = item.type;
 			record.question_text = item.title;
 
-			//THIS ONE IS PROBLEMATIC
+			//RATING TYPE IS PROBLEMATIC
 			// 1.Surveys JS default rating to 1-5, but if using default there are no fields for min/max/step  values.
 			// 2. dilemma - for answer values on a rating, if min/max is 1/10 should we produce string "1,2,3,4,5,...10"?
 			// might consider updating field names for this one.
-
 
 		}
 
@@ -260,6 +259,7 @@
 			}
 		}
 
+		// create a giant tab-separated string of all records, one record per row
 		function display(){
 			var keys = Object.keys(allRecords[0]);
 			var str = "";
@@ -279,17 +279,19 @@
 		}
 
 	</script>
-	<style type="text/css">
-		pre {
-			tab-size: 2;
-		}
-	</style>
 </head>
 <body onload="load_from_localStorage()">
-	<textarea id="json" rows=6 cols=80></textarea>
+	<h1>Example of processing foorm_questions</h1>
+	<li>Reveal Source to see the javascript that does the parsing (or look at <a href='https://github.com/bakerfranke/bakerfranke.github.io/blob/master/jotform/foorm_processing.html'>Baker's GitHub Repo</a>)</li>
+	<hr>
+	<h2>Foorm JSON here:</h2>
+		<li>Copy/Paste JSON describing Foorm survey (SurveysJS format).  [<a href="https://github.com/code-dot-org/code-dot-org/blob/staging/dashboard/config/foorm/forms/surveys/pd/summer_workshop_post_survey.0.json" target="_top">Example</a>] </li>
+		<li>Hit "Go/Parse" button</li>
+	<textarea id="json" rows=6 cols=80></textarea><br>
 	<button id='go' onClick='parse()'>Go / Parse</button>
 	<hr>
-	<p>TSV'd data goes here. Copy/paste this into g-sheet.<br><br>
+	<h2>Parsed to .tsv here.</h2>
+	<p> Copy/paste this into g-sheet.</p>
 	<textarea id='textarea_output' rows=15 cols=80></textarea>
 
 </body>
