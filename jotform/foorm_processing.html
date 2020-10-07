@@ -40,8 +40,8 @@
 			// create an object with all the fields you expect.  Most start as null.
 			var record_obj = {};
 				record_obj.id = null;
-				record_obj.form_id= '12345';  //form_id and _name are not properties of the survey JSON itself, will have to come from dashboard.
-				record_obj.form_name= '[some_form_name]';
+				record_obj.form_id= '4';  //form_id and _name are not properties of the survey JSON itself, will have to come from dashboard.
+				record_obj.form_name= 'surveys/pd/summer_workshop_post_survey';
 				record_obj.library_name= null;
 				record_obj.page_number= null;
 				record_obj.page_name= null;
@@ -92,6 +92,10 @@
 			record.panel_name = panel.name; // update the record with this panel's name
 			record.panel_text = panel.title; //this might not be a thing we need
 
+			if(panel.type == 'paneldynamic'){
+				panel.elements = panel.templateElements;
+			}
+
 			process_elements(panel, record);
 
 		}
@@ -126,6 +130,7 @@
 					else if(item.type=='matrix') process_matrix(item, new_record);
 					else if(item.type=='checkbox') process_checkbox(item,new_record);
 					else if(item.type=='rating') process_rating(item,new_record);
+					else if(item.type=='radiogroup') process_radiogroup(item, new_record);
 					else{
 						console.error("ERROR: item type: "+item.type+" is in known in known_types list but no processing function exists.\nDid not handle: "+JSON.stringify(item));
 					}
@@ -233,6 +238,17 @@
 
 		}
 
+// for(var k in a){ 
+// 	if(typeof(a[k])=='object'){
+// 		for(var k2 in a[k]){
+// 			console.log(k+" >> "+k2+" -> "+a[k][k2]);
+// 		}
+// 	}
+// 	else {
+// 		console.log(k + " -> " + a[k]);
+// 	} 
+// }
+
 		function process_rating(item, record){
 
 			//console.table(item);
@@ -271,6 +287,33 @@
 					str += allRecords[r][keys[k]] +"\t";
 				}
 				str += "\n";
+			}
+			$("#textarea_output").val(str);
+		}
+
+		function display_sql(){
+			var keys = Object.keys(allRecords[0]);
+			var str = "INSERT INTO public.bf_foorm_survey_questions\n(";
+			for(var k in keys){
+				str += keys[k]+", ";
+			}
+			str+="\nVALUES\n";
+
+			for(var r in allRecords){
+				if(allRecords[r].question_type != 'html'){
+					var keys = Object.keys(allRecords[r]);
+					str += "("
+					for(var k in keys){
+						if(allRecords[r][keys[k]] == null){ str += ''}
+						else{
+							console.log(allRecords[r]+"-->"+allRecords[r][keys[k]]);
+
+							var escaped = allRecords[r][keys[k]].replace("'","''");
+							str += "'"+ escaped+"', ";
+						}
+					}
+					str += "\n";
+				}
 			}
 			$("#textarea_output").val(str);
 		}
