@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body{
+			font-family: arial;
+		}
+		.page {
+			margin: 3px;
+			/*border: 1px solid black;*/
+			background-color: rgb(240,240,240);
+			padding: 5px;
+		}
+		ol{
+			margin: 3px;
+			padding: 3px;
+		}
+		ol>li {
+			margin-left: 20px;
+		}
+		.panel {
+			margin: 3px;
+			/*border: 1px solid black;*/
+			background-color: rgb(230,230,240);
+			padding: 5px;
+		}
+
+		details{
+			border: solid #999999;
+		 	border-width: 0px 0px 0px 3px;
+		 	margin-bottom: 3px;
+		}
+
+		details > summary {
+		  padding-left: 4px;
+		  background-color: #eeeeee;
+		  cursor: pointer;
+		  list-style: none;
+
+		}
+
+		details > p {
+		  background-color: #eeeeee;
+		  margin: 0px;
+		  padding: 4px ;
+		}
+
+	</style>
+	 <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+
+	<script type="text/javascript">
+
+		var foorm = {}; // JSON of the survey, parsed into Javascript Object (similar to python dictionary)
+		var allRecords = []; // will be filled with records as code processes;
+
+		// list of types I know how to process so far.
+		var known_types = ['html','rating','radiogroup','comment','matrix','panel','paneldynamic','checkbox'];
+
+
+
+		function parse(){
+			// save JSON from input area into local storage -- IGNORE this is a feature of my widget.
+			foorm = JSON.parse($("#foorm_json").val());
+			localStorage['foorm'] = JSON.stringify(foorm,null,"   ");
+			
+			// process each page
+			for(var p in foorm.pages){
+				foorm.pages[p].type='page';
+				var str = layout_elements(foorm.pages[p]);
+				$("#main").append(str);
+			}
+
+			//console.table(allRecords); // dump all records to developer's console.
+			//display(); // update the textarea .tsv display
+		}
+
+		function layout_elements(obj){ //el is an array of elements
+
+
+			var elems = obj.elements; //pre-condition that obj HAS elements.  can add check later.
+			var str = "<div id='"+obj.type+"_"+obj.name+"' class='"+obj.type+"'>"+obj.type+": "+obj.name+"\n";
+			if(obj.visibleIf !== undefined){
+				str += "<p><em>visibleIf = "+obj.visibleIf+"</em></p>";
+			}
+
+			str += "<ol>";
+			
+			for(var e in elems){
+				var el = elems[e];
+				//str += "<details><li><summary>"+el.name+" ("+el.type+")</summary></li>";
+				if(el.elements !== undefined){
+					str += layout_elements(el);
+				}
+				else{
+					//str += "<li id='"+el.name+"' class='"+el.type+"'>"+el.name+" ("+el.type+")</li>";
+					str += get_str_for_type(el);
+				//console.log(tabs+el.name+" ("+el.type+")");
+				}
+			}
+			str += "</ol></div>";
+			return str;
+
+		}
+		function get_str_for_type(el){
+			var str = "";
+			str += "<details><summary>"+el.name+" ("+el.type+")</summary>"
+			//str += "<li id='"+el.name+"' class='"+el.type+"'>"+el.name+" ("+el.type+")</li>";
+			
+			if(el.type=='matrix'){
+				str += "<ol class='matrix_list'>";
+				for(var r in el.rows){
+					var row = el.rows[r];
+
+					str+="<li id='"+el.name+"_"+row.value+"' class='"+el.type+"_value'>"+row.value+"</li>";
+				}
+				str += '</ol>'
+			}
+			else{
+				str+="<p>"+el.title+"</p>";
+			}
+			str+="</details>";
+
+			return str;
+		}
+
+		function process_page(pages, p){
+
+			//process_elements(page, record);
+			var page = pages[p];
+			page.type = "page"; //force this 'type' propoerty
+			var str = "";// "<div id='page_"+p+"' class='page'>Page: "+page.name;
+			var page_div = border_type(pages[p]);
+			str = page_div.start;
+			str += process_elements(pages[p].elements)
+			str += page_div.end;
+			return str;
+			
+
+		}
+
+		function border_type(element){
+			var el_obj = {};
+			el_obj.start = "<div id='"+element.type+"_"+element.name+"' class='"+element.type+"'>";
+			el_obj.end = "</div>"
+			return el_obj;
+		}
+
+		function process_elements(elements){
+			var str = "";
+			for(var e in elements){
+
+				str += get_html_display(elements[e]);
+
+				
+			}
+			return str;
+		}
+
+		function get_html_display(element){
+			var str = "";
+			if(element.type == 'panel'){
+				var el_obj = border_type(element);
+				str = el_obj.start;
+				//console.log("before call to get_html_display.process_elements");
+				str += process_elements(element.elements);
+				str += el_obj.end;
+			}
+			else{
+				str = "<li>"+element.name+"("+ element.type+")";
+			}
+
+			return str;
+		}
+
+		
+
+		// web page stuff (remeber what we last parsed)
+		function load_from_localStorage(){
+			if(localStorage['foorm']!==undefined){
+				$("#foorm_json").val(localStorage['foorm'])
+			}
+		}
+
+		// create a giant tab-separated string of all records, one record per row
+		function display(){
+			var keys = Object.keys(allRecords[0]);
+			var str = "";
+			for(var k in keys){
+				str += keys[k]+"\t";
+			}
+			str+="\n";
+
+			for(var r in allRecords){
+				var keys = Object.keys(allRecords[r]);
+				for(var k in keys){
+					str += allRecords[r][keys[k]] +"\t";
+				}
+				str += "\n";
+			}
+			$("#textarea_output").val(str);
+		}
+
+
+	</script>
+</head>
+<body onload="load_from_localStorage()">
+	<h1>Example of processing foorm_questions</h1>
+	<hr>
+	<h2>Foorm JSON here:</h2>
+	<textarea id="foorm_json" rows=6 cols=80></textarea><br>
+	<button id='go' onClick='parse()'>Go / Parse</button>
+	<div id="main"></div>
+	
+
+</body>
+</html>

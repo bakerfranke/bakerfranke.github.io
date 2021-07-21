@@ -1,0 +1,20 @@
+$.fn.fetchResultsAutocomplete = function (request, response) {
+    var ajax = $.ajax( {
+      url: 'https://organization.cds-prod.collegeboard.org/pine/aisearch',
+      dataType: 'json',
+      data: {
+        'name': $.ui.autocomplete.escapeRegex(request.term),
+        'statecd': $('.k12Lookup_state').val(),
+        'city': $('.k12Lookup_city').val(),
+        'zip': $('.k12Lookup_zip').val(),
+        'aidomain': 'K12',
+        'aistatus': '2',
+        'distance': 25,
+        'start': 0,
+        'rows': 100,
+      },
+      headers: {
+        "x-api-key": "rIpe33sDa87VYmjcZSUbd7IE1DpUckt37iYK2zVD",
+      },
+      'contentType': "application/javascript",
+    });
