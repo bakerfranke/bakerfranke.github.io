@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+	<script src="papaparse.min.js" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		
+		var CONFIG = {
+			delimiter: "",	// auto-detect
+			newline: "",	// auto-detect
+			quoteChar: '"',
+			escapeChar: '"',
+			header: true,
+			transformHeader: undefined,
+			dynamicTyping: false,
+			preview: 0,
+			encoding: "",
+			worker: false,
+			comments: false,
+			step: undefined,
+			complete: undefined,
+			error: undefined,
+			download: false,
+			downloadRequestHeaders: undefined,
+			downloadRequestBody: undefined,
+			skipEmptyLines: false,
+			chunk: undefined,
+			chunkSize: undefined,
+			fastMode: undefined,
+			beforeFirstChunk: undefined,
+			withCredentials: undefined,
+			transform: undefined,
+			delimitersToGuess: ['\t',',', '|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP]
+		}
+
+		function loadFromLocalStorage(){
+			$("#input").val(localStorage.cla);
+			process_levels_tsv();
+			parse_properties();
+			process_levels(); //find all possible question texts and add to `.qtext` property in each object
+			process_answers();
+		}
+
+		var all_levels = [];
+
+		function process_levels_tsv(){
+			// parse tsv
+			var result = Papa.parse($("#input").val(), CONFIG);
+			// process array of results - parseJSON of properties field
+			// 
+			all_levels = result.data;
+			
+			
+		}
+		function parse_properties(){
+			//  result.data is an array results, each result is an array of length 3
+			// // index: 0=id, 1=level_name, 2=properties
+			for(var i in all_levels){ //all_levels[0] is column headings
+				var record = all_levels[i]; //isolate the record for simplicity
+
+				if(record !== undefined && record.properties !== undefined){
+
+					var properties_json = JSON.parse(record.properties); //parse the json of the properties text
+					record["properties_json"] = properties_json; //append the parsed json to the record object
+					//console.log(i+". "+record.id+" "+record.name);
+					all_levels[i] = record; // replace all_levels[i] with new object
+				}
+
+			}
+		}
+
+		var levelqtexts = [];
+		var levelsums = [];
+		var sumDictionary = {};
+		var levelstsv = "";
+
+		function process_levels(){ //produce a list of all question texts - challening because it lives within different (and multiple) fields within the property object
+			levelqtexts = [];
+			levelsums = [];
+			sumDictionary = {};
+			levelstsv = "";
+
+			for(var i in all_levels){
+			    var p = all_levels[i].properties_json
+			    var qCount = 0;
+			    var mdCount = 0;
+			    var tCount = 0;
+			    var con1Count = 0;
+
+			    levelqtext = {};
+				levelqtext.questions = 0;
+				levelqtext.markdown = 0;
+				levelqtext.title = 0;
+				levelqtext.con1 = 0;
+
+				var code = [0,0,0,0];
+				var sum = 0;
+
+				var qtext = "";
+			    if(p.questions !== undefined){
+			      //  console.log(i+"--> questions[].length = "+p.questions.length);
+			      qCount++;
+			      code[0] = 1;
+			      sum+=8;
+			      qtext += "(text)"+p.questions[0].text;
+			    }
+
+			    if(p.markdown !== undefined){
+			        //console.log(i+"--> MARKDOWN: "+p.markdown);
+			        mdCount++
+			        //levelqtext.markdown = 1;
+			        code[1]=1;
+			        sum+=4;
+			        qtext += "(markdown)"+p.markdown;
+			    }
+			    
+			    if(p.title !== undefined){
+			        tCount++;
+			        //levelqtext.title = 1;
+			        code[2]=1;
+			        sum+=2;
+			        //title isn't really what holds the question, but a few old levels have only the title. Check for that.
+			        if(qtext===""){ // if qtext hasn't been set by markdown or questions[0] then
+			        	qtext += "(title)"+p.title; //use title instead
+			        }
+			    }
+			    if(p.content1 !== undefined){
+			    	//levelqtext.con1 = 1;
+			    	code[3]=1;
+			    	sum+=1;
+			    	qtext += "(content1)"+p.content1;
+			    }
+			    levelqtexts[i] = JSON.stringify(code);
+			    levelsums[i] = sum; // make list of all sums
+			    if(sumDictionary[sum] === undefined){
+					sumDictionary[sum] = [];
+				}
+				sumDictionary[sum].push(i); //pushing arry index but could be level_id
+				var l = all_levels[i];
+				levelstsv += i+"\t"+sum+"\t"+l.id+"\t"+l.name+"\t"+l.created_at+"\t"+l.updated_at+"\n";
+
+				all_levels[i].qtext = qtext;
+			}
+
+		
+				
+			//$("#output").val(levelstsv);
+
+		}
+		var all_answers = [];
+
+		function process_answers(){
+			var id = 1;
+			for(var i in all_levels){
+				var level_id = all_levels[i].id;
+
+				var properties = all_levels[i].properties_json
+				
+				all_levels[i].sql = [];
+				all_levels[i].tsv = [];
+				for(var a in properties.answers){
+
+					if(properties.answers[a].correct == undefined){ //weird thing.  insert correct=0 if correct field doesn't exist
+						properties.answers[a].correct = 0;
+					}
+
+					id++;
+					var str = "";
+					str += (id)+"\t";
+					str += level_id+"\t";
+					str += a+"\t";
+					str += properties.answers[a].text.replace(/'/g, "\\'").replace(/(\r\n|\r|\n)/g,"\\n")+"\t";
+					str += (properties.answers[a].correct+0)+"\t";
+					str += all_levels[i].created_at+"\t";
+					str += all_levels[i].updated_at+"\n";
+					var sql_insert = "(";
+					sql_insert += (id)+", ";
+					sql_insert += level_id + ", ";
+					sql_insert += a +", ";
+					sql_insert += "'"+properties.answers[a].text.replace(/'/g, "\\'").replace(/(\r\n|\r|\n)/g,"\\n");
+
+					sql_insert += "'"+(properties.answers[a].correct+0)+", ";
+
+					sql_insert += "'"+all_levels[i].created_at+"',";
+					sql_insert += "'"+all_levels[i].updated_at+"'),\n";
+
+					all_levels[i].sql.push(sql_insert);
+					all_levels[i].tsv.push(str);
+
+
+				}
+				//all_levels[i].answers_str = str;
+				
+				
+			}
+		}
+
+		function produce_sql_insert(){ //pre-condition: process_levels() and process_answers() have been called prior to this, in that order
+			$("#output").val("");
+			var bigstr = "DROP TABLE IF EXISTS public.bf_contained_level_answers;\n"
+			bigstr += "CREATE TABLE public.bf_contained_level_answers (";
+			bigstr += "id INT,\n"
+			bigstr += "level_id INT,\n";
+			bigstr += "answer_number INT,\n";
+			bigstr += "answer_text VARCHAR(1024),\n";
+			bigstr += "created_at DATETIME,\n";
+			bigstr += "updated_at DATETIME);\n";
+
+			bigstr += "INSERT INTO public.bf_contained_level_answers VALUES\n";
+
+			for(var i in all_levels){
+				for(var a in all_levels[i].sql){
+					bigstr += all_levels[i].sql[a]
+				}
+				
+			}
+			$("#output").val(bigstr);
+		}
+		function produce_tsv(){ //pre-condition: process_levels() and process_answers() have been called prior to this, in that order
+			$("#output").val("");
+			
+			bigstr = "id\tlevel_id\tanswer_number\tanswer_text\tcorrect\tcreated_at\tupdated_at\n";
+			for(var i in all_levels){
+				for(var a in all_levels[i].sql){
+					bigstr += all_levels[i].tsv[a]
+				}
+				
+			}
+			$("#output").val(bigstr);
+		}
+	</script>
+</head>
+<body onLoad = "loadFromLocalStorage()">
+	<h1> Produce contained_level_answers "by hand"</h1>
+	<p> This is a utility to parse the JSON in the level.properties field for any level of type "Multi" which outputs a result of one-row-per-level-answer-pair just like dashboard_production.contained_level_answers.  Baker produced this utility as a bandaid in Sept. 2021 as engineering investigated why the dashboard_production version stopped updating. If the output is imported into a table on redshift, that table can be used exactly like contained_level_answers.
+	<p>
+		Process:<br>
+		<li>SQL: <pre>SELECT id, name, properties, created_at, updated_at FROM levels WHERE type='Multi';</pre></li>
+		<li>Copy/paste result of that ^^^ in tab-separated format (copy direct from SQLWorkbench/J works fine) into "input" text area below.
+	</p>
+	<p><strong>Input:</strong></p>
+	<textarea rows=10 cols=80 id="input"></textarea>
+	<li>Hit this button: <button onclick="produce_tsv()">produce tsv</button></li>
+
+	<textarea rows=10 cols=80 id="output"></textarea>
+	<li>Copy/Paste this ^^^ into a plain text doc (or gsheet) and save as [something].tsv</li>
+	<li>Upload to S3</li>
+	<li>Create a table to import to</li>
+	<pre>
+	CREATE TABLE [schema].[tablename] (
+	id INT,
+	level_id INT,
+	answer_number INT,
+	answer_text VARCHAR(1024),
+	correct INT,
+	created_at DATETIME,
+	updated_at DATETIME);
+	</pre>
+	<li>Copy data from tsv on S3 into the table structure you just made</li>
+	<pre>
+
+	copy [schema].[tablename]
+	from 's3://path/to/your/file.tsv'
+	iam_role 'arn:aws:iam::********role/redshift-s3'
+	region 'us-east-1'
+	delimiter '\t'
+	ignoreheader 1;
+	</pre>
+
+</body>
+</html>

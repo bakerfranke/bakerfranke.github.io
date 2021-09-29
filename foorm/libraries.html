@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		body{
+			font-family: arial;
+			font-size: 10pt;
+		}
+		.library_tile {
+			border: solid 2px white;
+			padding: 3px;
+			font-family: arial;
+			background-color: #DDDDDD;
+		}
+		#spacer{
+			margin-top: 0px;
+		}
+		p{
+			margin: 0px;
+		}
+		.library_tile:hover {
+			
+			background-color: #DDFFDD;
+
+		}
+		.question_tile{
+			margin-bottom: 10px;
+			padding: 5px;
+		}
+		.html{
+			background-color: #EEFFEE;
+		}
+
+		#library_titles{
+			float: left;
+		}
+		#library_items{
+			float: left;
+			width: 60%;
+		}
+		#json_text{
+			float: left;
+		}
+
+		.display {
+       
+	        border-collapse: collapse;
+	        width: 100%;
+
+	    }
+	    .display td{
+	        vertical-align: top;
+	        border: solid 1px black;
+	        padding: 5px;
+	        
+	    }
+	    ol { margin-top: 0px; }
+	    .radiogroup ul { margin-left: 5px; padding-left: 10px; }
+	    .visibleif {background-color: #FFEEEE;}
+	    .panel { 
+	    	background-color: #FAFAFA;
+	    	border: dotted 1px #AAAAAA;
+	    }
+	    .panel > .question_tile { padding-left: 5%; }
+	    .panel > .display {
+       
+	        border-collapse: collapse;
+	        width: 90%;
+
+	    }
+
+
+	</style>
+	<script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+	<script src="papaparse.min.js" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+	
+	var myconfig = {
+		delimiter: "",	// auto-detect
+		newline: "",	// auto-detect
+		quoteChar: '"',
+		escapeChar: '"',
+		header: false,
+		transformHeader: undefined,
+		dynamicTyping: false,
+		preview: 0,
+		encoding: "",
+		worker: false,
+		comments: false,
+		step: undefined,
+		complete: undefined,
+		error: undefined,
+		download: false,
+		downloadRequestHeaders: undefined,
+		downloadRequestBody: undefined,
+		skipEmptyLines: false,
+		chunk: undefined,
+		chunkSize: undefined,
+		fastMode: undefined,
+		beforeFirstChunk: undefined,
+		withCredentials: undefined,
+		transform: undefined,
+		delimitersToGuess: ['\t',',','|', ';', Papa.RECORD_SEP, Papa.UNIT_SEP] //reverse order of tab and comma
+	};
+
+	var myfile;
+	var myresults;
+
+	var library_obj_template = {id:"",library_name:"",library_version:"",question_name:"",question:"",created_at:"",updated_at:"",published:""};
+	var headings = [];
+	var allQs = [];
+	var library_stats = {};
+	var allQuestionTiles = {}; //possible TODO.  pre-load this with all question tile info and pull out, rather than regenerate strings.
+
+	function process_results(results){ //input: a results dataset from Papaparse
+		var data = results.data;
+		headings = data[0]; //assume first row is column headings
+
+		for(var row=1; row<data.length; row++){ // start at row 1
+			var obj = {}; // construct a json object representing each row.  using column headings as field names
+			obj.index = row-1; // let the object carry the index it will be in the AllQs array
+
+			for(var col=0; col<data[row].length; col++){
+				try {
+        			obj[headings[col]] = JSON.parse(data[row][col]); //use try/catch on json.parse so don't have to hard-bake in column names or indices that have JSON.
+    			} catch (e) {
+     			   obj[headings[col]] = data[row][col];
+    			}
+				
+
+			}
+
+			obj.json = jsonToInsert(obj);
+			obj.searchString = createSearchString(obj);
+			allQs.push(obj);
+		}
+		
+	}
+
+	function createSearchString(q){
+		//console.log(q);
+		//console.log(typeof(q));
+		if(q==undefined){ 
+			console.log("q undefined");
+			return ""; 
+		} //hack. don't know why a null question type comes up here.
+		if(q.question==undefined){ 
+			console.log("q.question undefined");
+			return ""; 
+		} //hack. don't know why a null question type comes up here.
+	
+
+		var str = q.question.name+" ";
+		if(q.question.title!==undefined){
+			str += q.question.title;
+		}
+		//TO DO: add matrix rows and cols, radio choices, html
+		return str;
+	}
+
+	function makeLibraryStats(){
+
+		for(var i in allQs){
+			if(library_stats[allQs[i].library_name] == undefined){
+				library_stats[allQs[i].library_name] = 1;
+			}
+			else library_stats[allQs[i].library_name]++;
+		}
+
+	}
+
+	myconfig.complete = function(results, file){
+		console.log("Done reading "+file.name);
+		//console.table(results.data);
+		myresults = results;
+		process_results(myresults);
+		makeLibraryStats();
+		displayLibraryTitles();
+	};
+
+	function loadFile(){
+		
+		myfile = new File([$("#library_tsv").val()], "library.tsv");
+		Papa.parse(myfile, myconfig);
+		localStorage['library_tsv'] = JSON.stringify($("#library_tsv").val());
+	}
+
+	var reader = new XMLHttpRequest();
+
+	function loadLibraryFile() {
+	    reader.open('get', 'libraries.tsv', true); 
+	    reader.onreadystatechange = parseTSVcontents;
+	    reader.send(null);
+	}
+
+
+	function parseTSVcontents() {
+	    if(reader.readyState==4) {
+	        console.log(reader.responseText);
+	        myfile = new File([reader.reponseText], "library.tsv");
+	        JSON.stringify($("#library_tsv").val(reader.responseText));	  
+			Papa.parse(myfile, myconfig);
+			localStorage['library_tsv'] = reader.responseText; //JSON.stringify($("#library_tsv").val());
+			
+			//loadFile();  
+		}
+	}
+
+	function makeLibraryTile(library_name, num_items){
+		var str = "<div class='library_tile' onMouseOver='showLibraryQuestions(\""+library_name+"\")'>";
+		str += "<p class='library_name'>"+library_name+"("+num_items+")</p>";
+		//str += "<p class='library_num_items'>num items:"+num_items+"</p>";
+		str += "</div>";
+
+		return str;
+
+	}
+
+	function makeQuestionTile(q){
+		var str = "<div class='question_tile display "+q.question.type;
+		if(q.index == undefined){ //if a q has no index it means it's an individual item burried in a panel and should not have any mouseover activity, because the json to insert is the parent panel. 
+			str +=">";
+		}
+		else {
+			str+="' onmouseover='showJsonToInsert("+q.index+")'>"; 
+		}
+		str += "<p>["+q.question_name+"]</p>";
+		str += "<p class='library_num_items'>type:"+q.question.type+"</p>";
+		//str += "<p class='library_num_items'>title:"+q.question.title+"</p>"; //move this eventually. not all Qs have a title
+
+		if(q.question.type=='matrix'){
+			str+=displayMatrixItem(q);
+		}
+		else if(q.question.type=='rating'){
+			str += displayRatingItem(q);
+		}
+		else if(q.question.type=='html'){
+			str += disaplayHtmlItem(q);
+		}
+		else if(q.question.type=='radiogroup'){
+			str += displayRadiogroupItem(q);
+		}
+		else if(q.question.type=='comment'){
+			str+=displayCommentItem(q);
+		}
+		else if(q.question.type=='panel' || q.question.type=='paneldynamic'){
+			str += displayPanelItem(q);
+		}
+		else if(q.question.type=='checkbox'){
+			str += displayRadiogroupItem(q);
+		}
+		else if(q.question.type=='text'){
+			str += displayTextItem(q);
+		}
+
+		str += "</div>"
+
+		if(q.question.visibleIf !== undefined){
+			str += "<div class='item_footer'><span class='visibleif'>visibleIf: "+q.question.visibleIf+"</span></div>";
+		}
+		
+		return str;
+
+	}
+	function displayTextItem(q){
+		var str = "<table class='display text'>";
+		str += "<tr><td width='66%''>";
+		str += q.question.title+"<br/>";
+		str += q.question.description+"<br>"
+		str += "</td><td>(text)<br/>";
+		str += "</td></tr></table>";
+		return str;
+
+	}
+	function displayPanelItem(q){
+		var str = ""
+
+		for(var i in q.question.elements){
+			//console.log("attempting to make: "+ typeof(q.question.elements[i]));
+			//console.table(q.question.elements[i]);
+			var qObj ={};
+			qObj.question = q.question.elements[i]; // need to add a layer of depth so the question sits at obj.question for makeQuestionTile to work.
+			if(qObj.question.templateElements !== undefined){ //if it's panel dynamic the elements are held in the array templateElements
+				qObj.question = q.question.templateElements;
+			}
+			str += makeQuestionTile(qObj); //recurse!
+		}
+		str += "<br/>";
+		return str;
+
+
+	}
+	function disaplayHtmlItem(q){
+		var str = "<table class='display html'>";
+		str += "<tr><td>";
+		str += q.question.html+"\n";
+		str += "</td></tr></table>";
+		return str;
+	}
+	function displayRadiogroupItem(q){
+
+		var str = "<table class='display radiogroup'><tr><td width=66%>";
+		str += q.question.title+"<br/>";
+		str += q.question.description+"<br>"
+		str += "</td>";
+		str += "<td>";
+
+		str += "("+q.question.type+")<br/><ul>"
+		for(var i in q.question.choices){
+			str += "<li>"+q.question.choices[i].text+"</li>"
+		}
+		str += "</ul>"
+		str += "</td></tr></table>";
+
+		return str;
+
+	}
+	function displayCommentItem(q){
+		var str = "<table class='display rating'>";
+		str += "<tr><td width='66%''>";
+		str += q.question.title;
+		str += "</td><td>(comment)<br/>";
+		str += "</td></tr></table>";
+		return str;
+	}
+	function displayRatingItem(q){
+
+		if(q.question.rateMin == undefined){ q.question.rateMin = 1; }; //force rateMin to exist, foorm doesn't require it, assumes 1
+
+		var str = "<table class='display rating'>";
+		str += "<tr><td width='66%''>";
+		str += q.question.title;
+		str += "</td><td>(rating)<br/>";
+		str += "from: ("+q.question.rateMin+") "+q.question.minRateDescription+"<br/>";
+		str += "to: ("+q.question.rateMax+") "+q.question.maxRateDescription;
+		str += "</td></tr></table>";
+		return str;
+
+
+
+	}
+
+	function displayMatrixItem(q){
+
+		var str = "<table class='display matrix'><tr><td colspan=2>";
+		str += q.question.title;
+		str += "</td></tr>";
+		str += "<tr><td width='66%''>";
+		str += "<ol>"
+		for(var i in q.question.rows){
+			str += "<li>"+q.question.rows[i].text+" ["+q.question.rows[i].value+"]</li>"
+		}
+		str += "</ol>"
+		str += "</td><td>";
+	
+		for(var i in q.question.columns){
+			str += "- "+q.question.columns[i].text+"<br/>"
+		}
+		str += "</td></tr></table>";
+
+		return str;
+
+	}
+
+	function showAllQuestionsForLibrary(library_name){
+		$("#library_items").empty();
+		$("#library_items").append("<div id='spacer'>Library Items</div>");
+		for(var i in allQs){
+			if(allQs[i].library_name == library_name){
+				$("#library_items").append(makeQuestionTile(allQs[i]));
+			}
+		}
+	}
+
+	$(document).on('mousemove', function(e){
+	    //$('#spacer').css('margin-top', e.pageY-100);
+	    //$("#library_items").css('left',100);
+	    //console.table(e)
+	});
+
+	function showLibraryQuestions(qname){
+		console.log("clicked "+qname);
+		showAllQuestionsForLibrary(qname);
+	}
+
+	function displayLibraryTitles(){
+		var lib_names = Object.keys(library_stats);
+
+
+		for(var i in lib_names){
+			var name = lib_names[i]
+			var str = makeLibraryTile(name, library_stats[name]);
+			//console.log(str);
+			if(name!==undefined){
+				$("#library_titles").append(str);
+			}
+		}
+	}
+	function showJsonToInsert(qIndex){
+
+		$("#json_to_insert").val(allQs[qIndex].json);
+	}
+	
+	function jsonToInsert(q){
+		var str = '{\n' +
+          	'"type":"library_item",\n'+
+          	'"library_name":  "'+q.library_name+'",\n'+
+          	'"library_version": "'+q.library_version+'",\n'+
+          	'"name": "'+q.question_name+'"\n'+
+        	'}';
+        	return str;
+
+	}
+
+	function setup(){
+
+		if(localStorage['library_tsv'] == undefined ||localStorage['library_tsv']=="\"\""){
+			loadLibraryFile();
+		}
+		else{
+			$("#library_tsv").val(JSON.parse(localStorage['library_tsv']));
+			loadFile();
+		
+		}
+	}
+
+
+	</script>
+	<title></title>
+</head>
+<body onLoad="setup()">
+
+	<p>copy/paste libraries tsv here:</p>
+	<textarea id="library_tsv"></textarea>
+	<button id="load_file" onClick="loadFile()">Load File</button>
+	<div id="main">
+		<div id="library_titles" class='column'>
+			<p>Libraries</p>
+
+		</div>
+		<div id="library_items" class='column'>
+			<p>questions</p>
+
+			
+		</div>
+		<div id="json_text" class='column'>
+			<p> json to insert </p>
+			<textarea id="json_to_insert" rows=40></textarea>
+			
+		</div>
+
+	</div>
+
+
+</body>
+</html>
