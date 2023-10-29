@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spinning Wheel Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="wheel-container">
+            <div class="arrow-container">
+        <div class="arrow"></div>
+    </div>
+        <svg id="wheel" viewBox="0 0 500 500">
+            <!-- Segments will be added here -->
+        </svg>
+        <div id="text-boxes">
+        <!-- Text boxes will be added here -->
+        </div>
+
+        <div class="ticker"></div>
+    </div>
+    <button onclick="spinWheel()">Spin Wheel</button>
+    <script src="script.js"></script>
+        <audio id="tickSound" src="tick.mp3" preload="auto"></audio>
+        <audio id="bellSound" src="bell.mp3" preload="auto"></audio>
+<!-- Add this button for testing -->
+
+
+</body>
+</html>
