@@ -6,22 +6,41 @@ body {
   justify-content: center;
   min-height: 100vh;
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  background-color: #FFFFFF;
+}
+
+.wheel-container {
+    position: relative;
+    width: 85vmin;
+    height: 85vmin;
+}
+
+#shadow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: gray;
+    filter: blur(5px); /* Adjust blur value as needed */
+    z-index: 1; /* Ensures the shadow is behind the wheel */
+    top: 5%;
+    left: 1%;
 }
 
 #wheel {
-  width: 85vmin;
-  height: 85vmin;
-  transform-origin: 50% 50%;
-  transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 50%;
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    z-index: 2; /* Ensures the wheel is in front of the shadow */
 }
 
 button {
-  font-size: 1.5rem;
-  padding: 0.5rem 1rem;
-  margin-top: 2rem;
-  cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    margin-top: 3rem;
+    cursor: pointer;
 }
 
 #text-boxes {
@@ -31,7 +50,9 @@ button {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    z-index: 3; /* Ensures the text boxes are above the wheel and shadow */
 }
+
 .text-box {
     position: absolute;
     width: 150px; /* Adjust as needed */
@@ -45,13 +66,14 @@ button {
     top: 0; /* Adjust the top position as needed */
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2; /* Set a higher z-index */
+    z-index: 4; /* Set a higher z-index */
 }
 
 .arrow-container {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 0;
 }
 
 /* Create the arrow using CSS border properties */
@@ -62,5 +84,5 @@ button {
     border-right: 15px solid transparent;
     border-top: 30px solid #000000; /* Adjust color as needed */
     margin: 0 auto;
-
+    z-index: 5; /* Set a higher z-index */
 }
