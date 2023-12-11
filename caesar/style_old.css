@@ -1,0 +1,246 @@
+
+
+
+
+
+
+
+
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light background for better contrast */
+    color: #333; /* Darker text for better readability */
+}
+
+.container {
+    display: flex;
+    padding: 20px;
+}
+
+
+
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.mode-button {
+    padding: 5px 10px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    flex-grow: 1; /* Makes buttons take equal space */
+    margin-right: 10px; /* Space between buttons */
+}
+
+.mode-button:last-child {
+    margin-right: 0; /* Remove right margin from last button */
+}
+
+#modeDecrypt {
+    background-color: #007bff; /* Blue for decrypt mode */
+}
+
+
+
+#modeEncrypt {
+    background-color: #28a745; /* Green for encrypt mode */
+}
+
+
+
+#toggleInstructions {
+    background-color: #add8e6; /* Light blue for instructions button */
+}
+
+
+
+
+
+
+
+
+
+
+
+.input-section {
+    flex: 1;
+    padding: 10px;
+
+    border: 1px solid transparent;
+    position: relative;
+}
+
+
+
+
+#inputText {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    font-size: 16px; /* Increase font size for better visibility */
+    padding: 10px;
+    border: 1px solid #ccc;
+
+    width: calc(100% - 20px); /* Adjust width to prevent overlapping */
+
+}
+
+.output-section {
+    flex: none;
+    width: calc(80ch + 20px);
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+
+    white-space: nowrap;
+    font-size: 16px; /* Match font size with input */
+    line-height: 1.5; /* Increased line height for better readability */
+    background-color: #fff; /* White background for contrast */
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    color: #007bff;
+}
+
+.subtitle {
+    color: #333;
+    font-style: italic;
+}
+
+
+.instructions {
+    display: none;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    width: calc(50% - 20px); /* Adjust width to match the input box */
+}
+
+
+
+#toggleInstructions {
+    display: block;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%; /* Make the button full width of the input-section */
+}
+
+#toggleInstructions:hover {
+    background-color: #0056b3;
+}
+.mode-toggle {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.mode-toggle button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mode-toggle button:hover {
+    background-color: #0056b3;
+}
+
+#encryptOptions {
+    margin-top: 10px;
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ... existing styles ... */
+
+.mode-toggle button {
+    /* ... existing styles ... */
+    background-color: #6c757d; /* Neutral color for mode buttons */
+}
+
+.mode-toggle button.active {
+    background-color: #007bff; /* Active mode color */
+    cursor: default;
+    pointer-events: none;
+}
+
+#decryptButton, #encryptButton {
+   background-color: #28a7AA;  /*Encrypt/Decrypt button color */
+/*    background-color: #ff0000;*/
+}
+
+
+
+#outputSection {
+    /* Set a minimum height */
+    min-height: 400px; /* Adjust this value as needed to accommodate 26 lines */
+    /* ... other styles for outputSection ... */
+}
+
+
+
+
+.input-section.encrypt-mode {
+    background-color: #e9f5eb; /* Light green for encrypt mode */
+    border-color: #28a745;
+}
+
+.input-section.decrypt-mode {
+    background-color: #f0f4ff; /* Light blue for decrypt mode */
+    border-color: #007bff;
+}
+
+.output-label {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 18px; /* Adjust the font size as needed */
+    color: #333; /* Adjust the color as needed */
+}
+
+
+
+
+

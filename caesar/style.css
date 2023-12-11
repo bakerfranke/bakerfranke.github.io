@@ -1,0 +1,154 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    padding: 20px;
+}
+
+.input-section {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid transparent;
+}
+
+#inputText {
+    width: calc(100% - 20px);
+    height: 150px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.output-section {
+    flex: none;
+    width: calc(80ch + 20px);
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    white-space: nowrap;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #fff;
+    min-height: 400px;
+}
+
+
+button {
+    padding: 10px 20px;
+     background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    color: #007bff;
+}
+
+.subtitle {
+    color: #333;
+    font-style: italic;
+}
+
+.instructions {
+    display: none;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
+    width: calc(100% - 20px);
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Aligns child elements to the right */
+    align-items: center;
+    gap: 10px;
+}
+
+
+
+.button-row {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    margin-bottom: 10px;
+}
+
+.mode-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.mode-button:last-child {
+    margin-right: 0;
+}
+
+#modeDecrypt {
+    background-color: #007bff;
+}
+#modeDecrypt:hover {
+    background-color: #65afff; 
+}
+
+#modeEncrypt {
+    background-color: #28a745;
+}
+#modeEncrypt:hover{
+    background-color: #5cd879;
+}
+
+#decryptButton, #encryptButton {
+   background-color: #28a7AA;  /*Encrypt/Decrypt button color */
+    flex-grow: 0;
+/*    background-color: #ff0000;*/
+}
+
+#toggleInstructions {
+    background-color: #28a7AA; 
+    padding: 5px 10px; /* Adjust padding for smaller size */
+    white-space: normal; /* Allow text to wrap */
+    text-align: center; /* Center text */
+    width: auto; /* Adjust width to fit content */
+
+}
+#toggleInstructions:hover {
+    background-color: #5ed6d9; 
+}
+
+
+
+/* ... existing styles ... */
+
+.input-section.encrypt-mode {
+    background-color: #e9f5eb; /* Light green for encrypt mode */
+    border-color: #28a745;
+}
+
+.input-section.decrypt-mode {
+    background-color: #f0f4ff; /* Light blue for decrypt mode */
+    border-color: #007bff;
+}
+
+/* ... remaining styles ... */

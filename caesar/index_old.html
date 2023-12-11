@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Decoder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Crack the Code!</h1>
+        <p class="subtitle">Caesar Cipher</p>
+    </header>
+
+    <div class="container">
+        <div class="input-section" id="inputSection">
+            <button id="toggleInstructions">Show Instructions</button>
+            <div class="instructions" id="instructions">
+                <p>Enter your encoded text in the box and press "Decrypt" to see all possible plaintext versions. Each line corresponds to a different shift of the Caesar cipher, labeled with the shift number. Use your human powers of recognition to identify the shift that makes the most sense!</p>
+                <p> Try this: IJHTINSL XJHWJY RJXXFLJX NX XT JFXD!</p>
+            </div>
+            <textarea id="inputText" placeholder="Enter cipher text here..."></textarea>
+
+            <div class="button-container">
+                <button id="decryptButton" style="display: block;">Decrypt →</button>
+                <div id="encryptOptions" style="display: none;">
+                    <label for="shiftAmount">Shift:</label>
+                    <select id="shiftAmount">
+                        <option value="1">1</option>
+                        <!-- ... more options up to 26 ... -->
+                        <option value="26">26</option>
+                    </select>
+                    <button id="encryptButton">Encrypt →</button>
+                </div>
+            </div>
+
+            <div class="mode-toggle">
+                <button id="modeDecrypt">Decrypt Mode</button>
+                <button id="modeEncrypt">Encrypt Mode</button>
+            </div>
+        </div>
+
+        <!-- 
+                <div class="input-section">
+                    <button id="toggleInstructions">Show Instructions</button>
+                    <div class="instructions" id="instructions">
+                        <p>Enter your encoded text in the box and press "Decrypt" to see all possible plaintext versions. Each line corresponds to a different shift of the Caesar cipher, labeled with the shift number. Use your human powers of recognition to identify the shift that makes the most sense!</p>
+                        <p> Try this: IJHTINSL XJHWJY RJXXFLJX NX XT JFXD!</p>
+                    </div>
+                    <textarea id="inputText" placeholder="Enter cipher text here..."></textarea>
+                    <button id="decryptButton">Decrypt</button>
+
+                   
+                    <div id="encryptOptions" style="display: none;">
+                        <label for="shiftAmount">Shift:</label>
+                        <select id="shiftAmount">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+
+                        </select>
+                        <button id="encryptButton">Encrypt</button>
+                    </div>
+                     <div class="mode-toggle">
+                        <button id="modeDecrypt">Decrypt Mode</button>
+                        <button id="modeEncrypt">Encrypt Mode</button>
+                    </div>
+                </div> -->
+        <div>
+            <p id="outputLabel" class="output-label">Scan the list and see if something looks like real words!</p>
+            <div class="output-section">
+                <div id="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
