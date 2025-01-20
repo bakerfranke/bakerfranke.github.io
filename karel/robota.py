@@ -29,6 +29,7 @@ from karel.basicdefinitions import RobotNotRunning
 from karel.basicdefinitions import FrontIsBlocked      
 
 use_graphics = True
+DEBUG = False
 
 # Placeholder imports (will be dynamically set)
 RobotWorld = None
@@ -86,7 +87,7 @@ class UrRobot(_RobotSkeleton, Observable):
             exit()
         
         RobotWorld, window, world = RW, win, wd
-        print(f"Graphics mode set to: {use_graphics}")
+        if(DEBUG): print(f"Graphics mode set to: {use_graphics}")
         return world
 
 
@@ -111,7 +112,7 @@ class UrRobot(_RobotSkeleton, Observable):
         "Create a robot in a particular situation."
         
         if not UrRobot._graphics_initialized:
-            print("initializing gaphics")
+            if(DEBUG): print("initializing gaphics")
             UrRobot._initialize_graphics()
 
         Observable.__init__(self)
@@ -137,23 +138,26 @@ class UrRobot(_RobotSkeleton, Observable):
 
     @staticmethod
     def _initialize_graphics():
-        """Initialize the graphics window and world settings."""
+        """Initialize the graphics window and world settings.
+            'Graphics' is a bit of a misnomer.  It means use tkinter graphics
+            via the tkworldadpater(KarelWindow) (UrRobot.use_graphics=True) if in GUI mode, but it means
+            ascii if NOT in graphics mode (UrRobot.use_graphics=False)
+        """
         #from karel.tkworldadapter import _window, window, world  # Ensure imports are correct
 
         global _window
         if _window is None:  #BEF: if _window doesn't exist default to graphics mode
 
             _window = window()  # Initialize the graphical window by default
-            print("Default graphics mode: Graphical")
+            if(DEBUG): print("Creating window with graphics = ", use_graphics)
 
             #world.setSize(10, 10)  # Default world size
             #world.setDelay(20)  # Default animation delay
-        
-        print('registering window')
         def default_task():
             pass
 
         # Register atexit to run the graphics loop with the default task
+        # BEF: I'm not sure what this does when in no-graphics mode, but it's working for now.
         import atexit
         atexit.register(lambda: _window.run(default_task))
         #atexit.register(_window.run)

@@ -171,9 +171,21 @@ class RobotWorldBase:
                                              
     def saveWorldWithPath(self, path, filename):
         pass
+
+    def getWorldAsLines(self):
+        "Get a string of the lines that would be written to a file"
                                              
     def saveWorld(self, filename):
         "Write a readable representation of the world (without robots) to a file"
+        lines = self.getWorldString()
+        writer = open(filename, "w")
+        for line in lines :
+            writer.write(line)
+        writer.close();  
+        
+    def getWorldString(self):
+        "Get a string of the lines that would be written to a file"
+        
         lines = []
         lines.append("KarelWorld\n")
         for  (x,y) in self._beepers.keys() :
@@ -182,10 +194,8 @@ class RobotWorldBase:
             lines.append("eastwestwalls " + str(x) + " " + str(y) + " " + str(y) + "\n")
         for (x, y) in self._northSouthWalls.keys():
             lines.append("northsouthwalls " + str(y) + " " + str(x) + " " + str(x) + "\n")
-        writer = open(filename, "w")
-        for line in lines :
-            writer.write(line)
-        writer.close();  
+        
+        return lines
         
     def _clearBefore(self, robot):
         direction = robot._UrRobot__direction

@@ -58,7 +58,7 @@ class RobotWorld(RobotWorldBase, Observer) :
         self.__beeperControl = threading.Condition()
         self._streets = streets
         self._avenues = avenues
-#        print("creating tk world", name)
+        print("Creating", name)
         self.trace_enabled = False
 
     # ADDED BY BAKER 1.8.24

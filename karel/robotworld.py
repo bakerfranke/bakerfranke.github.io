@@ -56,10 +56,16 @@ class RobotWorld(RobotWorldBase, Observer) :
         self.__delay = 0
         self._isVisible = False
         print("Creating ", name)
+        self.trace_enabled = True #Ascii Robot world has trace enabled by default
+
     
     def run(self, task, *pargs):
        mainThread = threading.Thread(target = task, args=pargs)
        mainThread.start()
+
+    def setTrace(self, enabled: bool):
+        """Enable or disable global trace output for all robots."""
+        self.trace_enabled = enabled
 
     def update(self, robot, robotState = None):
         "This is called whenever any robot changes state since the world observes all robots"
@@ -69,11 +75,12 @@ class RobotWorld(RobotWorldBase, Observer) :
         if action == karel.robota.UrRobot.moveAction or action == karel.robota.UrRobot.createAction :
             self._registerRobot(robot)
 
-        from karel.robota import UrRobot #defer this import to here to prevent circular import, we need the actions dictionary
-        print(
-            f"UPDATE: Robot {robot.ID()} at ({robotState.street()}, {robotState.avenue()}) facing {robotState.direction().__name__} "
-            f"with {robotState.beepers()} beeper(s), action: {UrRobot.actions[robotState.action()]}, {robotState.isRunning()}"
-        )
+        if self.trace_enabled:
+            from karel.robota import UrRobot #defer this import to here to prevent circular import, we need the actions dictionary
+            print(
+                f"UPDATE: Robot {robot.ID()} at ({robotState.street()}, {robotState.avenue()}) facing {robotState.direction().__name__} "
+                f"with {robotState.beepers()} beeper(s), action: {UrRobot.actions[robotState.action()]}, {robotState.isRunning()}"
+            )
 
 
     def name(self):

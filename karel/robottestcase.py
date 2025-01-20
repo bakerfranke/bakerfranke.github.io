@@ -10,7 +10,10 @@ from karel.robota import North
 from karel.robota import West
 from karel.robota import South
 from karel.robota import East
+from karel.robotutils import direction_strings
 #from exceptions import Exception
+
+
 
 class RobotException(Exception) :
     def __init__(self, message):
@@ -22,7 +25,58 @@ class RobotException(Exception) :
 class RobotTestCase(TestCase):
     def __init__(self, methodName):
         TestCase.__init__(self, methodName)
-        
+
+    # def getStreet(self, robot):
+    #     return robot._UrRobot__street
+    
+    # def getAvenue(self, robot):
+    #     return robot._UrRobot__avenue
+
+    # def getLocation(self, robot):
+    #     return (robot._UrRobot__street, robot._UrRobot__avenue)
+    
+    # def getDirection(self, robot):
+    #     return robot._UrRobot__direction
+    
+    # def getDirectionStr(self, robot):
+    #     return direction_strings[robot._UrRobot__direction]
+    
+    # def _status_to_str(self, status):
+    #     return (status[0], 
+    #             status[1],
+    #             direction_strings[status[2]],
+    #             status[3])
+    
+    # def getBeepers(self, robot):
+    #     return robot._UrRobot__beepers
+
+    def _getStatus(self, robot):
+        return (robot._UrRobot__street, 
+                robot._UrRobot__avenue,
+                robot._UrRobot__direction,
+                robot._UrRobot__beepers)
+    
+    def assertStatus(self, robot, expected_status):
+        curr_status = self._getStatus(robot)
+        if curr_status != expected_status:
+            raise RobotException(f"Robot status: {self._status_to_str(curr_status)}. Expected: {self._status_to_str(expected_status)}")
+    
+    def _createException(msg, value, expected):
+        return RobotException(f"{msg} Value: {value}. Expected: {expected}")
+    
+    def assertKarel(self, msg, value, expected):
+        # print("in assertKarel ",msg,value,expected)
+        # print(f"\t{value}!={expected}? {value!=expected}")
+
+        if value!=expected:
+            raise RobotException(f"{msg} Value: {value}. Expected: {expected}")
+
+
+    def assertDirection(self, robot, expected_direction):
+        value = robot._UrRobot__direction
+        if  value != direction:
+            return self._createException("Checking direction:",)
+
     def assertNotFacingNorth(self, robot):
         if robot._UrRobot__direction == North :
             raise RobotException( "Facing north")
@@ -38,7 +92,6 @@ class RobotTestCase(TestCase):
     def assertFacingEast(self, robot):
         if not robot._UrRobot__direction == East :
             raise RobotException( "Not facing east")
-        
         
     def assertFacingWest(self, robot):
         if not robot._UrRobot__direction == West :
@@ -125,12 +178,18 @@ class RobotTestCase(TestCase):
     
     def assertBeepersAt(self, street, avenue): 
         if not world._beepersAt(street, avenue) :
-            raise RobotException( "Not beepers at (" + str(street)+ ", " + str(avenue) + ")")
+            raise RobotException( "Expected beepers at (" + str(street)+ ", " + str(avenue) + ") but not there.")
     
     def assertNoBeepersAt(self, street, avenue):
         if world._beepersAt(street, avenue) :
-            raise RobotException( "Beepers at (" + str(street)+ ", " + str(avenue) + ")")
-        
+            raise RobotException( "Expected NO beepers at (" + str(street)+ ", " + str(avenue) + ") but at least one was there.")
+
+    def assertBeeperList(self, expectedBeepers):
+        allBeepers = world.getAllBeepers();
+        if allBeepers != expectedBeepers:
+            raise RobotException(f"Expected Beepers at: {expectedBeepers}, but found: {allBeepers}")
+
+
 #if __name__ == '__main__':
 #    for i in dir(RobotTestCase):
 #        print(i)
