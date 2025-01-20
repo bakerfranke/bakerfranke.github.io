@@ -66,6 +66,7 @@ def North(robot, world):
         robot.turnOff()
         raise FrontIsBlocked( "at (" + str(robot._UrRobot__street) + ", " + str(robot._UrRobot__avenue) + ")" + 
             " facing north" )
+    
         
 def South(robot, world):
     "Represents the south direction in the robot world."
@@ -84,6 +85,7 @@ def East(robot, world):
         robot.turnOff()
         raise FrontIsBlocked( "at (" + str(robot._UrRobot__street) + ", " + str(robot._UrRobot__avenue) + ")" + 
             " facing east")
+
        
 def West(robot, world):
     "Represents the west direction in the robot world."

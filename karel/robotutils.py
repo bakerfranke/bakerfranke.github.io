@@ -86,8 +86,74 @@ def get_world_diffs_from_file(robot_world, expected_world_file):
 
     # Use the world comparison function
     return get_world_diffs(robot_world, expected_world)
-
+    
 def get_beeper_diffs(world_beepers, expected_beepers):
+    """
+    Compares beepers in the current world state with those described in another world.
+
+    Args:
+        world_beepers (dict): Beeper positions and counts in the current world state.
+        expected_beepers (dict): Beeper positions and counts from the .kwld file or another world.
+
+    Returns:
+        dict: 
+            - 'diffs': True if differences exist, False otherwise.
+            - 'allbeeperdiffs': A multiline string showing the side-by-side comparison.
+    """
+    differences_found = False
+    comparison_lines = []
+
+    # Add column headings
+    header = (
+        f"{' '.ljust(8)}|{'Your World'.center(15)}|{'Expected'.center(15)}\n"
+        f"{'RESULT'.ljust(8)}| {'st  ave beeps'.ljust(13)} | {'st  ave beeps'.ljust(14)}"
+    )
+    separator = f"{'-' * 8}| {'-'*3} {'-'*3} {'-'*5} | {'-'*3} {'-'*3} {'-'*5}"
+    comparison_lines.append(header)
+    comparison_lines.append(separator)
+
+    # Gather all unique positions from both dictionaries
+    all_positions = set(world_beepers.keys()) | set(expected_beepers.keys())
+
+    for position in sorted(all_positions):
+        robot_count = world_beepers.get(position, None)
+        expected_count = expected_beepers.get(position, None)
+
+        if robot_count is None:  # Missing in robot world
+            differences_found = True
+            comparison_lines.append(
+                f"{'MISSING'.ljust(8)}| {'_   _   _':<14}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {expected_count:<5}':<14}"
+            )
+        elif expected_count is None:  # Extra in robot world
+            differences_found = True
+            comparison_lines.append(
+                f"{'EXTRA'.ljust(8)}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {robot_count:<5}':<14}| {'--  --  --':<14}"
+            )
+        elif robot_count != expected_count:  # Mismatched counts
+            differences_found = True
+            robot_count = str(robot_count)+"<<"
+            comparison_lines.append(
+                f"{'MISMATCH'.ljust(8)}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {robot_count:<5}':<14}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {expected_count:<5}':<14}"
+            )
+        else:  # Matches correctly
+            comparison_lines.append(
+                f"{'   -'.ljust(8)}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {robot_count:<5}':<14}| "
+                f"{f'{position[0]:<3} {position[1]:<3} {expected_count:<5}':<14}"
+            )
+
+    return {
+        'diffs': differences_found,
+        'allbeeperdiffs': "\n".join(comparison_lines)
+    }
+
+
+
+def get_beeper_diffs_OLD(world_beepers, expected_beepers):
     """
     Compares beepers in the current world state with those described in another world.
 
