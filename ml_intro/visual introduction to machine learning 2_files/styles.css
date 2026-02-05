@@ -1,0 +1,317 @@
+svg {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+div {
+  /* background: rgba(0,0,0,0.01); */
+}
+
+.container {
+  overflow: hidden;
+}
+
+#main {
+  position: relative;
+  z-index: 100;
+}
+
+#main h1, #main h2, #main h3 {
+  font-weight: 300;
+  color: #000;
+  letter-spacing: -0.02em;
+}
+
+#main h2 {
+  border-bottom: 3px solid;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.5em;
+}
+
+#main p {
+  margin: 1.3em 0;
+}
+
+#main .small {
+  margin-top: 40px;
+  color: #999;
+}
+
+#translations.small {
+  margin-top: 0;
+}
+
+#conclusion li {
+  margin: 1em 0;
+}
+
+@media (min-width: 800px) and (min-height: 650px)  {
+  #main h1 {
+    font-size: 60px;
+  }
+
+  #main h2 {
+    font-size: 48px;
+  }
+
+  #main p, #main li {
+    font-weight: 300;
+    font-size: 21px;
+  }
+
+  #main .small {
+    font-size: 16px;
+  }
+
+  #conclusion li {
+    font-size: 21px;
+    font-weight: 300;
+  }
+}
+
+#intro-scatterplot {
+  position: absolute;
+  right: 0;
+  width: 55%;
+  height: 100vh;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+#intro-scatterplot canvas {
+  position: absolute;
+  z-index: 1000;
+}
+.hideCanvas {
+  opacity: 0;
+}
+
+#intro-scatterplot svg {
+  position: absolute;
+  z-index: 2000;
+}
+
+#keep-scrolling {
+  position: absolute;
+  width: 100%;
+}
+
+#animated-arrow {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+#animated-arrow p {
+  text-transform: uppercase;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0;
+}
+
+#animated-arrow svg {
+  margin: 0 auto;
+}
+
+.hover-animation {
+  -moz-animation-duration: 0.8s;
+  -webkit-animation-duration: 0.8s;
+  -moz-animation-name: slidein;
+  -webkit-animation-name: slidein;
+  -moz-animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-direction: alternate;
+  -webkit-animation-direction: alternate;
+}
+
+@-moz-keyframes slidein {
+  from {
+    top: 0;
+  }
+
+  to {
+    top: 10px;
+  }
+}
+
+@-webkit-keyframes slidein {
+  from {
+    top: 10px;
+  }
+
+  to {
+    top: 0;
+  }
+}
+
+#list-of-attributes {
+  font-size: 21px;
+  font-weight: 300;
+}
+
+#scatterplot-labels-group {
+  transition: opacity 0.4s ease;
+}
+
+#split-quality {
+  position: absolute;
+  left: 4%;
+  width: 53%;
+  height: 100vh;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+#split-quality canvas,
+#split-quality svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#rotating-canvas {
+  width: 100vh;
+  height: 100vh;
+}
+
+#decision-tree {
+  position: absolute;
+  right: 0;
+  width: 65%;
+  height: 95vh;
+  text-align: right;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+  padding-top: 10vh;
+}
+
+#train-vs-test {
+  position: absolute;
+  right: 0;
+  width: 60%;
+  height: 99vh;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+#variable-intro-svg {
+  transition: opacity 1s ease;
+}
+
+.scatterPlotPoint {
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  transform: translateZ(0);
+  transition: width 0.4s ease, transform 0.4s ease, opacity 0.01s ease;
+}
+.ny-line {
+  background: #456EBF;
+}
+.sf-line {
+  background: #828C35;
+}
+.rounded {
+  border-radius: 2px;
+}
+
+.verticalAxis, .horizontalAxis {
+  transition-delay: 1s;
+  transition: opacity 1s ease;
+}
+
+#shadow-scatterplot {
+  height: 100vh;
+  width: 55vw;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#train-vs-test {
+  z-index: 400;
+}
+
+.labelBox {
+  font-size: 11px;
+}
+
+.whitespace {
+  display: block;
+  padding: 0;
+  margin: 0;
+  height: 20vh;
+  width: 100%;
+  background: none;
+  border: none;
+}
+
+#data-table {
+  height: 23em;
+}
+.data-table th {
+  font-size: 11px;
+  color: #888;
+  padding-right: 20px;
+}
+.data-table td {
+  padding: 8px 20px 8px 0;
+}
+
+.sub_split_histograms {
+  transition: opacity 0.3s ease;
+}
+
+.tree_pie, .tree_histogram, .tree_link {
+  transition: opacity 0.3s;
+}
+
+.keep-in-touch {
+  text-align: center;
+}
+
+.footnote-anchor {
+  border: 1px solid #aaa;
+  border-radius: 0.2em;
+  font-weight: 600;
+  padding: 0.1em 0.3em;
+  margin: 0.2em;
+  font-size: 0.75em;
+  cursor: pointer;
+}
+
+#footnote-container {
+  position: absolute;
+  z-index: 200;
+  top: 300px;
+  left: 300px;
+  width: 20em;
+  background: #ffffff;
+  border: 1px solid #aaa;
+  border-radius: 0.5em;
+  padding: 0.9em 1em 1.1em;
+}
+/*
+     FILE ARCHIVED ON 15:01:48 Jun 30, 2025 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 04:11:59 Feb 05, 2026.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 9.194
+  exclusion.robots: 0.026
+  exclusion.robots.policy: 0.011
+  esindex: 0.015
+  cdx.remote: 39.495
+  LoadShardBlock: 148.154 (3)
+  PetaboxLoader3.datanode: 130.37 (4)
+  load_resource: 54.912
+  PetaboxLoader3.resolve: 43.546
+*/
