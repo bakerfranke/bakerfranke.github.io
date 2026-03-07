@@ -1,0 +1,153 @@
+<div class="grid" id="grid"></div>
+
+<script>
+const sites = [
+  "https://sites.google.com/view/dalereedcs218dataai/about-me",
+  "https://sites.google.com/view/dorian-copo-cs-294/home",
+  "https://sites.google.com/uic.edu/paulyangcs294/home"
+];
+
+const grid = document.getElementById("grid");
+
+for (const url of sites) {
+  const thumb = `https://image.thum.io/get/width/900/${encodeURIComponent(url)}`;
+
+  const tile = document.createElement("a");
+  tile.className = "tile";
+  tile.href = url;
+  tile.target = "_blank";
+  tile.rel = "noopener noreferrer";
+  tile.innerHTML = `
+    <img src="${thumb}" alt="Preview of ${url}" loading="lazy">
+    <div class="meta">${url}</div>
+  `;
+  grid.appendChild(tile);
+}
+</script>
+
+<style>
+.grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px; }
+.tile { display:block; text-decoration:none; color:#111; background:#fff; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; }
+.tile img { width:100%; height:220px; object-fit:cover; display:block; background:#f3f4f6; }
+.meta { padding:10px 12px; font-size:13px; border-top:1px solid #e5e7eb; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+
+
+
+<!-- <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Site Gallery</title>
+  <style>
+    :root {
+      --cols: 4;          /* change to 3, 4, 5... */
+      --frame-h: 240px;   /* iframe height per tile */
+      --gap: 12px;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f6f7f9;
+      color: #111;
+    }
+
+    header {
+      padding: 16px 20px;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .grid {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+      gap: var(--gap);
+    }
+
+    .tile {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      min-height: calc(var(--frame-h) + 44px);
+    }
+
+    iframe {
+      width: 100%;
+      height: var(--frame-h);
+      border: 0;
+      background: #fff;
+    }
+
+    .meta {
+      padding: 10px 12px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .meta a {
+      color: #0b5fff;
+      text-decoration: none;
+    }
+
+    .meta a:hover { text-decoration: underline; }
+
+    /* Responsive: fewer columns on smaller screens */
+    @media (max-width: 1200px) { :root { --cols: 3; } }
+    @media (max-width: 800px)  { :root { --cols: 2; } }
+    @media (max-width: 520px)  { :root { --cols: 1; } }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Student Site Gallery</strong>
+    <span id="count" style="opacity:.7; margin-left:10px;"></span>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <script>
+    // Paste your full list here:
+    const sites = [
+      "https://sites.google.com/view/dalereedcs218dataai/about-me",
+      "https://sites.google.com/view/dorian-copo-cs-294/home",
+      "https://sites.google.com/uic.edu/paulyangcs294/home"
+      // ...
+    ];
+
+    const grid = document.getElementById("grid");
+    document.getElementById("count").textContent = `(${sites.length} sites)`;
+
+    for (const url of sites) {
+      const tile = document.createElement("section");
+      tile.className = "tile";
+
+      const frame = document.createElement("iframe");
+      frame.src = url;
+      frame.loading = "lazy";              // helps performance
+      frame.referrerPolicy = "no-referrer"; // optional
+      // frame.sandbox = ""; // optional: tighten security (may break some sites)
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+
+      tile.appendChild(frame);
+      tile.appendChild(meta);
+      grid.appendChild(tile);
+    }
+  </script>
+</body>
+</html> -->

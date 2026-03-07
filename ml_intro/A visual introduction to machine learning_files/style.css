@@ -1,0 +1,98 @@
+body {
+  padding-top: 160px;
+  background: #ffffff;
+}
+
+#header {
+  height: 90px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  z-index: 3000;
+}
+#logo {
+  background: url("/web/20250305183127im_/https://www.r2d3.us/static/app/global/r2d3-logo.png") no-repeat top left;
+  background-size: cover;
+  margin: 15px 0;
+  width: 60px;
+  height: 60px;
+  display: block;
+}
+
+#footer {
+  background: #323137;
+  padding-top: 70px;
+  padding-bottom: 160px;
+  color: #d1d2d8;
+}
+
+#footer p {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  color: #d1d2d8;
+  margin: 0 0 10px;
+  line-height: 1.4285;
+}
+
+#footer a {
+  color: #fff;
+  text-decoration: underline;
+}
+.team-bio h3 {
+  margin-top: 0;
+  font-weight: normal;
+  font-size: 1.3em;
+  color: #fff;
+}
+#footer-logo {
+  width: 100%;
+  background: url("/web/20250305183127im_/https://www.r2d3.us/static/app/global/r2d3-large-white.png") no-repeat top left;
+  background-size: contain;
+  display: block;
+  height: 120px;
+}
+.footer-portrait {
+  width: 100%;
+  border: 8px solid #fff;
+}
+#about-r2d3 {
+  margin-bottom: 60px;
+}
+.team-bio {
+  margin-bottom: 30px;
+}
+
+.mailing-list {
+  margin: 10px 0;
+  padding: 10px 20px 10px;
+  background-color: #fff;
+  border: 1px solid #e1e8ed;
+  border-radius: 3px;
+}
+
+/* Utilities */
+.hide-text {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/*
+     FILE ARCHIVED ON 18:31:27 Mar 05, 2025 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 23:29:05 Feb 04, 2026.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 0.662
+  exclusion.robots: 0.021
+  exclusion.robots.policy: 0.009
+  esindex: 0.012
+  cdx.remote: 115.216
+  LoadShardBlock: 70.219 (3)
+  PetaboxLoader3.datanode: 109.587 (4)
+  PetaboxLoader3.resolve: 40.48 (2)
+  load_resource: 119.9
+*/
