@@ -3,1000 +3,342 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Decision Tree Card Generator</title>
+<title>Decision Tree Card Sorting — Unplugged ML Activity</title>
 <style>
-/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --brand: #1a3a5c;
+  --brand-light: #2a5080;
   --accent: #c0392b;
   --light: #f4f6f9;
   --border: #d0d7e2;
   --r: 8px;
-  --gray-card: #d8d8d8;
-  --white-card: #ffffff;
+  --card-r: 10px;
 }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1a1a1a; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
-.btn { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem 1rem; border-radius: var(--r); border: none; cursor: pointer; font-size: .88rem; font-weight: 600; transition: opacity .15s; }
-.btn:hover { opacity: .82; }
-.btn-primary { background: var(--brand); color: #fff; }
-.btn-accent  { background: var(--accent); color: #fff; }
-.btn-outline { background: #fff; color: var(--brand); border: 1.5px solid var(--brand); }
-.btn-sm { padding: .3rem .7rem; font-size: .8rem; }
-.btn:disabled { opacity: .35; cursor: not-allowed; }
-
-/* ══ BUILDER ══ */
-.bld-header { background: var(--brand); color: #fff; padding: 1.1rem 2rem; }
-.bld-header h1 { font-size: 1.3rem; font-weight: 700; }
-.bld-header p  { font-size: .8rem; opacity: .7; margin-top: .15rem; }
-.wrap { max-width: 900px; margin: 0 auto; padding: 1.75rem 1.5rem; }
-.box  { background: #fff; border: 1px solid var(--border); border-radius: var(--r); padding: 1.35rem; margin-bottom: 1.35rem; }
-.box h2 { font-size: .95rem; font-weight: 700; color: var(--brand); margin-bottom: .9rem; display: flex; align-items: center; gap: .5rem; }
-.badge { background: var(--brand); color: #fff; border-radius: 50%; width: 1.5rem; height: 1.5rem; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; flex-shrink: 0; }
-
-.drop { border: 2px dashed var(--border); border-radius: var(--r); padding: 2rem; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
-.drop:hover, .drop.over { border-color: var(--brand); background: #eef3fa; }
-.drop svg { opacity: .3; margin-bottom: .5rem; }
-.drop p { font-size: .88rem; color: #555; }
-.drop span { color: var(--brand); font-weight: 600; }
-#file-input { display: none; }
-.or { text-align: center; color: #888; font-size: .8rem; margin: .55rem 0; }
-.csv-ta { width: 100%; height: 100px; border: 1px solid var(--border); border-radius: var(--r); padding: .65rem; font-family: monospace; font-size: .76rem; resize: vertical; }
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
-@media (max-width: 560px) { .g2 { grid-template-columns: 1fr; } }
-.field label { display: block; font-size: .73rem; font-weight: 600; color: #555; margin-bottom: .25rem; }
-.field select, .field input[type=text] { width: 100%; padding: .44rem .55rem; border: 1px solid var(--border); border-radius: var(--r); font-size: .86rem; background: #fff; }
-.field select:focus, .field input:focus { outline: 2px solid var(--brand); }
-.vmsg { font-size: .76rem; margin-top: .28rem; min-height: 1em; }
-.ok  { color: #16a34a; } .err { color: var(--accent); }
-
-/* Step 3 count controls */
-.count-row { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-bottom: .85rem; }
-.count-group { display: flex; align-items: center; gap: .5rem; }
-.count-group label { font-size: .82rem; font-weight: 600; min-width: 4rem; }
-.count-group .cls-badge { width: 1rem; height: 1rem; border-radius: 3px; display: inline-block; flex-shrink: 0; }
-.count-group .cls-badge.a { background: var(--gray-card); border: 1px solid #999; }
-.count-group .cls-badge.b { background: var(--white-card); border: 1px solid #999; }
-.count-group input[type=range] { width: 110px; }
-.count-group .cnt { font-weight: 700; color: var(--brand); min-width: 1.5ch; }
-
-/* Selection table */
-.sel-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-.sel-toolbar { display: flex; align-items: center; gap: .65rem; padding: .5rem .75rem; background: #f8f9fc; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-.sel-toolbar span { font-size: .78rem; color: #555; }
-.sel-toolbar strong { color: var(--brand); }
-.sel-scroll { overflow-x: auto; max-height: 320px; overflow-y: auto; }
-.sel-tbl { width: 100%; border-collapse: collapse; font-size: .8rem; }
-.sel-tbl th { background: var(--brand); color: #fff; padding: .4rem .6rem; text-align: left; position: sticky; top: 0; z-index: 1; cursor: default; white-space: nowrap; user-select: none; }
-.sel-tbl th.sortable { cursor: pointer; }
-.sel-tbl th.sortable:hover { background: #24527a; }
-.sel-tbl th .sort-arrow { opacity: .45; font-size: .7rem; margin-left: .2rem; }
-.sel-tbl th.asc .sort-arrow::after { content: ' ↑'; opacity: 1; }
-.sel-tbl th.desc .sort-arrow::after { content: ' ↓'; opacity: 1; }
-.sel-tbl td { padding: .38rem .6rem; border-bottom: 1px solid #eee; }
-.sel-tbl tr:last-child td { border-bottom: none; }
-.sel-tbl tr.sel-a td { background: var(--gray-card); }
-.sel-tbl tr.sel-b td { background: #fde0e0; }
-.sel-tbl tr.unsel td { background: #fafafa; color: #aaa; }
-.sel-tbl tr.unsel td:first-child { opacity: .5; }
-.sel-tbl tr:not(.header-row):hover td { filter: brightness(.96); cursor: pointer; }
-.sel-chk { text-align: center; width: 2rem; }
-
-.warn-list { margin-top: .55rem; font-size: .76rem; }
-.warn-list .warn { color: #b45309; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 4px; padding: .3rem .6rem; margin-top: .3rem; display: inline-block; }
-.warn-list .ok-check { color: #16a34a; font-size: .76rem; margin-top: .3rem; display: inline-block; }
-
-/* ══ RESULTS ══ */
-#results { display: none; background: var(--light); min-height: 100vh; }
-.res-hdr { background: var(--brand); color: #fff; padding: 1.1rem 2rem; }
-.res-hdr h1 { font-size: 1.3rem; font-weight: 700; }
-.res-hdr p  { font-size: .8rem; opacity: .7; margin-top: .15rem; }
-.res-body { max-width: 9in; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
-.res-acts {
-  display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
-  margin-bottom: .75rem;
-  padding-bottom: .65rem;
-  border-bottom: 1px solid var(--border);
+/* ── Header ── */
+.site-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 1.4rem 2rem 1.2rem;
+  border-bottom: 3px solid rgba(255,255,255,.12);
 }
-.res-acts .act-link {
-  background: none; border: 1px solid var(--border); color: #444;
-  padding: .28rem .7rem; border-radius: 5px; font-size: .78rem; font-weight: 500;
-  cursor: pointer; transition: background .15s, border-color .15s;
-  font-family: inherit;
-}
-.res-acts .act-link:hover { background: #eef; border-color: #aaa; color: #1a1a1a; }
-.res-acts .act-link.primary { border-color: var(--brand); color: var(--brand); }
-.res-acts .act-link.primary:hover { background: #eef3fa; }
+.site-header .eyebrow { font-size: .73rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: .3rem; }
+.site-header h1 { font-size: 1.65rem; font-weight: 800; line-height: 1.2; }
+.site-header .tagline { font-size: .88rem; opacity: .75; margin-top: .35rem; }
 
-.inst-panel { background: #fff; border: 1px solid var(--border); border-radius: var(--r); padding: 1.35rem; margin-bottom: 1.25rem; }
-.inst-panel h1 { font-size: 1.2rem; font-weight: 700; color: var(--brand); margin-bottom: .6rem; }
-.inst-panel h2 { font-size: .95rem; font-weight: 700; color: var(--brand); margin: .85rem 0 .3rem; }
-.inst-panel p, .inst-panel li { font-size: .88rem; line-height: 1.6; }
-.inst-panel ul, .inst-panel ol { padding-left: 1.25em; margin: .25rem 0 .4rem; }
-.inst-panel li { margin-bottom: .22rem; }
-.sheet-lbl { font-size: .73rem; font-weight: 700; color: #888; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .45rem; }
+/* ── Layout ── */
+.wrap { max-width: 860px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
 
-/* ── Card sheet (screen) ── */
-.cards-sheet {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(5, auto);
-  grid-auto-flow: column;
-  gap: .48rem;
+/* ── Hero description ── */
+.hero {
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: .7rem;
-  margin-bottom: .75rem;
+  border-radius: var(--card-r);
+  padding: 1.6rem 1.75rem;
+  margin-bottom: 1.75rem;
+  overflow: hidden;
+}
+.hero-diagram { float: right; width: 145px; margin: 0 0 .75rem 1.25rem; }
+.hero-diagram svg { display: block; width: 100%; height: auto; }
+@media (max-width: 500px) {
+  .hero-diagram { float: none; display: block; width: 120px; margin: 0 auto .75rem; }
+}
+.hero p { font-size: 1rem; line-height: 1.7; color: #333; }
+.hero p + p { margin-top: .75rem; }
+.hero .badges { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.1rem; }
+.tag {
+  font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: .22rem .6rem; border-radius: 20px;
+  background: #e8eff8; color: var(--brand);
+  border: 1px solid #c2d4ea;
 }
 
-/* ── Data card ── */
-.dc {
-  border: 1.5px solid #999;
-  border-radius: 5px;
-  padding: .55rem .65rem;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.dc.cls-a { background: var(--gray-card); }
-.dc.cls-b { background: #fde0e0; }  /* pink on screen */
-.dc .dc-name { font-size: 1rem; font-weight: 700; line-height: 1.2; }
-.dc .dc-feats { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: .25rem 0; }
-.dc .dc-feat { font-size: .86rem; margin-bottom: .08rem; }
-.dc .dc-feat b { font-weight: 600; }
-.dc .dc-lbl  { font-size: .84rem; font-weight: 700; border-top: 1px solid rgba(0,0,0,.14); padding-top: .2rem; }
+/* ── Two-column how-it-works ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.75rem; }
+@media (max-width: 620px) { .two-col { grid-template-columns: 1fr; } }
 
-/* ── Empty placeholder cell ── */
-.dc-empty { visibility: hidden; border: none !important; background: none !important; }
-
-/* ── Split point card ── */
-.sc {
-  border: 1.5px solid #999;
-  border-radius: 5px;
-  padding: .45rem .6rem .25rem;
+.panel {
   background: #fff;
-  font-family: Arial, sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 1.35rem 1.4rem;
+}
+.panel h2 {
+  font-size: .88rem; font-weight: 700; color: var(--brand);
+  letter-spacing: .04em; text-transform: uppercase;
+  margin-bottom: .8rem; padding-bottom: .4rem;
+  border-bottom: 2px solid var(--brand);
+  display: inline-block;
+}
+.panel p, .panel li { font-size: .88rem; line-height: 1.65; color: #333; }
+.panel ol, .panel ul { padding-left: 1.2em; }
+.panel li { margin-bottom: .35rem; }
+
+/* ── Resources section ── */
+.section-title {
+  font-size: .73rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #888; margin-bottom: .9rem;
+}
+
+.resources { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+@media (max-width: 620px) { .resources { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 420px) { .resources { grid-template-columns: 1fr; } }
+
+.res-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 1.1rem 1.1rem .9rem;
   display: flex;
   flex-direction: column;
+  gap: .35rem;
+  transition: border-color .15s, box-shadow .15s;
+  text-decoration: none;
+  color: inherit;
 }
-.sc-title { font-size: .82rem; font-weight: 700; letter-spacing: .1em; text-align: center; margin-bottom: .35rem; }
-.sc-body { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; margin-top: 1.5em}
-.sc-blanks { display: flex; align-items: flex-end; gap: .28rem; padding-bottom: .05rem; }
-.sc-line { flex: 1; border-bottom: 1.5px solid #333; }
-.sc-leq { font-size: 1rem; font-weight: 700; line-height: 1; padding-bottom: .05rem; }
-.sc-hints { display: flex; justify-content: space-between; font-size: .62rem; font-style: italic; color: #666; margin-bottom: .1rem; }
-.sc-fork svg { display: block; width: 100%; height: 100%}
-
-/* ══ PRINT ══ */
-@media print {
-  #builder, .inst-panel, .sheet-lbl, .no-print { display: none !important; }
-  #results { display: block !important; background: #fff; }
-  .res-body { padding: 0; max-width: none; margin: 0; }
-
-  /* Print page 1: instructions (comes first in DOM) */
-  .print-inst {
-    display: block !important;
-    width: 7.5in;
-    margin: 0 auto;
-    padding: .45in .5in .4in;
-    font-family: Georgia, serif;
-    font-size: 10.5pt;
-    line-height: 1.55;
-    page-break-after: always;
-  }
-  .print-inst h1 { font-size: 15pt; margin-bottom: .12in; }
-  .print-inst h2 { font-size: 11pt; margin: .17in 0 .06in; border-bottom: 1px solid #bbb; padding-bottom: .04in; }
-  .print-inst ul, .print-inst ol { padding-left: 1.1em; margin: .04in 0 .09in; }
-  .print-inst li { margin-bottom: .04in; }
-  .print-inst .pfooter { font-size: 8pt; color: #888; text-align: center; margin-top: .25in; border-top: 1px solid #ddd; padding-top: .07in; }
-
-  /* Card sheet: one .cards-sheet per page, each exactly 3×5, page-break after */
-  .cards-sheet {
-    width: 7.7in;
-    margin: 0 auto;
-    padding: .18in .3in;
-    gap: .1in;
-    border: none;
-    border-radius: 0;
-    background: #fff;
-    /* 5 rows × 1.72in + 4 gaps × .1in + 2 × .18in padding = 9.56in — fits in ~9.5in printable */
-    grid-template-rows: repeat(5, 1.72in) !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    page-break-after: always;
-    margin-bottom: 0;
-  }
-  .cards-sheet:last-of-type { page-break-after: auto; }
-  .dc, .sc { page-break-inside: avoid; box-sizing: border-box; height: 100%; }
-  .dc { padding: .09in .11in; }
-  .dc.cls-a { background: #d0d0d0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .dc.cls-b { background: #ffffff !important; border: 1.5px solid #888; }
-  .dc .dc-name { font-size: 10.5pt; }
-  .dc .dc-feats { padding: .05in 0; }
-  .dc .dc-feat { font-size: 9pt; margin-bottom: .03in; }
-  .dc .dc-lbl  { font-size: 9pt; padding-top: .05in; }
-  .sc { padding: .09in .11in .05in; display: flex; flex-direction: column; }
-  .sc-title { font-size: 8pt; margin-bottom: .15in; }
-  .sc-blanks { padding-bottom: .05in; }
-  .sc-hints { font-size: 6pt; }
-  .sc-leq { font-size: 10pt; }
-  .dc-empty { visibility: hidden; border: none !important; background: none !important; }
+.res-card:hover { border-color: var(--brand); box-shadow: 0 2px 10px rgba(26,58,92,.1); text-decoration: none; }
+.res-card.placeholder { opacity: .55; cursor: default; pointer-events: none; }
+.res-group + .res-group { margin-top: 1.75rem; }
+.resources.res-2col { grid-template-columns: repeat(2, 1fr); }
+.res-card.featured {
+  border-color: var(--brand);
+  background: linear-gradient(135deg, #eef3fa 0%, #fff 60%);
+  grid-column: span 3;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.25rem 1.4rem;
 }
-@media screen { .print-inst { display: none; } }
+@media (max-width: 620px) { .res-card.featured { grid-column: span 2; } }
+@media (max-width: 420px) { .res-card.featured { grid-column: span 1; flex-direction: column; } }
+
+.res-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+.res-card.featured .res-icon { font-size: 2.1rem; }
+
+.res-body { flex: 1; }
+.res-title { font-size: .92rem; font-weight: 700; color: var(--brand); }
+.res-card.featured .res-title { font-size: 1.05rem; }
+.res-desc { font-size: .78rem; color: #555; line-height: 1.5; margin-top: .15rem; }
+.res-type { font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #999; margin-top: .3rem; }
+
+.res-cta {
+  display: inline-flex; align-items: center; gap: .35rem;
+  background: var(--brand); color: #fff;
+  padding: .45rem 1rem; border-radius: var(--r);
+  font-size: .82rem; font-weight: 600;
+  white-space: nowrap; flex-shrink: 0;
+  transition: opacity .15s;
+}
+.res-cta:hover { opacity: .85; text-decoration: none; }
+
+/* ── Footer ── */
+.site-footer { text-align: center; font-size: .72rem; color: #aaa; margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════ BUILDER ══════════════════ -->
-<div id="builder">
-<div class="bld-header">
-  <h1>Decision Tree Card Generator</h1>
-  <p>Create printable card-sorting materials for the unplugged decision tree activity</p>
-</div>
+<header class="site-header">
+  <div class="eyebrow">CS 218 · Machine Learning</div>
+  <h1>Decision Tree Card Sorting</h1>
+  <p class="tagline">An unplugged activity for understanding how decision trees work</p>
+</header>
+
 <div class="wrap">
 
-  <!-- Step 1 -->
-  <div class="box">
-    <h2><span class="badge">1</span> Upload Your Dataset</h2>
-    <div class="drop" id="drop">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <p>Drag &amp; drop a CSV file here, or <span id="browse-lnk">browse</span></p>
-      <p style="font-size:.73rem;color:#888;margin-top:.25rem">CSV with header row · 20+ rows recommended</p>
-    </div>
-    <input type="file" id="file-input" accept=".csv,text/csv">
-    <div class="or">— or paste CSV text —</div>
-    <textarea class="csv-ta" id="csv-ta" placeholder="Paste CSV here (first row = headers)…"></textarea>
-    <div style="margin-top:.6rem;display:flex;gap:.45rem;flex-wrap:wrap">
-      <button class="btn btn-outline btn-sm" id="demo-btn">Load Chicago example</button>
-      <button class="btn btn-primary btn-sm" id="parse-btn">Parse CSV →</button>
-    </div>
-    <div id="parse-msg" style="font-size:.76rem;margin-top:.4rem;color:#555"></div>
-  </div>
-
-  <!-- Step 2 -->
-  <div class="box" id="s2" style="display:none">
-    <h2><span class="badge">2</span> Configure Columns</h2>
-    <div class="g2">
-      <div class="field"><label>Feature 1 (numeric)</label><select id="f1"></select></div>
-      <div class="field"><label>Feature 2 (numeric)</label><select id="f2"></select></div>
-      <div class="field"><label>Feature 3 (numeric)</label><select id="f3"></select></div>
-      <div class="field">
-        <label>Label column (binary classification)</label>
-        <select id="lc"></select>
-        <div class="vmsg" id="lc-msg"></div>
-      </div>
-      <div class="field"><label>Name / ID column (anonymized on cards)</label><select id="nc"></select></div>
-    </div>
-    <button class="btn btn-primary btn-sm" id="confirm-btn" disabled>Confirm columns →</button>
-  </div>
-
-  <!-- Step 3 -->
-  <div class="box" id="s3" style="display:none">
-    <h2><span class="badge">3</span> Select Cards</h2>
-
-    <div class="count-row">
-      <div class="count-group">
-        <span class="cls-badge a"></span>
-        <label id="lbl-a-count">Label A:</label>
-        <input type="range" id="n-a" min="1" max="12" value="5">
-        <span class="cnt" id="na-disp">5</span>
-      </div>
-      <div class="count-group">
-        <span class="cls-badge b"></span>
-        <label id="lbl-b-count">Label B:</label>
-        <input type="range" id="n-b" min="1" max="12" value="5">
-        <span class="cnt" id="nb-disp">5</span>
-      </div>
-      <button class="btn btn-outline btn-sm" id="resample-btn">🎲 Re-sample</button>
-    </div>
-
-    <div class="sel-wrap">
-      <div class="sel-toolbar">
-        <button class="btn btn-outline btn-sm" id="toggle-view-btn">Show all rows</button>
-        <span id="sel-summary"></span>
-        <span id="pure-warn" style="margin-left:auto"></span>
-      </div>
-      <div class="sel-scroll">
-        <table class="sel-tbl" id="sel-tbl">
-          <thead><tr id="tbl-head"></tr></thead>
-          <tbody id="tbl-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="warn-list" id="split-warnings"></div>
-  </div>
-
-  <!-- Step 4 -->
-  <div class="box" id="s4" style="display:none">
-    <h2><span class="badge">4</span> Customize &amp; Generate</h2>
-    <div class="g2">
-      <div class="field"><label>Activity title</label><input type="text" id="act-title" value="Decision Tree Card Sorting Activity"></div>
-      <div class="field"><label>Course / instructor (optional)</label><input type="text" id="act-course" placeholder="e.g. CS 218 · Fall 2025"></div>
-      <div class="field">
-        <label>Card subject name <span style="font-weight:400;color:#888">(what each card represents)</span></label>
-        <input type="text" id="subject" placeholder="Community, Animal, Car…">
-      </div>
-      <div class="field"><label>Label A display name (gray / shaded)</label><input type="text" id="la-name"></div>
-      <div class="field"><label>Label B display name (white / unshaded)</label><input type="text" id="lb-name"></div>
-    </div>
-    <p style="font-size:.76rem;color:#666;margin-bottom:.7rem">Cards labeled "<strong id="subj-prev">Community</strong> A", "<strong id="subj-prev2">Community</strong> B", etc. — actual names anonymized (reveal button on the results page).</p>
-    <button class="btn btn-accent" id="gen-btn">Generate activity page →</button>
-  </div>
-
-</div><!-- /wrap -->
-</div><!-- /builder -->
-
-
-<!-- ══════════════════ RESULTS ══════════════════ -->
-<div id="results">
-  <div class="res-hdr no-print">
-    <h1 id="res-title">Decision Tree Card Sorting Activity</h1>
-    <p>Your cards are ready to print. Use the buttons below to go back and edit, reveal names, or print.</p>
-  </div>
-  <div class="res-body">
-    <!-- Print page 1 (hidden on screen, shows first on print) -->
-    <div class="print-inst" id="print-inst"></div>
-    <!-- Screen instructions -->
-    <div class="inst-panel no-print" id="screen-inst"></div>
-    <!-- Action bar above cards -->
-    <div class="res-acts no-print">
-      <button class="act-link" id="back-btn">← Back to Edit</button>
-      <button class="act-link" id="unanon-btn" style="display:none">Show Names</button>
-      <button class="act-link primary" id="link-btn">🔗 Copy permalink</button>
-      <button class="act-link primary" id="print-cards-btn">🖨 Print card sheet</button>
-      <button class="act-link primary" id="print-all-btn">🖨 Print full document</button>
-    </div>
-    <!-- Sheet label (screen only) -->
-    <div class="sheet-lbl no-print">Cards &amp; Split Points — cut along borders · <span id="lbl-a-indicator"></span> = gray · <span id="lbl-b-indicator"></span> = white</div>
-    <!-- Card sheets (one per page of 5 rows) -->
-    <div id="cards-container"></div>
-  </div>
-</div>
-
-
-<script>
-// ══════════════════════════════════════════
-//  State
-// ══════════════════════════════════════════
-let allRows = [];       // all parsed rows
-let headers = [];
-let labelVals = [];     // [labelA_raw, labelB_raw]
-let selSet = new Set(); // indices into allRows that are selected
-
-// Config (mirrors form values; also populated from permalink)
-let cfg = { f1:'', f2:'', f3:'', lc:'', nc:'', subject:'', title:'', course:'', labelA:'', labelB:'' };
-
-// Table state
-let showAllRows = false;
-let sortColIdx  = -1;   // index into displayed columns
-let sortDir     = 1;    // 1=asc, -1=desc
-
-// Names map for unanonymize (letter → actual name)
-let nameMap = {};
-let namesShown = false;
-
-// Permalink load flag
-let fromPermalink = false;
-let permalinkPayload = null;
-
-// ══════════════════════════════════════════
-//  Demo data
-// ══════════════════════════════════════════
-const DEMO_CSV = `Community,Grad Rate,Tree Canopy,Crowded Housing,Side
-North Park,90.15,33.00,6.00,North
-South Shore,88.78,23.10,3.62,South
-Portage Park,88.40,19.40,3.26,North
-Avalon Park,90.77,22.00,1.21,South
-Belmont Cragin,68.90,15.20,8.76,North
-West Elsdon,73.60,12.70,5.03,South
-Logan Square,92.48,19.90,1.59,North
-West Lawn,74.25,10.70,8.54,South
-South Lawndale,64.51,14.90,8.28,South
-Mt. Greenwood,96.04,18.60,1.60,South
-Lincoln Square,85.30,28.50,4.10,North
-Hyde Park,82.60,21.80,2.90,South
-Rogers Park,71.40,18.30,7.60,North
-Beverly,91.20,25.60,1.80,South
-Wicker Park,88.90,16.70,4.30,North
-Englewood,55.20,9.40,12.30,South
-Lincoln Park,94.50,30.20,2.10,North
-Chatham,72.80,14.10,6.80,South
-Edgewater,84.70,22.40,5.50,North
-Auburn Gresham,61.30,11.20,9.10,South
-Jefferson Park,83.60,24.80,3.70,North
-Morgan Park,78.40,19.60,4.90,South
-Andersonville,87.20,27.30,3.40,North
-Roseland,59.80,10.50,11.20,South
-Lakeview,92.10,23.70,3.80,North`;
-
-// ══════════════════════════════════════════
-//  Helpers
-// ══════════════════════════════════════════
-function g(id) { return document.getElementById(id); }
-function show(id) { g(id).style.display = 'block'; }
-function hide(id) { g(id).style.display = 'none'; }
-
-function fmtVal(v) {
-  if (v === undefined || v === null || v === '') return '—';
-  const n = parseFloat(v);
-  if (!isNaN(n)) return n % 1 === 0 ? String(n) : n.toFixed(2);
-  return v;
-}
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-// ══════════════════════════════════════════
-//  CSV parser
-// ══════════════════════════════════════════
-function parseCSV(text) {
-  const lines = text.trim().split('\n').filter(l => l.trim());
-  if (lines.length < 2) throw new Error('Need at least a header row and one data row.');
-  const parseRow = line => {
-    const cols = []; let cur = '', inQ = false;
-    for (const c of line) {
-      if (c === '"') { inQ = !inQ; continue; }
-      if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; } else cur += c;
-    }
-    cols.push(cur.trim()); return cols;
-  };
-  const hdrs = parseRow(lines[0]);
-  const rows = lines.slice(1).map(l => {
-    const vals = parseRow(l), obj = { _idx: 0 };
-    hdrs.forEach((h, i) => obj[h] = vals[i] ?? '');
-    return obj;
-  });
-  rows.forEach((r, i) => r._idx = i);
-  return { headers: hdrs, rows };
-}
-
-// ══════════════════════════════════════════
-//  Step 2: column selects
-// ══════════════════════════════════════════
-function populateSelects(hdrs) {
-  ['f1','f2','f3','lc','nc'].forEach(id => {
-    const sel = g(id), isN = id === 'nc';
-    sel.innerHTML = isN ? '<option value="">(none)</option>' : '<option value="">— select —</option>';
-    hdrs.forEach(h => { const o = document.createElement('option'); o.value = o.textContent = h; sel.appendChild(o); });
-  });
-}
-
-function validateCols() {
-  const f1=g('f1').value, f2=g('f2').value, f3=g('f3').value, lc=g('lc').value;
-  const msg = g('lc-msg'), btn = g('confirm-btn');
-  if (!f1||!f2||!f3||!lc) { msg.textContent = ''; btn.disabled = true; return; }
-  if (new Set([f1,f2,f3]).size < 3) { msg.className = 'vmsg err'; msg.textContent = 'Feature columns must be distinct.'; btn.disabled = true; return; }
-  if ([f1,f2,f3].includes(lc)) { msg.className = 'vmsg err'; msg.textContent = 'Label column cannot be a feature.'; btn.disabled = true; return; }
-  const vals = [...new Set(allRows.map(r => r[lc]).filter(v => v !== undefined && v !== ''))];
-  if (vals.length !== 2) { msg.className = 'vmsg err'; msg.textContent = `Need exactly 2 label values — found ${vals.length}.`; btn.disabled = true; return; }
-  labelVals = vals;
-  msg.className = 'vmsg ok'; msg.textContent = `✓ Classes: "${vals[0]}" (gray) and "${vals[1]}" (white)`;
-  btn.disabled = false;
-  g('la-name').value = vals[0];
-  g('lb-name').value = vals[1];
-  const nc = g('nc').value;
-  if (nc && !g('subject').value) {
-    let s = nc.replace(/s$/i,'').replace(/_/g,' ').trim();
-    g('subject').value = s.charAt(0).toUpperCase() + s.slice(1);
-  } else if (!g('subject').value) g('subject').value = 'Item';
-  g('lbl-a-count').textContent = vals[0] + ':';
-  g('lbl-b-count').textContent = vals[1] + ':';
-  updateSubjPreview();
-}
-
-function updateSubjPreview() {
-  const s = g('subject').value || 'Item';
-  g('subj-prev').textContent = s;
-  g('subj-prev2').textContent = s;
-}
-
-// ══════════════════════════════════════════
-//  Step 3: sampling & interactive table
-// ══════════════════════════════════════════
-function doSample() {
-  const nA = parseInt(g('n-a').value);
-  const nB = parseInt(g('n-b').value);
-  const lc = g('lc').value;
-
-  const idxA = shuffle(allRows.filter(r => r[lc] === labelVals[0]).map(r => r._idx)).slice(0, nA);
-  const idxB = shuffle(allRows.filter(r => r[lc] === labelVals[1]).map(r => r._idx)).slice(0, nB);
-
-  selSet = new Set([...idxA, ...idxB]);
-  renderTable();
-  checkPureSplits();
-}
-
-function getLc() { return cfg.lc || g('lc').value; }
-function getSelectedA() { return allRows.filter(r => r[getLc()] === labelVals[0] && selSet.has(r._idx)); }
-function getSelectedB() { return allRows.filter(r => r[getLc()] === labelVals[1] && selSet.has(r._idx)); }
-
-// Table columns in display order
-function tblCols() {
-  const nc = g('nc').value, f1 = g('f1').value, f2 = g('f2').value, f3 = g('f3').value, lc = g('lc').value;
-  return [nc, f1, f2, f3, lc].filter(Boolean);
-}
-
-function renderTable() {
-  const lc = g('lc').value;
-  const cols = tblCols();
-  const selA = getSelectedA(), selB = getSelectedB();
-  const nA = selA.length, nB = selB.length;
-
-  // Summary
-  g('sel-summary').innerHTML = `Selected: <strong>${nA}</strong> ${labelVals[0]} (gray) + <strong>${nB}</strong> ${labelVals[1]} (white) = <strong>${nA+nB}</strong> cards`;
-
-  // Toggle button label
-  g('toggle-view-btn').textContent = showAllRows ? 'Show selection only' : `Show all ${allRows.length} rows`;
-
-  // Header
-  const head = g('tbl-head');
-  head.innerHTML = '<th class="sel-chk">✓</th>' + cols.map((c, i) => {
-    let cls = 'sortable';
-    if (sortColIdx === i) cls += sortDir === 1 ? ' asc' : ' desc';
-    return `<th class="${cls}" data-ci="${i}">${c}<span class="sort-arrow"></span></th>`;
-  }).join('');
-  head.querySelectorAll('th.sortable').forEach(th => th.addEventListener('click', () => {
-    const ci = parseInt(th.dataset.ci);
-    if (sortColIdx === ci) sortDir *= -1; else { sortColIdx = ci; sortDir = 1; }
-    renderTable();
-  }));
-
-  // Rows to show
-  let rows = showAllRows ? [...allRows] : allRows.filter(r => selSet.has(r._idx));
-
-  // Sort
-  if (sortColIdx >= 0 && sortColIdx < cols.length) {
-    const col = cols[sortColIdx];
-    rows.sort((a, b) => {
-      const av = parseFloat(a[col]), bv = parseFloat(b[col]);
-      const av2 = isNaN(av) ? a[col] : av, bv2 = isNaN(bv) ? b[col] : bv;
-      return sortDir * (av2 < bv2 ? -1 : av2 > bv2 ? 1 : 0);
-    });
-  }
-
-  // Body
-  const body = g('tbl-body');
-  body.innerHTML = '';
-  rows.forEach(row => {
-    const isSel = selSet.has(row._idx);
-    const isA   = row[lc] === labelVals[0];
-    const tr = document.createElement('tr');
-    tr.className = isSel ? (isA ? 'sel-a' : 'sel-b') : 'unsel';
-    tr.innerHTML = `<td class="sel-chk">${isSel ? '✓' : ''}</td>` + cols.map(c => `<td>${row[c] ?? ''}</td>`).join('');
-    tr.addEventListener('click', () => {
-      if (selSet.has(row._idx)) selSet.delete(row._idx); else selSet.add(row._idx);
-      renderTable(); checkPureSplits();
-    });
-    body.appendChild(tr);
-  });
-}
-
-function checkPureSplits() {
-  const selA = getSelectedA(), selB = getSelectedB();
-  if (!selA.length || !selB.length) { g('split-warnings').innerHTML = ''; return; }
-  const feats = [g('f1').value, g('f2').value, g('f3').value];
-  const issues = [], clear = [];
-  feats.forEach(feat => {
-    const aVals = selA.map(r => parseFloat(r[feat])).filter(v => !isNaN(v));
-    const bVals = selB.map(r => parseFloat(r[feat])).filter(v => !isNaN(v));
-    if (!aVals.length || !bVals.length) return;
-    const maxA = Math.max(...aVals), minA = Math.min(...aVals);
-    const maxB = Math.max(...bVals), minB = Math.min(...bVals);
-    if (maxA < minB || maxB < minA) issues.push(feat); else clear.push(feat);
-  });
-  const warn = g('split-warnings');
-  if (issues.length) {
-    warn.innerHTML = issues.map(f => `<span class="warn">⚠️ <b>${f}</b> perfectly separates the classes — consider resampling for a better activity</span>`).join(' ');
-  } else {
-    warn.innerHTML = '<span class="ok-check">✓ No single feature produces a perfect split — good selection!</span>';
-  }
-}
-
-// ══════════════════════════════════════════
-//  Letter assignment (reading order)
-// ══════════════════════════════════════════
-function assignLetters(selA, selB) {
-  // Reading order: left-to-right across each row
-  // col1=A cards, col2=B cards, col3=split → row0: A[0]→letterA, B[0]→letterB; row1: A[1]→letterC, B[1]→letterD ...
-  const nRows = Math.max(selA.length, selB.length);
-  const aLetters = [], bLetters = [];
-  let li = 0;
-  for (let row = 0; row < nRows; row++) {
-    if (row < selA.length) { aLetters.push(String.fromCharCode(65 + li)); li++; }
-    if (row < selB.length) { bLetters.push(String.fromCharCode(65 + li)); li++; }
-  }
-  return { aLetters, bLetters };
-}
-
-// ══════════════════════════════════════════
-//  Card element builders
-// ══════════════════════════════════════════
-function makeDataCard(row, letter, labelDisplay, cls) {
-  const { f1, f2, f3, nc, subject } = cfg;
-  const div = document.createElement('div');
-  div.className = `dc ${cls}`;
-  const anonName = `${subject} ${letter}`;
-  const realName = nc && row[nc] ? row[nc] : anonName;
-  div.innerHTML = `
-    <div class="dc-name" data-anon="${anonName}" data-real="${realName}">${anonName}</div>
-    <div class="dc-feats">
-      <div class="dc-feat"><b>${f1}:</b> ${fmtVal(row[f1])}</div>
-      <div class="dc-feat"><b>${f2}:</b> ${fmtVal(row[f2])}</div>
-      <div class="dc-feat"><b>${f3}:</b> ${fmtVal(row[f3])}</div>
-    </div>
-    <div class="dc-lbl">Label: ${labelDisplay}</div>`;
-  return div;
-}
-
-function makeEmptyCard() {
-  const div = document.createElement('div');
-  div.className = 'dc dc-empty';
-  return div;
-}
-
-function makeSplitCard() {
-  const div = document.createElement('div');
-  div.className = 'sc';
-  div.innerHTML = `
-    <div class="sc-title">SPLIT POINT</div>
-    <div class="sc-body">
-      <div class="sc-blanks">
-        <div class="sc-line"></div>
-        <span class="sc-leq">≤</span>
-        <div class="sc-line"></div>
-      </div>
-      <div class="sc-hints"><span><em>feature</em></span><span><em>value</em></span></div>
-    </div>
-    <div class="sc-fork">
-      <svg viewBox="0 10 200 30" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-    <!-- A marker to be used as an arrowhead -->
-    <marker
-      id="arrow"
-      viewBox="0 0 10 10"
-      refX="5"
-      refY="5"
-      markerWidth="6"
-      markerHeight="6"
-      orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" />
-    </marker>
-  </defs>
-        <line x1="100" y1="13" x2="14" y2="36" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)" />
-        <line x1="100" y1="13" x2="186" y2="36" stroke="#444" stroke-width="1.5" marker-end="url(#arrow)" />
-
+  <!-- About -->
+  <div class="hero">
+    <div class="hero-diagram">
+      <svg viewBox="0 0 414 430" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif">
+        <defs>
+          <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#555"/>
+          </marker>
+        </defs>
+        <!-- Arrows (drawn behind cards) -->
+        <line x1="192" y1="62" x2="114" y2="118" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="222" y1="62" x2="284" y2="118" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="82"  y1="168" x2="50"  y2="230" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="112" y1="168" x2="143" y2="230" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="278" y1="168" x2="261" y2="228" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="312" y1="168" x2="357" y2="230" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="242" y1="278" x2="214" y2="346" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <line x1="268" y1="278" x2="301" y2="346" stroke="#555" stroke-width="1.4" marker-end="url(#arr)"/>
+        <!-- ROOT split point card -->
+        <rect x="163" y="12" width="88" height="50" rx="8" fill="white" stroke="#aaa" stroke-width="1.5"/>
+        <text x="207" y="26" text-anchor="middle" font-size="6.5" font-weight="700" letter-spacing="1.5" fill="#222">SPLIT POINT</text>
+        <line x1="175" y1="38" x2="197" y2="38" stroke="#555" stroke-width="1.2"/>
+        <text x="207" y="42" text-anchor="middle" font-size="9" font-weight="700" fill="#333">≤</text>
+        <line x1="216" y1="38" x2="238" y2="38" stroke="#555" stroke-width="1.2"/>
+        <text x="182" y="54" text-anchor="middle" font-size="5" fill="#999" font-style="italic">feature</text>
+        <text x="232" y="54" text-anchor="middle" font-size="5" fill="#999" font-style="italic">value</text>
+        <!-- L1-Left split point card -->
+        <rect x="52" y="118" width="88" height="50" rx="8" fill="white" stroke="#aaa" stroke-width="1.5"/>
+        <text x="96" y="132" text-anchor="middle" font-size="6.5" font-weight="700" letter-spacing="1.5" fill="#222">SPLIT POINT</text>
+        <line x1="64"  y1="144" x2="86"  y2="144" stroke="#555" stroke-width="1.2"/>
+        <text x="96"  y="148" text-anchor="middle" font-size="9" font-weight="700" fill="#333">≤</text>
+        <line x1="105" y1="144" x2="127" y2="144" stroke="#555" stroke-width="1.2"/>
+        <text x="71"  y="160" text-anchor="middle" font-size="5" fill="#999" font-style="italic">feature</text>
+        <text x="121" y="160" text-anchor="middle" font-size="5" fill="#999" font-style="italic">value</text>
+        <!-- L1-Right split point card -->
+        <rect x="252" y="118" width="88" height="50" rx="8" fill="white" stroke="#aaa" stroke-width="1.5"/>
+        <text x="296" y="132" text-anchor="middle" font-size="6.5" font-weight="700" letter-spacing="1.5" fill="#222">SPLIT POINT</text>
+        <line x1="264" y1="144" x2="286" y2="144" stroke="#555" stroke-width="1.2"/>
+        <text x="296" y="148" text-anchor="middle" font-size="9" font-weight="700" fill="#333">≤</text>
+        <line x1="305" y1="144" x2="327" y2="144" stroke="#555" stroke-width="1.2"/>
+        <text x="271" y="160" text-anchor="middle" font-size="5" fill="#999" font-style="italic">feature</text>
+        <text x="321" y="160" text-anchor="middle" font-size="5" fill="#999" font-style="italic">value</text>
+        <!-- Leaf group: 3 pink (LL) -->
+        <rect x="16" y="236" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <rect x="46" y="236" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <rect x="31" y="266" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <!-- Leaf: 1 white (LR) -->
+        <rect x="130" y="236" width="26" height="26" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+        <!-- L2 split point card (deeper right) -->
+        <rect x="212" y="228" width="88" height="50" rx="8" fill="white" stroke="#aaa" stroke-width="1.5"/>
+        <text x="256" y="242" text-anchor="middle" font-size="6.5" font-weight="700" letter-spacing="1.5" fill="#222">SPLIT POINT</text>
+        <line x1="224" y1="254" x2="246" y2="254" stroke="#555" stroke-width="1.2"/>
+        <text x="256" y="258" text-anchor="middle" font-size="9" font-weight="700" fill="#333">≤</text>
+        <line x1="265" y1="254" x2="287" y2="254" stroke="#555" stroke-width="1.2"/>
+        <text x="231" y="270" text-anchor="middle" font-size="5" fill="#999" font-style="italic">feature</text>
+        <text x="281" y="270" text-anchor="middle" font-size="5" fill="#999" font-style="italic">value</text>
+        <!-- Leaf group: 2 pink (RR) -->
+        <rect x="344" y="236" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <rect x="374" y="236" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <!-- Leaf: 1 pink (RLL) -->
+        <rect x="201" y="352" width="26" height="26" rx="5" fill="#fde0e0" stroke="#c8a0a0" stroke-width="1.2"/>
+        <!-- Leaf group: 3 white (RLR) -->
+        <rect x="287" y="352" width="26" height="26" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+        <rect x="317" y="352" width="26" height="26" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
+        <rect x="302" y="382" width="26" height="26" rx="5" fill="white" stroke="#aaa" stroke-width="1.2"/>
       </svg>
-    </div>`;
-  return div;
-}
+    </div>
+    <p>In this activity, students physically sort a deck of data cards to build a decision tree by hand — no computer required. Each card represents a real-world data point with numeric features and a binary label. Students take turns finding split points, dividing the deck, and repeating until every group is "pure."</p>
+    <p>Working through the algorithm with physical cards builds intuition for how a machine learns: what it means to find a good feature, why a split might not be perfect, and how a tree grows. After the activity, the same dataset can be loaded into the Colab notebook to compare the hand-built tree against what the algorithm produces.</p>
+    <div class="badges">
+      <span class="tag">~45 min</span>
+      <span class="tag">Groups of 3–4</span>
+      <span class="tag">No coding required</span>
+      <span class="tag">Binary classification</span>
+      <span class="tag">Pairs with Colab notebook</span>
+    </div>
+  </div>
 
-// ══════════════════════════════════════════
-//  Generate results page
-// ══════════════════════════════════════════
-function generateResults() {
-  const selA = getSelectedA(), selB = getSelectedB();
-  if (!selA.length && !selB.length) { alert('Please select at least a few cards in Step 3.'); return; }
-
-  const { aLetters, bLetters } = assignLetters(selA, selB);
-  const nRows = Math.max(selA.length, selB.length);
-
-  // Build nameMap
-  nameMap = {};
-  aLetters.forEach((l, i) => { nameMap[l] = cfg.nc && selA[i] ? selA[i][cfg.nc] : `${cfg.subject} ${l}`; });
-  bLetters.forEach((l, i) => { nameMap[l] = cfg.nc && selB[i] ? selB[i][cfg.nc] : `${cfg.subject} ${l}`; });
-
-  namesShown = false;
-  g('res-title').textContent = cfg.title;
-  g('lbl-a-indicator').textContent = cfg.labelA;
-  g('lbl-b-indicator').textContent = cfg.labelB;
-
-  // Unanonymize button
-  if (cfg.nc) { g('unanon-btn').style.display = 'inline-flex'; g('unanon-btn').textContent = `Show ${cfg.subject} Names`; }
-  else hide('unanon-btn');
-
-  // Screen instructions
-  g('screen-inst').innerHTML = `
-    <h1>${cfg.title}</h1>
-    <p>Classify <strong>${cfg.subject}s</strong> as <strong>"${cfg.labelA}"</strong> (gray) or <strong>"${cfg.labelB}"</strong> (white) using: <strong>${cfg.f1}</strong>, <strong>${cfg.f2}</strong>, and <strong>${cfg.f3}</strong>.</p>
-    <h2>Algorithm</h2>
+  <!-- How it works -->
+  <div class="panel" style="margin-bottom:1rem">
+    <h2>How to Run the Activity</h2>
     <ol>
-      <li><strong>Check the group:</strong> all same label? STOP. Mixed? Continue.</li>
-      <li><strong>Pick a feature</strong> and sort cards by that value.</li>
-      <li><strong>Find a split point</strong> — a threshold where one side is mostly <em>${cfg.labelA}</em> and the other mostly <em>${cfg.labelB}</em>.</li>
-      <li><strong>Record</strong> the feature and threshold on a SPLIT POINT card.</li>
-      <li><strong>Split:</strong> cards ≤ threshold → left; cards > threshold → right.</li>
-      <li><strong>Repeat</strong> on each new group until all groups are pure.</li>
+      <li>Print the activity sheet and instructions. Each sheet includes 10 data cards and blank split-point cards.</li>
+      <li>Cut out the cards and distribute one set of 10 data cards per group.</li>
+      <li>Students follow the algorithm on the instruction sheet — picking a feature, finding a split point, and dividing the cards — repeating until all groups are pure.</li>
+      <li>Groups share their trees, discuss differences, then run the same data through the Colab notebook to see what the algorithm finds.</li>
     </ol>
-    <h2>Tips</h2>
-    <ul>
-      <li>You can reuse the same feature more than once.</li>
-      <li>No single correct answer — different trees can both work.</li>
-    </ul>
-    ${cfg.course ? `<p style="margin-top:.65rem;font-size:.78rem;color:#888">${cfg.course}</p>` : ''}`;
+  </div>
+  <div class="panel" style="margin-bottom:1.75rem">
+    <h2>Customize the Data</h2>
+    <p>The activity ships with a Chicago neighborhood dataset, but you can use any CSV. The <a href="generator.html" style="color:var(--brand);font-weight:600">Card Generator tool</a> lets you upload your own dataset, choose features and a label column, sample 10 representative rows, and print a ready-to-use activity sheet. See the resources below for the source data and additional datasets.</p>
+  </div>
 
-  // Build card sheets — one per page of PAGE_ROWS rows, each column padded to PAGE_ROWS
-  const PAGE_ROWS = 5;
-  const container = g('cards-container');
-  container.innerHTML = '';
-  const nPages = Math.ceil(nRows / PAGE_ROWS);
+  <!-- Resources -->
+  <div class="res-group">
+    <div class="section-title">Activity Resources</div>
+    <div class="resources res-2col">
 
-  for (let p = 0; p < nPages; p++) {
-    const sheet = document.createElement('div');
-    sheet.className = 'cards-sheet';
+      <!-- Activity Guide -->
+      <a class="res-card" href="https://docs.google.com/document/d/1IzZUvE7CniRZUKR99gns33V-mRKa70j3NcrBkT05z2E/edit?tab=t.0#heading=h.3dkxvii2p3h" target="_blank" rel="noopener">
+        <div class="res-icon">📄</div>
+        <div class="res-body">
+          <div class="res-title">Activity Guide</div>
+          <div class="res-desc">Instructor notes, facilitation tips, and discussion questions for running the card sort in class.</div>
+          <div class="res-type">Google Docs</div>
+        </div>
+      </a>
 
-    // Column 1: class-A cards for this page
-    for (let r = 0; r < PAGE_ROWS; r++) {
-      const idx = p * PAGE_ROWS + r;
-      sheet.appendChild(idx < selA.length
-        ? makeDataCard(selA[idx], aLetters[idx], cfg.labelA, 'cls-a')
-        : makeEmptyCard());
-    }
-    // Column 2: class-B cards for this page
-    for (let r = 0; r < PAGE_ROWS; r++) {
-      const idx = p * PAGE_ROWS + r;
-      sheet.appendChild(idx < selB.length
-        ? makeDataCard(selB[idx], bLetters[idx], cfg.labelB, 'cls-b')
-        : makeEmptyCard());
-    }
-    // Column 3: split point cards for this page
-    for (let r = 0; r < PAGE_ROWS; r++) {
-      const idx = p * PAGE_ROWS + r;
-      sheet.appendChild(idx < nRows ? makeSplitCard() : makeEmptyCard());
-    }
+      <!-- Slides -->
+      <a class="res-card" href="https://docs.google.com/presentation/d/1elM8fK0D2ZrY5eaPirWuE0JaYc2a835bDKlmsT1LWJY/edit?usp=drive_link" target="_blank" rel="noopener">
+        <div class="res-icon">📑</div>
+        <div class="res-body">
+          <div class="res-title">Lecture Slides</div>
+          <div class="res-desc">Slides introducing decision trees, information gain, and how to run the card sorting activity.</div>
+          <div class="res-type">Google Slides</div>
+        </div>
+      </a>
 
-    container.appendChild(sheet);
-  }
+      <!-- Colab Notebook -->
+      <a class="res-card" href="https://colab.research.google.com/drive/1CZfb0i66ee46SvRcFyocnv0IrWhrkW12" target="_blank" rel="noopener">
+        <div class="res-icon">🪐</div>
+        <div class="res-body">
+          <div class="res-title">Colab Notebook</div>
+          <div class="res-desc">Run scikit-learn's decision tree on the same Chicago dataset and compare the algorithm's result to your hand-built tree. Open in Colab and make a copy to run it yourself.</div>
+          <div class="res-type">Google Colab · requires Google account</div>
+        </div>
+      </a>
 
-  // Print instructions (page 1)
-  g('print-inst').innerHTML = `
-    <h1>${cfg.title}</h1>
-    <h2>What You Are Doing (and Why)</h2>
-    <p>You are going to use your brain and some cut-out cards to simulate a <strong>decision tree</strong> — a machine learning algorithm that assigns a label to an item based on its features.</p>
-    <p>Classify <strong>${cfg.subject}s</strong> as either <strong>"${cfg.labelA}"</strong> or <strong>"${cfg.labelB}"</strong> based on 3 features:</p>
-    <ul><li>${cfg.f1}</li><li>${cfg.f2}</li><li>${cfg.f3}</li></ul>
-    <p><em>Gray-shaded cards = ${cfg.labelA} &nbsp;·&nbsp; White cards = ${cfg.labelB}</em></p>
-    <h2>Materials</h2>
-    <ul>
-      <li>${selA.length + selB.length} data cards (cut out from the next page)</li>
-      <li>${nRows} SPLIT POINT cards (also on the next page)</li>
-    </ul>
-    <h2>Your Goal</h2>
-    <p>Build a <strong>decision tree</strong> by splitting the cards based on features. At each step, choose:</p>
-    <ol>
-      <li><strong>Which feature</strong> to sort on</li>
-      <li><strong>What value</strong> to use as the split point</li>
-      <li><strong>How to split</strong> — cards ≤ threshold go left, cards > threshold go right</li>
-    </ol>
-    <p>Keep going until every group is "pure" (all ${cfg.labelA} or all ${cfg.labelB}).</p>
-    <h2>The Algorithm</h2>
-    <ol>
-      <li><strong>Check the group:</strong> all same label? STOP. Mixed? Continue.</li>
-      <li><strong>Pick a feature</strong> and sort cards by that feature's value.</li>
-      <li><strong>Find a split point:</strong> a value where one side is mostly ${cfg.labelA} and the other mostly ${cfg.labelB}. A perfect split may not exist — that's okay.</li>
-      <li><strong>Record your decision</strong> on a SPLIT POINT card: feature name + threshold value.</li>
-      <li><strong>Physically split:</strong> cards ≤ threshold go <strong>left</strong>; cards > threshold go <strong>right</strong>.</li>
-      <li><strong>Repeat</strong> on the left group, then the right group.</li>
-    </ol>
-    <h2>Tips for Success</h2>
-    <ul>
-      <li>You can reuse the same feature more than once.</li>
-      <li>There is no single correct solution.</li>
-      <li>Focus on making each group <strong>purer</strong> than before.</li>
-    </ul>
-    ${cfg.course ? `<div class="pfooter">${cfg.course}</div>` : ''}`;
+      <!-- Activity dataset -->
+      <a class="res-card" href="chicago_data_with_northsouth.csv" download>
+        <div class="res-icon">📊</div>
+        <div class="res-body">
+          <div class="res-title">Activity Dataset</div>
+          <div class="res-desc">Chicago neighborhood data with graduation rate, tree canopy, crowded housing, and North/South Side label — the dataset used in both the card activity and the notebook.</div>
+          <div class="res-type">CSV download</div>
+        </div>
+      </a>
 
-  hide('builder'); show('results'); window.scrollTo(0,0);
-}
+    </div>
+  </div>
 
-// ══════════════════════════════════════════
-//  Unanonymize toggle
-// ══════════════════════════════════════════
-function toggleNames() {
-  namesShown = !namesShown;
-  document.querySelectorAll('.dc-name').forEach(el => {
-    el.textContent = namesShown ? el.dataset.real : el.dataset.anon;
-  });
-  g('unanon-btn').textContent = namesShown ? `Hide ${cfg.subject} Names` : `Show ${cfg.subject} Names`;
-}
+  <div class="res-group">
+    <div class="section-title">Datasets &amp; Tools</div>
+    <div class="resources">
 
-// ══════════════════════════════════════════
-//  Print helpers
-// ══════════════════════════════════════════
-function printCardsOnly() {
-  // Temporarily hide print-inst so only cards print
-  g('print-inst').style.display = 'none';
-  window.print();
-  setTimeout(() => { g('print-inst').style.display = ''; }, 500);
-}
+      <!-- Full Chicago Health Atlas dataset -->
+      <a class="res-card" href="https://docs.google.com/spreadsheets/d/1amFDx_BlYpE_LZ-EOHJWJkHSFDBrnVOiletPU3NTHyE/edit?usp=drive_link" target="_blank" rel="noopener">
+        <div class="res-icon">🏙️</div>
+        <div class="res-body">
+          <div class="res-title">Chicago Health Atlas Data</div>
+          <div class="res-desc">The full source dataset downloaded from the Chicago Health Atlas — a richer starting point for building your own activities with different feature combinations.</div>
+          <div class="res-type">Google Sheets</div>
+        </div>
+      </a>
 
-// ══════════════════════════════════════════
-//  Permalink
-// ══════════════════════════════════════════
-function buildCfg() {
-  return {
-    f1: g('f1').value, f2: g('f2').value, f3: g('f3').value,
-    lc: g('lc').value, nc: g('nc').value,
-    subject: g('subject').value || 'Item',
-    title: g('act-title').value || 'Decision Tree Card Sorting Activity',
-    course: g('act-course').value,
-    labelA: g('la-name').value || labelVals[0],
-    labelB: g('lb-name').value || labelVals[1],
-  };
-}
+      <!-- Activity data prep sheet -->
+      <a class="res-card" href="https://docs.google.com/spreadsheets/d/17EVvnmX1x7jWTm3tFdVNwXhkQsal7cVa2hUG_lKBvcg/edit?gid=1936710634#gid=1936710634" target="_blank" rel="noopener">
+        <div class="res-icon">🗂️</div>
+        <div class="res-body">
+          <div class="res-title">Data Prep Sheet</div>
+          <div class="res-desc">The Google Sheet showing how the activity columns were selected and prepared from the full Chicago Health Atlas download.</div>
+          <div class="res-type">Google Sheets</div>
+        </div>
+      </a>
 
-function copyPermalink() {
-  cfg = buildCfg();
-  const selA = getSelectedA(), selB = getSelectedB();
-  const payload = { cfg, lv: labelVals, selA, selB };
-  const hash = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const url = location.href.split('#')[0] + '#data=' + hash;
-  navigator.clipboard.writeText(url).then(() => {
-    g('link-btn').textContent = '✓ Copied!';
-    setTimeout(() => g('link-btn').textContent = '🔗 Copy permalink', 2500);
-  }).catch(() => prompt('Copy this permalink:', url));
-}
+      <!-- Notebook download -->
+      <a class="res-card" href="Northside_Southside_Decision_Trees.ipynb" download>
+        <div class="res-icon">⬇️</div>
+        <div class="res-body">
+          <div class="res-title">Download Notebook</div>
+          <div class="res-desc">Download the <code>.ipynb</code> file to run locally in Jupyter or upload to any notebook environment. The notebook loads the dataset directly from this site — no Drive access needed.</div>
+          <div class="res-type">.ipynb download</div>
+        </div>
+      </a>
 
-function tryLoadPermalink() {
-  if (!location.hash.startsWith('#data=')) return false;
-  try {
-    const json = decodeURIComponent(escape(atob(location.hash.slice(6))));
-    permalinkPayload = JSON.parse(json);
-    const { cfg: c, lv, selA, selB } = permalinkPayload;
-    cfg = c; labelVals = lv;
+      <!-- Featured: Card Generator -->
+      <a class="res-card featured" href="generator.html">
+        <div class="res-icon">🃏</div>
+        <div class="res-body">
+          <div class="res-title">Decision Tree Card Generator</div>
+          <div class="res-desc">Upload any CSV dataset, choose your features and label, sample rows interactively, and generate a print-ready card sheet. Includes a permalink so you can reproduce the exact same deck.</div>
+        </div>
+        <span class="res-cta">Open tool →</span>
+      </a>
 
-    // Build minimal allRows from selA + selB so edit works
-    allRows = [...selA, ...selB].map((r, i) => ({ ...r, _idx: i }));
-    selA.forEach((r, i) => allRows[i]._idx = i);
-    selB.forEach((r, i) => allRows[selA.length + i]._idx = selA.length + i);
-    selSet = new Set(allRows.map(r => r._idx));
+    </div>
+  </div>
 
-    fromPermalink = true;
-    generateResults();
-    return true;
-  } catch(e) { console.warn('Permalink load failed:', e); return false; }
-}
+  <div class="site-footer">© Baker Franke &bull; CS 218 &bull; University of Illinois Chicago</div>
 
-// ══════════════════════════════════════════
-//  "Edit" from permalink — restore builder
-// ══════════════════════════════════════════
-function goBack() {
-  hide('results'); show('builder');
-  window.scrollTo(0,0);
-
-  if (fromPermalink && permalinkPayload) {
-    const { cfg: c, lv, selA, selB } = permalinkPayload;
-    // Rebuild CSV from stored rows
-    const cols = Object.keys(selA[0] || selB[0] || {}).filter(k => k !== '_idx');
-    const csvLines = [cols.join(','), ...[...selA,...selB].map(r => cols.map(k => r[k]??'').join(','))];
-    g('csv-ta').value = csvLines.join('\n');
-
-    // Parse it
-    const result = parseCSV(g('csv-ta').value);
-    allRows = result.rows; headers = result.headers;
-
-    // Populate and pre-set selects
-    populateSelects(headers);
-    ['f1','f2','f3','lc','nc'].forEach(id => {
-      const map = {f1:'f1',f2:'f2',f3:'f3',lc:'lc',nc:'nc'};
-      if (c[map[id]] !== undefined) g(id).value = c[map[id]];
-    });
-    labelVals = lv;
-
-    // Pre-fill Step 4
-    g('act-title').value  = c.title;
-    g('act-course').value = c.course;
-    g('subject').value    = c.subject;
-    g('la-name').value    = c.labelA;
-    g('lb-name').value    = c.labelB;
-    g('lbl-a-count').textContent = lv[0] + ':';
-    g('lbl-b-count').textContent = lv[1] + ':';
-    updateSubjPreview();
-
-    // Rebuild selSet from restored rows
-    selSet = new Set(allRows.map(r => r._idx));
-
-    // Show all steps
-    show('s2'); show('s3'); show('s4');
-    showAllRows = false;
-    renderTable(); checkPureSplits();
-
-    g('lc-msg').className = 'vmsg ok';
-    g('lc-msg').textContent = `✓ Restored from permalink: "${lv[0]}" and "${lv[1]}"`;
-    g('confirm-btn').disabled = false;
-
-    g('s3').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
-
-// ══════════════════════════════════════════
-//  Event wiring
-// ══════════════════════════════════════════
-g('drop').addEventListener('click', () => g('file-input').click());
-g('browse-lnk').addEventListener('click', e => { e.stopPropagation(); g('file-input').click(); });
-g('drop').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('over'); });
-g('drop').addEventListener('dragleave', e => e.currentTarget.classList.remove('over'));
-g('drop').addEventListener('drop', e => {
-  e.preventDefault(); e.currentTarget.classList.remove('over');
-  if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
-});
-g('file-input').addEventListener('change', e => { if(e.target.files[0]) readFile(e.target.files[0]); });
-
-function readFile(file) {
-  const r = new FileReader();
-  r.onload = ev => { g('csv-ta').value = ev.target.result; doParse(); };
-  r.readAsText(file);
-}
-
-g('demo-btn').addEventListener('click', () => {
-  g('csv-ta').value = DEMO_CSV;
-  doParse();
-  setTimeout(() => {
-    g('f1').value='Grad Rate'; g('f2').value='Tree Canopy'; g('f3').value='Crowded Housing';
-    g('lc').value='Side'; g('nc').value='Community';
-    validateCols();
-  }, 30);
-});
-
-g('parse-btn').addEventListener('click', doParse);
-
-function doParse() {
-  const text = g('csv-ta').value.trim();
-  const msg = g('parse-msg');
-  if (!text) { msg.textContent = 'Paste CSV or upload a file first.'; return; }
-  try {
-    const result = parseCSV(text);
-    allRows = result.rows; headers = result.headers;
-    msg.textContent = `✓ Loaded ${allRows.length} rows, ${headers.length} columns.`;
-    populateSelects(headers);
-    show('s2');
-    g('s2').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch(e) { msg.textContent = '✗ ' + e.message; }
-}
-
-['f1','f2','f3','lc','nc'].forEach(id => g(id).addEventListener('change', validateCols));
-
-g('confirm-btn').addEventListener('click', () => {
-  show('s3'); show('s4');
-  // Update range maxes based on class counts
-  const lc = g('lc').value;
-  const nAvail_A = allRows.filter(r => r[lc] === labelVals[0]).length;
-  const nAvail_B = allRows.filter(r => r[lc] === labelVals[1]).length;
-  g('n-a').max = Math.min(nAvail_A, 12); g('n-a').value = Math.min(5, nAvail_A);
-  g('n-b').max = Math.min(nAvail_B, 12); g('n-b').value = Math.min(5, nAvail_B);
-  g('na-disp').textContent = g('n-a').value;
-  g('nb-disp').textContent = g('n-b').value;
-  doSample();
-  g('s3').scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
-
-g('n-a').addEventListener('input', function() { g('na-disp').textContent = this.value; doSample(); });
-g('n-b').addEventListener('input', function() { g('nb-disp').textContent = this.value; doSample(); });
-g('resample-btn').addEventListener('click', doSample);
-
-g('toggle-view-btn').addEventListener('click', () => { showAllRows = !showAllRows; renderTable(); });
-
-g('subject').addEventListener('input', updateSubjPreview);
-
-g('gen-btn').addEventListener('click', () => {
-  cfg = buildCfg();
-  generateResults();
-});
-
-g('back-btn').addEventListener('click', goBack);
-g('unanon-btn').addEventListener('click', toggleNames);
-g('link-btn').addEventListener('click', copyPermalink);
-g('print-cards-btn').addEventListener('click', printCardsOnly);
-g('print-all-btn').addEventListener('click', () => window.print());
-
-window.addEventListener('load', () => { if (!tryLoadPermalink()) fromPermalink = false; });
-</script>
+</div>
 </body>
 </html>
