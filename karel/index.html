@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karel the Robot — CS 111 at UIC</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9BZC2D28MZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9BZC2D28MZ');
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #1a3a5c;
+  --brand-light: #2a5080;
+  --accent: #c0392b;
+  --light: #f4f6f9;
+  --border: #d0d7e2;
+  --r: 8px;
+  --card-r: 10px;
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1a1a1a; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 1.4rem 2rem 1.2rem;
+  border-bottom: 3px solid rgba(255,255,255,.12);
+}
+.site-header .eyebrow { font-size: .73rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: .3rem; }
+.site-header h1 { font-size: 1.65rem; font-weight: 800; line-height: 1.2; }
+.site-header .tagline { font-size: .88rem; opacity: .75; margin-top: .35rem; }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
+
+.hero {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 1.6rem 1.75rem;
+  margin-bottom: 1.75rem;
+}
+.hero p { font-size: 1rem; line-height: 1.7; color: #333; }
+.hero p + p { margin-top: .75rem; }
+.hero .note {
+  margin-top: 1.1rem;
+  font-size: .82rem;
+  color: #666;
+  background: #f4f6f9;
+  border-left: 3px solid var(--border);
+  padding: .6rem .9rem;
+  border-radius: 4px;
+}
+
+.section-title {
+  font-size: .73rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #888; margin-bottom: .9rem;
+}
+
+.resources { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+@media (max-width: 500px) { .resources { grid-template-columns: 1fr; } }
+
+.res-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 1.1rem 1.1rem .9rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  transition: border-color .15s, box-shadow .15s;
+  text-decoration: none;
+  color: inherit;
+}
+.res-card:hover { border-color: var(--brand); box-shadow: 0 2px 10px rgba(26,58,92,.1); text-decoration: none; }
+
+.res-icon { font-size: 1.6rem; line-height: 1; }
+.res-title { font-size: .92rem; font-weight: 700; color: var(--brand); }
+.res-desc { font-size: .78rem; color: #555; line-height: 1.5; margin-top: .15rem; }
+
+.site-footer { text-align: center; font-size: .72rem; color: #aaa; margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow">CS 111 · Introduction to Computing</div>
+  <h1>Karel the Robot</h1>
+  <p class="tagline">Documentation and resources for the Karel robot library used at UIC</p>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p>Karel is a simple robot that lives in a grid world, understands a small set of commands, and helps you practice the fundamentals of programming — sequencing, loops, and eventually your own classes and methods — before you ever have to deal with the syntax of a "real" language's ecosystem.</p>
+    <p>This site hosts the command references and other resources for the course. Each project introduces a few new commands — start with Project 1 and work forward.</p>
+    <div class="note">This page is a documentation mirror only. It doesn't contain the library's source code.</div>
+  </div>
+
+  <div class="section-title">Resources</div>
+  <div class="resources">
+    <a class="res-card" href="docs/">
+      <div class="res-icon">📘</div>
+      <div class="res-title">Command Reference</div>
+      <div class="res-desc">Progressive command docs, one per project — only the commands you've learned so far.</div>
+    </a>
+  </div>
+
+  <div class="site-footer">CS 111 · University of Illinois Chicago</div>
+</div>
+
+</body>
+</html>

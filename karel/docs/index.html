@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karel Command Reference — CS 111 at UIC</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9BZC2D28MZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9BZC2D28MZ');
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #1a3a5c;
+  --light: #f4f6f9;
+  --border: #d0d7e2;
+  --card-r: 10px;
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1a1a1a; }
+a { color: var(--brand); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 1.4rem 2rem 1.2rem;
+  border-bottom: 3px solid rgba(255,255,255,.12);
+}
+.site-header .eyebrow { font-size: .73rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: .3rem; }
+.site-header .eyebrow a { color: #fff; opacity: .85; }
+.site-header h1 { font-size: 1.5rem; font-weight: 800; }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
+
+.doc-list { display: flex; flex-direction: column; gap: .75rem; }
+.doc-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s, box-shadow .15s;
+}
+.doc-card:hover { border-color: var(--brand); box-shadow: 0 2px 10px rgba(26,58,92,.1); text-decoration: none; }
+.doc-num {
+  font-size: .78rem; font-weight: 800; color: #fff; background: var(--brand);
+  width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.doc-title { font-size: .95rem; font-weight: 700; color: var(--brand); }
+.doc-desc { font-size: .8rem; color: #555; margin-top: .1rem; }
+
+.site-footer { text-align: center; font-size: .72rem; color: #aaa; margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow"><a href="../">← Karel</a></div>
+  <h1>Command Reference</h1>
+</header>
+
+<div class="wrap">
+  <div class="doc-list">
+    <a class="doc-card" href="viewer.html?doc=01_project1_commands.md">
+      <div class="doc-num">1</div>
+      <div>
+        <div class="doc-title">Project 1 Commands</div>
+        <div class="doc-desc">UrRobot, move, turnLeft, pickBeeper, putBeeper, world.setSize, world.setDelay</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="site-footer">More docs are added here as each project is introduced.</div>
+</div>
+
+</body>
+</html>

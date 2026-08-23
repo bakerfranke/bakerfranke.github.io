@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karel Command Reference — CS 111 at UIC</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9BZC2D28MZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9BZC2D28MZ');
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --brand: #1a3a5c;
+  --light: #f4f6f9;
+  --border: #d0d7e2;
+  --card-r: 10px;
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: #1a1a1a; }
+a { color: var(--brand); }
+
+.site-header {
+  background: var(--brand);
+  color: #fff;
+  padding: 1.4rem 2rem 1.2rem;
+  border-bottom: 3px solid rgba(255,255,255,.12);
+}
+.site-header .eyebrow { font-size: .73rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: .3rem; }
+.site-header .eyebrow a { color: #fff; opacity: .85; text-decoration: none; }
+.site-header .eyebrow a:hover { text-decoration: underline; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 2.2rem 1.5rem 4rem; }
+
+.doc {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 2rem 2.2rem;
+  line-height: 1.65;
+}
+.doc h1 { font-size: 1.6rem; color: var(--brand); margin-bottom: .3rem; }
+.doc h2 { font-size: 1.15rem; color: var(--brand); margin: 1.6rem 0 .6rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.doc h2:first-child { padding-top: 0; border-top: none; }
+.doc h3 { font-size: 1rem; margin: 1.1rem 0 .3rem; }
+.doc h3 code { font-size: .95em; }
+.doc p { margin-bottom: .7rem; font-size: .95rem; }
+.doc ul, .doc ol { margin: .4rem 0 .8rem 1.4rem; font-size: .95rem; }
+.doc li { margin-bottom: .25rem; }
+.doc hr { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
+.doc code {
+  font-family: 'SF Mono', Consolas, monospace;
+  background: #eef1f6; color: #b5442b;
+  padding: .1em .35em; border-radius: 4px; font-size: .88em;
+}
+.doc pre {
+  background: #1a2233; color: #e8ecf4;
+  padding: 1rem 1.15rem; border-radius: 8px;
+  overflow-x: auto; margin: .7rem 0 1rem;
+}
+.doc pre code { background: none; color: inherit; padding: 0; font-size: .85rem; }
+.doc strong { color: #111; }
+
+.loading, .error { text-align: center; padding: 3rem 1rem; color: #888; font-size: .9rem; }
+.error { color: #a33; }
+
+.site-footer { text-align: center; font-size: .72rem; color: #aaa; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="eyebrow"><a href="./">← Command Reference</a></div>
+</header>
+
+<div class="wrap">
+  <div class="doc" id="doc">
+    <div class="loading">Loading…</div>
+  </div>
+  <div class="site-footer">CS 111 · University of Illinois Chicago</div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const docFile = params.get('doc');
+  const container = document.getElementById('doc');
+
+  if (!docFile) {
+    container.innerHTML = '<div class="error">No document specified. Go back to the <a href="./">Command Reference index</a>.</div>';
+  } else {
+    fetch(docFile)
+      .then(res => {
+        if (!res.ok) throw new Error('File not found: ' + docFile);
+        return res.text();
+      })
+      .then(markdown => {
+        container.innerHTML = marked.parse(markdown);
+        const firstHeading = container.querySelector('h1');
+        if (firstHeading) {
+          document.title = firstHeading.textContent + ' — CS 111 at UIC';
+        }
+      })
+      .catch(err => {
+        container.innerHTML = '<div class="error">Couldn\'t load this document. ' + err.message + '</div>';
+      });
+  }
+</script>
+
+</body>
+</html>
