@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Karel Command Reference — CS 111 at UIC</title>
+<title>UIC Karel the Robot Reference</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BZC2D28MZ"></script>
 <script>
@@ -74,14 +74,14 @@ a { color: var(--brand); }
 <body>
 
 <header class="site-header">
-  <div class="eyebrow"><a href="./">← Command Reference</a></div>
+  <div class="eyebrow"><a href="./">← Project Code Reference</a></div>
 </header>
 
 <div class="wrap">
   <div class="doc" id="doc">
     <div class="loading">Loading…</div>
   </div>
-  <div class="site-footer">CS 111 · University of Illinois Chicago</div>
+  <div class="site-footer">UIC CS 111 - Program Design I</div>
 </div>
 
 <script>
@@ -90,7 +90,7 @@ a { color: var(--brand); }
   const container = document.getElementById('doc');
 
   if (!docFile) {
-    container.innerHTML = '<div class="error">No document specified. Go back to the <a href="./">Command Reference index</a>.</div>';
+    container.innerHTML = '<div class="error">No document specified. Go back to the <a href="./">Project Code Reference index</a>.</div>';
   } else {
     fetch(docFile)
       .then(res => {
@@ -99,10 +99,6 @@ a { color: var(--brand); }
       })
       .then(markdown => {
         container.innerHTML = marked.parse(markdown);
-        const firstHeading = container.querySelector('h1');
-        if (firstHeading) {
-          document.title = firstHeading.textContent + ' — CS 111 at UIC';
-        }
       })
       .catch(err => {
         container.innerHTML = '<div class="error">Couldn\'t load this document. ' + err.message + '</div>';
