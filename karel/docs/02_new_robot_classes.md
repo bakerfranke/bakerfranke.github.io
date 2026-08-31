@@ -67,6 +67,7 @@ Just like `UrRobot`, you give it a starting street, avenue, direction, and beepe
 Let's use this to build something a bit bigger: a robot that sweeps a **whole** staircase, picking up the beeper sitting on every step, not just one.
 
 ![StairSweeper starting state (bottom of the staircase, one beeper per step) and ending state (top of the staircase, all beepers collected)](images/stair_sweeper_states.png)
+<img src="images/stair_sweeper_states.png" alt="StairSweeper starting state (bottom of the staircase, one beeper per step) and ending state (top of the staircase, all beepers collected)" width="600">
 
 Karel starts at the bottom of the staircase facing East, carrying no beepers. Each step has exactly one beeper waiting on it. By the end, Karel should be standing on the top step, facing the same direction it started in, having picked up every beeper along the way.
 
