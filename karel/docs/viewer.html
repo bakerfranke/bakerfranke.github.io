@@ -56,6 +56,15 @@ a { color: var(--brand); }
 .doc table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; font-size: .9rem; }
 .doc th, .doc td { border: 1px solid var(--border); padding: .5rem .7rem; text-align: left; vertical-align: top; }
 .doc th { background: var(--light); color: var(--brand); font-weight: 700; }
+.doc blockquote {
+  background: var(--light);
+  border-left: 3px solid var(--accent, #c0392b);
+  border-radius: 4px;
+  padding: .8rem 1rem;
+  margin: .9rem 0 1.1rem;
+}
+.doc blockquote p { margin-bottom: 0; }
+.doc blockquote p + p { margin-top: .5rem; }
 .doc code {
   font-family: 'SF Mono', Consolas, monospace;
   background: #eef1f6; color: #b5442b;

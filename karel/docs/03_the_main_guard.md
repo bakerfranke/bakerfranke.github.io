@@ -17,36 +17,15 @@ This page explains what it is and why we use it. **You will always be given this
 
 ---
 
-## What `__name__` actually is
-
-Every Python file has a hidden variable called `__name__` that Python fills in automatically. Its value depends on *how* the file gets used:
-
-- If you **run the file directly** (hit Run, or `python main.py` from a terminal), Python sets `__name__` to the string `"__main__"`.
-- If the file is **imported** by something else instead of run directly, Python sets `__name__` to the file's own name (e.g. `"main"`) — not `"__main__"`.
-
-So `if __name__ == "__main__":` is really just asking one question: **"Was this file the one that got run directly?"** The code indented underneath only executes when the answer is yes.
-
----
-
 ## Why not just write the code out in the open?
 
-Nothing stops you from skipping the guard entirely and writing your setup code at the top level of the file, with no `if` and no indentation:
+We don't want your program to run automatically the moment we import your code. The main guard puts your code in a section that only runs when you ask it to — separately from the rest of the file.
 
-```python
-# Without a main guard - works, but only until it doesn't
-class UrRobot:
-    ...
+Without the guard, everything just starts running right away. That means we don't have a way to test the individual pieces of your code on their own: to check your class, or test one of your methods directly, we have to `import` your file — and without a guard, that import triggers your whole program to run too, right then, as a side effect.
 
-world.setSize(8, 8)
-foo = UrRobot(3, 3, East, 100)
-foo.move()
-```
+There's a second reason, less technical: this is just common practice. You're going to see `if __name__ == "__main__":` in basically every Python program you look at from here on, so it's worth getting used to the pattern now.
 
-This runs fine when you hit Run. The problem shows up the moment anyone else's code needs to use *just* your class, without also re-running your whole program.
-
-That "anyone else" is almost always the grading tool. To check your class, count its methods, or test your solving method directly on a fresh robot, the grader has to `import` your file — that's the only way to get at your class from outside it. Without a main guard, importing your file has no way to hold back the moves-and-setup code sitting underneath your class: `import` runs the *entire* file top to bottom, so your whole program executes again, right then, as a side effect of just trying to look at your class.
-
-The main guard is what makes that possible to avoid. Code inside it runs when you hit Run yourself, but is skipped entirely when the file is imported — so the grader can bring in your class cleanly, without triggering a second full run of your solution.
+> **Take this one on faith for now.** We're not going to explain the syntax deeply until later — it's just the way Python programs are structured, and you'll see it enough that it'll stop looking strange.
 
 ---
 
@@ -83,6 +62,19 @@ Your class and its methods are defined once, at the top level, so they're always
 
 ## Why this affects how you write your main block
 
-Because the guarded block is what actually runs your program, it's tempting to put extra work there — an extra `move()`, a second helper call — to patch up something your class method doesn't quite do right. Don't. The whole reason main guards matter for grading is that your solving method gets tested **on its own**, by importing your class and calling that one method directly, completely bypassing whatever is inside your guard. If your method only produces the right answer *with help from your main block*, that isolated test will catch it — the correct answer from clicking Run doesn't mean the method itself is correct.
+Because the guarded block is what actually runs your program, it's tempting to put extra work there — an extra `move()`, a second helper call — to patch up something your class method doesn't quite do right. **Don't do work inside `__main__`.**
 
-**Takeaway:** your main block should only construct the robot and call the one method that's supposed to solve the whole problem (plus `turnOff()`, if the assignment calls for it). All of the actual problem-solving belongs inside your class's own methods.
+> **Our expectation:** your `__main__` block should only set up the world, construct a robot, and call a single method that makes it do its whole thing. That's it.
+
+The whole reason main guards matter for grading is that your solving method gets tested **on its own**, by importing your class and calling that one method directly, completely bypassing whatever is inside your guard. If your method only produces the right answer *with help from your main block*, that isolated test will catch it — the correct answer from clicking Run doesn't mean the method itself is correct.
+
+---
+
+## What `__name__` actually is
+
+If you're curious about the mechanism behind all this: every Python file has a hidden variable called `__name__` that Python fills in automatically. Its value depends on *how* the file gets used:
+
+- If you **run the file directly** (hit Run, or `python main.py` from a terminal), Python sets `__name__` to the string `"__main__"`.
+- If the file is **imported** by something else instead of run directly, Python sets `__name__` to the file's own name (e.g. `"main"`) — not `"__main__"`.
+
+So `if __name__ == "__main__":` is really just asking one question: **"Was this file the one that got run directly?"** The code indented underneath only executes when the answer is yes — which is exactly the behavior described above.
