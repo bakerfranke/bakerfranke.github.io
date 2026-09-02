@@ -12,6 +12,10 @@ Sometimes the built-in commands aren't enough on their own — you want Karel to
 
 ## Defining a new robot class
 
+For the rest of this page, we'll build up a `StairSweeper` — a robot that climbs a staircase, picking up the beeper waiting on every step.
+
+![StairSweeper starting state (bottom of the staircase, one beeper per step) and ending state (top of the staircase, all beepers collected)](images/stair_sweeper_states.png)
+
 **Example:**
 
 ```python
@@ -49,40 +53,41 @@ class StairSweeper(UrRobot):
 - Inside the method, use `self.move()`, `self.turnLeft()`, etc. — the same commands as before, just written with `self.` instead of a robot's name, since the method doesn't know what the robot will actually be named when it's used.
 - Notice that `sweepStair()` calls `self.turnRight()` — a method defined right above it, on the same class. Once you've written a method, you can use it just like any built-in one, including inside your *other* methods.
 
+## Using your new robot
+
+**Example:**
+
+```python
+if __name__ == "__main__":
+    sweeper = StairSweeper(1, 1, East, 0)
+    sweeper.sweepStair()
+```
+
+Just like `UrRobot`, you give it a starting street, avenue, direction, and beeper count. Once it exists, you can call your new method on it just like any built-in one.
+
 > ### A closer look at `self`
 >
-> In `__main__`, when you write `bob = HBot(2, 1, North, 7)`, you're creating one particular robot and giving it the name `bob`. If a method inside your class referred to `bob` directly — like `bob.turnLeft()` — it could only ever act on the one robot actually named `bob`.
+> In `__main__`, when you write `alice = StairSweeper(1, 1, East, 0)`, you're creating one particular robot and giving it the name `alice`. If a method inside your class referred to `bob` directly — like `bob.turnLeft()` — it could only ever act on a robot actually named `bob`.
 >
 > That's a problem, because a class definition isn't really about one specific robot — it's more like a **blueprint**. You write the class once, and the blueprint can then be used to construct as many different robots as you want, each with its own name. A method needs a way to refer to "whichever robot I should act on right now," not a name hardcoded to one particular robot.
 >
 > Watch what happens if a method carelessly refers to a hardcoded name instead of `self`:
 >
 > ```python
-> class HBot(UrRobot):
+> class StairSweeper(UrRobot):
 >     def turnRight(self):
 >         bob.turnLeft()   # BUG: this refers to a specific robot named "bob"
 >         bob.turnLeft()
 >         bob.turnLeft()
 >
 > if __name__ == "__main__":
->     alice = HBot(2, 1, North, 7)
+>     alice = StairSweeper(1, 1, East, 0)
 >     alice.turnRight()
 > ```
 >
 > This program never creates a robot named `bob` — it creates one named `alice`. So `alice.turnRight()` breaks: the method tries to act on `bob`, and no robot named `bob` exists anywhere in this program. The fix is `self.turnLeft()` — `self` always refers to whichever robot the method is actually being called on, no matter what that robot happens to be named in a particular program.
 >
 > One last thing: **`self` is just a convention**, not a Python keyword. You could technically name that first parameter something else (`this`, `me`, `robot`) and it would still work, as long as you used that same name consistently throughout the method. But every Python programmer uses `self` — so should you. Using anything else will only confuse anyone reading your code later, including future you.
-
-## Using your new robot
-
-**Example:**
-
-```python
-sweeper = StairSweeper(1, 1, East, 0)
-sweeper.sweepStair()
-```
-
-Just like `UrRobot`, you give it a starting street, avenue, direction, and beeper count. Once it exists, you can call your new method on it just like any built-in one.
 
 ---
 
