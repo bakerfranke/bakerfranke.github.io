@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 111 PrairieLearn Runbook</title>
+<meta name="description" content="Onboarding notes for the CS 111 PrairieLearn course-content repo: what the system is, how to get it running, and where things currently stand." />
+<meta name="robots" content="noindex">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9BZC2D28MZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9BZC2D28MZ');
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#f3f5fa;
+    --surface:#ffffff;
+    --surface-2:#eaeef8;
+    --ink:#161b2c;
+    --ink-soft:#545e78;
+    --ink-faint:#8892ab;
+    --accent:#2b4fe0;
+    --accent-soft:#e8ecfc;
+    --accent-ink:#ffffff;
+    --line:#d7dcec;
+    --line-strong:#b9c1de;
+    --warn:#8a5a08;
+    --warn-soft:#fbf0dd;
+    --warn-line:#ecd9ab;
+    --good:#1c7a52;
+    --good-soft:#e3f5ec;
+    --good-line:#bfe6d3;
+    --code-bg:#161b2c;
+    --code-ink:#d9e0f7;
+    --code-accent:#9db6ff;
+    --code-comment:#7f8bb3;
+    --grid-line: rgba(43,79,224,0.05);
+    --shadow: 0 1px 2px rgba(22,27,44,0.04), 0 8px 24px rgba(22,27,44,0.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0e1220;
+      --surface:#161b2c;
+      --surface-2:#1c2238;
+      --ink:#e8ecf9;
+      --ink-soft:#a7b0cc;
+      --ink-faint:#707aa0;
+      --accent:#8aa5ff;
+      --accent-soft:#232c4d;
+      --accent-ink:#0e1220;
+      --line:#2a3150;
+      --line-strong:#394272;
+      --warn:#e3ac52;
+      --warn-soft:#2c2412;
+      --warn-line:#4a3a17;
+      --good:#57d5a2;
+      --good-soft:#122a21;
+      --good-line:#1e4635;
+      --code-bg:#090c16;
+      --code-ink:#cddaff;
+      --code-accent:#8aa5ff;
+      --code-comment:#66709a;
+      --grid-line: rgba(138,165,255,0.06);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0e1220;
+    --surface:#161b2c;
+    --surface-2:#1c2238;
+    --ink:#e8ecf9;
+    --ink-soft:#a7b0cc;
+    --ink-faint:#707aa0;
+    --accent:#8aa5ff;
+    --accent-soft:#232c4d;
+    --accent-ink:#0e1220;
+    --line:#2a3150;
+    --line-strong:#394272;
+    --warn:#e3ac52;
+    --warn-soft:#2c2412;
+    --warn-line:#4a3a17;
+    --good:#57d5a2;
+    --good-soft:#122a21;
+    --good-line:#1e4635;
+    --code-bg:#090c16;
+    --code-ink:#cddaff;
+    --code-accent:#8aa5ff;
+    --code-comment:#66709a;
+    --grid-line: rgba(138,165,255,0.06);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ background:var(--bg); }
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 32px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 32px),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces", Georgia, serif;
+    font-weight:600;
+    text-wrap:balance;
+    color:var(--ink);
+    margin:0;
+  }
+  code, .mono, pre, .tree{
+    font-family:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  a{ color:var(--accent); text-decoration-color:var(--line-strong); text-underline-offset:2px; }
+  a:hover{ text-decoration-color:currentColor; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
+
+  .page{
+    max-width:1180px;
+    margin:0 auto;
+    padding:56px 32px 96px;
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:56px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .page{ grid-template-columns:1fr; padding:32px 20px 72px; gap:28px; }
+    .rail{ position:static !important; order:2; }
+    .masthead{ order:1; }
+    main{ order:3; }
+  }
+
+  /* ---- Masthead ---- */
+  .masthead{
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    padding-bottom:28px;
+    margin-bottom:8px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+  }
+  .masthead .eyebrow{
+    font-family:"IBM Plex Mono";
+    font-size:12px;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 10px;
+  }
+  .masthead h1{ font-size:38px; line-height:1.12; }
+  .masthead .sub{ color:var(--ink-soft); font-size:15.5px; margin-top:10px; max-width:52ch; }
+  .masthead .meta{
+    font-family:"IBM Plex Mono";
+    font-size:12.5px;
+    color:var(--ink-faint);
+    text-align:right;
+    line-height:1.7;
+    white-space:nowrap;
+  }
+  .masthead .meta a{ color:var(--ink-faint); }
+
+  /* ---- Rail / TOC ---- */
+  .rail{ position:sticky; top:32px; align-self:start; }
+  .rail-label{
+    font-family:"IBM Plex Mono"; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin:0 0 12px;
+  }
+  .rail nav{ display:flex; flex-direction:column; gap:2px; }
+  .rail nav a{
+    color:var(--ink-soft); text-decoration:none; font-size:14px;
+    padding:7px 10px; border-radius:7px; border-left:2px solid transparent;
+  }
+  .rail nav a:hover{ background:var(--surface-2); color:var(--ink); }
+
+  /* ---- Sections ---- */
+  section{ scroll-margin-top:24px; margin-bottom:56px; }
+  section > h2{
+    font-size:23px;
+    display:flex; align-items:baseline; gap:12px;
+    margin-bottom:16px;
+  }
+  section > h2 .num{
+    font-family:"IBM Plex Mono"; font-size:13px; color:var(--accent);
+    font-weight:500;
+  }
+  section > p{ color:var(--ink-soft); max-width:68ch; }
+  section > p + p{ margin-top:12px; }
+  .lede{ font-size:16.5px; }
+
+  h3{ font-size:16.5px; margin:22px 0 10px; color:var(--ink); }
+
+  /* ---- Steps ---- */
+  .steps{ list-style:none; margin:18px 0 0; padding:0; counter-reset:step; display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line); }
+  .steps > li{
+    counter-increment:step;
+    display:grid; grid-template-columns:40px minmax(0,1fr);
+    gap:16px; padding:18px 0; border-bottom:1px solid var(--line);
+  }
+  .steps > li::before{
+    content:counter(step);
+    font-family:"IBM Plex Mono"; font-weight:600; font-size:14px;
+    color:var(--accent); background:var(--accent-soft);
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .steps h4{ margin:0 0 6px; font-size:15px; font-weight:600; }
+  .steps p{ margin:0 0 10px; color:var(--ink-soft); font-size:14.5px; }
+  .steps p:last-child{ margin-bottom:0; }
+
+  pre{
+    background:var(--code-bg); color:var(--code-ink);
+    border-radius:10px; padding:14px 16px;
+    font-size:13px; line-height:1.65;
+    overflow-x:auto; margin:0;
+    box-shadow: var(--shadow);
+  }
+  pre .c{ color:var(--code-comment); }
+  pre .k{ color:var(--code-accent); }
+  code.inline{
+    font-family:"IBM Plex Mono"; font-size:0.87em;
+    background:var(--surface-2); border:1px solid var(--line);
+    padding:1px 6px; border-radius:5px; color:var(--ink);
+  }
+
+  /* ---- Callouts ---- */
+  .callout{
+    border:1px solid var(--line); background:var(--surface);
+    border-radius:12px; padding:18px 20px; margin-top:16px;
+    box-shadow:var(--shadow);
+  }
+  .callout.warn{ border-color:var(--warn-line); background:var(--warn-soft); }
+  .callout.good{ border-color:var(--good-line); background:var(--good-soft); }
+  .callout .label{
+    font-family:"IBM Plex Mono"; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px; margin-bottom:8px; font-weight:600;
+  }
+  .callout.warn .label{ color:var(--warn); }
+  .callout.good .label{ color:var(--good); }
+  .callout p{ margin:0; color:var(--ink-soft); font-size:14.5px; max-width:none; }
+  .callout p + p{ margin-top:8px; }
+
+  /* ---- Tree ---- */
+  .tree{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:16px 20px; font-size:13px; line-height:1.85; color:var(--ink-soft);
+    box-shadow:var(--shadow); overflow-x:auto;
+  }
+  .tree .d{ color:var(--ink); font-weight:600; }
+  .tree .a{ color:var(--accent); }
+
+  /* ---- Grading model table ---- */
+  .gtable{ width:100%; border-collapse:collapse; margin-top:16px; font-size:14px; }
+  .gtable th{
+    text-align:left; font-family:"IBM Plex Mono"; font-size:11px; letter-spacing:0.06em;
+    text-transform:uppercase; color:var(--ink-faint); font-weight:500;
+    padding:0 14px 10px; border-bottom:1px solid var(--line-strong);
+  }
+  .gtable td{ padding:14px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink-soft); }
+  .gtable tr:last-child td{ border-bottom:none; }
+  .gtable td:first-child, .gtable th:first-child{ padding-left:0; }
+  .gtable strong{ color:var(--ink); }
+  .gtable .pill{ margin-bottom:2px; }
+
+  /* ---- Pills ---- */
+  .pill{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:"IBM Plex Mono"; font-size:11px; font-weight:500;
+    padding:3px 9px; border-radius:99px; letter-spacing:0.02em;
+    border:1px solid var(--line-strong); color:var(--ink-soft);
+  }
+  .pill.working{ background:var(--accent-soft); color:var(--accent); border-color:transparent; }
+  .pill.done{ background:var(--good-soft); color:var(--good); border-color:transparent; }
+  .pill.open{ background:var(--warn-soft); color:var(--warn); border-color:transparent; }
+
+  /* ---- Question cards ---- */
+  .cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:14px; margin-top:18px; }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:18px; display:flex; flex-direction:column; gap:10px;
+    box-shadow:var(--shadow);
+  }
+  .card .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .card .name{ font-family:"IBM Plex Mono"; font-size:14px; font-weight:600; color:var(--ink); }
+  .card p{ margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .card .path{ font-family:"IBM Plex Mono"; font-size:11.5px; color:var(--ink-faint); margin-top:auto; padding-top:8px; border-top:1px dashed var(--line); }
+
+  /* ---- Doc links ---- */
+  .doclinks{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:12px; margin-top:16px; }
+  .doclinks a{
+    display:block; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; text-decoration:none; box-shadow:var(--shadow);
+  }
+  .doclinks a:hover{ border-color:var(--line-strong); }
+  .doclinks .t{ color:var(--ink); font-weight:600; font-size:14px; display:block; margin-bottom:3px; }
+  .doclinks .d{ color:var(--ink-faint); font-size:12.5px; }
+
+  footer{
+    grid-column:1/-1; margin-top:8px; padding-top:24px; border-top:1px solid var(--line);
+    color:var(--ink-faint); font-size:13px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="masthead">
+    <div>
+      <p class="eyebrow">CS 111 · Program Design I</p>
+      <h1>PrairieLearn Runbook</h1>
+      <p class="sub">A working map of the course-content system — what it is, how to stand it up locally, and where things stand right now. Meant to get you poking at it productively before we sit down together.</p>
+    </div>
+    <div class="meta">
+      From Baker Franke — bfranke@uic.edu<br>
+      Updated 2026-09-05<br>
+      <a href="https://us.prairielearn.com/pl/course_instance/168220/instructor/instance_admin/assessments">Live course →</a>
+    </div>
+  </div>
+
+  <aside class="rail">
+    <p class="rail-label">Contents</p>
+    <nav>
+      <a href="#what">01 · What PrairieLearn is</a>
+      <a href="#start">02 · Get it running</a>
+      <a href="#map">03 · Repo map</a>
+      <a href="#anatomy">04 · Anatomy of a question</a>
+      <a href="#flow">05 · Getting a change live</a>
+      <a href="#stand">06 · Where things stand</a>
+      <a href="#karel">07 · Open problem: Karel</a>
+      <a href="#docs">08 · Official docs</a>
+    </nav>
+  </aside>
+
+  <main>
+
+    <section id="what">
+      <h2><span class="num">01</span> What PrairieLearn is</h2>
+      <p class="lede">PrairieLearn is an open-source, auto-gradable homework and exam platform — students answer coding, math, and interactive questions and get scored automatically wherever possible. UIC runs a hosted instance of it; CS 111 lives there as one course among many.</p>
+      <p>There are two separate repositories in play, and it matters which one you're in:</p>
+      <div class="cards" style="margin-top:14px;">
+        <div class="card">
+          <div class="top"><span class="name">PrairieLearn/PrairieLearn</span><span class="pill">platform</span></div>
+          <p>The engine itself — the app that renders questions, runs the grader, serves the site. You will basically never need this repo.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">PrairieLearn/pl-uic-cs111</span><span class="pill working">content</span></div>
+          <p>Our course's actual questions and assessments — plain files in a git repo. This is the one you'll clone and live in.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <h2><span class="num">02</span> Get it running</h2>
+      <p>Goal: clone the content repo, run a local copy of PrairieLearn against it in Docker, and confirm you can browse CS 111's questions. Fifteen minutes, no one else's help required.</p>
+      <ol class="steps">
+        <li>
+          <div>
+            <h4>Clone the course repo</h4>
+            <p>Ask Baker for repo access first if you don't have it yet.</p>
+            <pre>git clone https://github.com/PrairieLearn/pl-uic-cs111.git</pre>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h4>Install Docker Desktop</h4>
+            <p>PrairieLearn ships as one Docker image — you don't build the platform from source. Grab it from <a href="https://www.docker.com/products/docker-desktop/">docker.com/products/docker-desktop</a>, install it, open it once, and wait for the whale icon to say it's running.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h4>Run PrairieLearn, pointed at the repo</h4>
+            <p>This mounts your local checkout into the container at <code class="inline">/course</code>. Swap in your actual path.</p>
+            <pre>docker run -it --rm -p 3000:3000 \
+  -v ~/path/to/pl-uic-cs111:/course \
+  prairielearn/prairielearn:us-prod-live</pre>
+            <p>The <code class="inline">us-prod-live</code> tag matches what's actually running our live course — closer to reality than the bleeding-edge default image.</p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h4>Load the course and look around</h4>
+            <p>Open <a href="http://localhost:3000/pl">localhost:3000/pl</a>, click <strong>Load from disk</strong> in the top bar, and confirm <strong>CS 111: Program Design I</strong> shows up. Click into a question and hit Preview — you're now looking at a fully local, editable copy of the course.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="callout">
+        <p class="label">Editing loop, once it's running</p>
+        <p><strong>HTML / Python changes</strong> (<code class="inline">question.html</code>, <code class="inline">server.py</code>) — just reload the page in the browser.</p>
+        <p><strong>JSON changes</strong> (<code class="inline">info.json</code>, <code class="inline">infoAssessment.json</code>) — click <strong>Load from disk</strong> first, then reload.</p>
+      </div>
+      <div class="callout warn">
+        <p class="label">⚠ One thing this simple command can't do</p>
+        <p>Questions that auto-grade actual student-submitted <em>code</em> (not just a number or click) need "external grading" — PrairieLearn spins up a second, disposable Docker container per submission to run the code safely. The command above doesn't enable that. See §04 for what that means and which flags fix it — ask Baker if you hit a submission that just hangs.</p>
+      </div>
+    </section>
+
+    <section id="map">
+      <h2><span class="num">03</span> Repo map</h2>
+      <p>Everything under one course root. The two things you'll spend most of your time in are <code class="inline">questions/</code> and one course instance's <code class="inline">assessments/</code>.</p>
+      <div class="tree">
+pl-uic-cs111/<br>
+├── <span class="d">infoCourse.json</span> <span style="color:var(--ink-faint)">— course-wide metadata, topics, tags</span><br>
+├── <span class="a">questions/</span> <span style="color:var(--ink-faint)">— every question, one folder each</span><br>
+│&nbsp;&nbsp;&nbsp;├── graph-start-end/&nbsp;&nbsp;&nbsp;<span style="color:var(--ink-faint)">info.json · question.html · server.py</span><br>
+│&nbsp;&nbsp;&nbsp;├── max-of-two/&nbsp;&nbsp;&nbsp;<span style="color:var(--ink-faint)">+ tests/tests.py (autograded)</span><br>
+│&nbsp;&nbsp;&nbsp;└── … 30 more<br>
+├── <span class="a">courseInstances/</span> <span style="color:var(--ink-faint)">— one folder per semester offering</span><br>
+│&nbsp;&nbsp;&nbsp;├── TemplateCourseInstance/&nbsp;&nbsp;&nbsp;<span style="color:var(--ink-faint)">scratch / demo assessments</span><br>
+│&nbsp;&nbsp;&nbsp;├── Fa26/&nbsp;&nbsp;&nbsp;<span style="color:var(--ink-faint)">sections 44929, 50707, 50708</span><br>
+│&nbsp;&nbsp;&nbsp;└── Fa26-40304/<br>
+└── <span class="a">serverFilesCourse/</span> <span style="color:var(--ink-faint)">— shared code, e.g. autograder/</span>
+      </div>
+      <p style="margin-top:12px; font-size:14px;">A question only appears on an assessment if its <code class="inline">id</code> is listed in that assessment's <code class="inline">infoAssessment.json</code> — plenty of questions in this repo exist standalone and aren't assigned to anything yet.</p>
+    </section>
+
+    <section id="anatomy">
+      <h2><span class="num">04</span> Anatomy of a question</h2>
+      <p>Every question folder has the same three core files. <code class="inline">server.py</code> always runs, but what it's responsible for depends on the grading method.</p>
+      <table class="gtable">
+        <tr><th>File</th><th>Role</th></tr>
+        <tr><td><code class="inline">info.json</code></td><td>Title, topic, UUID, and — critically — <code class="inline">gradingMethod</code>.</td></tr>
+        <tr><td><code class="inline">question.html</code></td><td>Mustache template. <code class="inline">{{params.x}}</code> is escaped, <code class="inline">{{{params.x}}}</code> drops in raw HTML built by <code class="inline">server.py</code>.</td></tr>
+        <tr><td><code class="inline">server.py</code></td><td><code class="inline">generate()</code> builds random params + the correct answer. <code class="inline">grade()</code> is optional, in-process scoring for value-type answers.</td></tr>
+      </table>
+      <h3>The three grading methods</h3>
+      <table class="gtable">
+        <tr><th>Method</th><th>Where code runs</th><th>Use for</th></tr>
+        <tr>
+          <td><span class="pill done">Internal</span></td>
+          <td>Inside PrairieLearn's own server process — safe because the student only submits a <em>value</em> (a number, a click, a multiple-choice pick).</td>
+          <td>Numeric answers, multiple choice, <code class="inline">pl-drawing</code> click-to-place questions.</td>
+        </tr>
+        <tr>
+          <td><span class="pill working">External</span></td>
+          <td>A second, disposable Docker container spun up per submission — the student's actual code gets executed there, isolated from the real server.</td>
+          <td>"Write a function that…" coding questions. Needs an <code class="inline">image</code>, an <code class="inline">entrypoint</code>, and usually a <code class="inline">tests/</code> folder in <code class="inline">info.json</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="pill open">Manual</span></td>
+          <td>Nowhere — code is just saved. A human opens PrairieLearn's grading UI later and scores it by hand.</td>
+          <td>Open-ended or design-y responses that can't be mechanically checked.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="flow">
+      <h2><span class="num">05</span> Getting a change live</h2>
+      <p>The live site at <a href="https://us.prairielearn.com/pl/course_instance/168220/instructor/instance_admin/assessments">us.prairielearn.com</a> only ever reflects whatever is on this repo's <code class="inline">master</code> branch — and only after someone pulls it in. There's no way to preview a feature branch on the hosted site; that's what your local Docker copy is for.</p>
+      <ol class="steps">
+        <li><div><h4>Branch, edit, push</h4><p>Work locally against Docker, same as §02, until it looks right.</p></div></li>
+        <li><div><h4>Open a PR, get it reviewed and merged to <code class="inline">master</code></h4><p></p></div></li>
+        <li><div><h4>Sync it on the live site</h4><p>An Editor/Owner goes to the course's <strong>Sync</strong> page and clicks <strong>Pull from remote git repository</strong>. Merging alone does not update the live course — this step is easy to forget.</p></div></li>
+      </ol>
+      <p style="margin-top:14px; font-size:14px;">There's also an in-browser file editor on the live site for quick one-off edits — it commits straight to <code class="inline">master</code>, bypassing review. Fine for typo fixes; use the git flow for anything that touches grading logic.</p>
+    </section>
+
+    <section id="stand">
+      <h2><span class="num">06</span> Where things stand</h2>
+      <p>Some orientation on what's already in the repo and how far along each thing is — so you're not guessing at intent when you open a file.</p>
+      <div class="cards">
+        <div class="card">
+          <div class="top"><span class="name">simple-graph</span><span class="pill done">reference</span></div>
+          <p>A colleague's demo of the <code class="inline">pl-drawing</code> element — a click-to-place-a-point grid question with hand-drawn axis labels. Good model for grid/coordinate questions generally.</p>
+          <p class="path">questions/simple-graph</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">graph-start-end</span><span class="pill working">has a known bug</span></div>
+          <p>Same pattern, extended to a start/end pair. One of its buttons mis-renders a <code class="inline">label</code> attribute as stray text — flagged, not yet fixed. Good first bug to read through.</p>
+          <p class="path">questions/graph-start-end/server.py</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">karel-world-drawing-test</span><span class="pill open">my prototype</span></div>
+          <p>My own earlier attempt at a Karel question — hand-rolled SVG grid and a raw <code class="inline">&lt;canvas&gt;</code> click handler, <em>not</em> using <code class="inline">pl-drawing</code>. Grading is a brittle exact-string match. Likely to be superseded — see §07.</p>
+          <p class="path">questions/karel-world-drawing-test</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">larger-divided-by-smaller</span><span class="pill working">WIP, unstarted</span></div>
+          <p>A coding question I just scaffolded from the template — still has the default "palindrome" placeholder text and Manual grading. Needs to become an External-graded question, modeled on <code class="inline">max-of-two</code>.</p>
+          <p class="path">questions/larger-divided-by-smaller</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">max-of-two, output-1…6</span><span class="pill done">good examples</span></div>
+          <p>Real autograded coding questions pulled in from other course staff (Fa26 content) — each with a working <code class="inline">tests/tests.py</code>. Best examples to copy the pattern from.</p>
+          <p class="path">questions/max-of-two</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">Fa26 / Fa26-40304</span><span class="pill working">live-ish</span></div>
+          <p>The two real course instances for this fall, as distinct from <code class="inline">TemplateCourseInstance</code>, which is just scratch/demo material.</p>
+          <p class="path">courseInstances/Fa26*</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="karel">
+      <h2><span class="num">07</span> Open problem: Karel-style questions</h2>
+      <div class="callout warn">
+        <p class="label">⚠ Unsolved — good use of your background here</p>
+        <p>We don't have a settled pattern for Karel-the-Robot questions yet. Two incompatible approaches exist in the repo right now: my own <code class="inline">karel-world-drawing-test</code> (hand-rolled canvas + JS, fragile grading) and the colleague's <code class="inline">pl-drawing</code>-based <code class="inline">graph-start-end</code> (native tolerance-based grading, but wasn't built with Karel's fixed four-direction facing in mind).</p>
+          <p>Given you've managed engineering teams before, this is less "figure out PrairieLearn syntax" and more an actual design decision: pick one direction, or a hybrid, and prototype it. I have some half-formed ideas (representing Karel's facing as one of four preset <code class="inline">pl-vector</code> angles rather than a freehand point) — worth a real conversation before you sink time into it.</p>
+      </div>
+    </section>
+
+    <section id="docs">
+      <h2><span class="num">08</span> Official docs</h2>
+      <p>The canonical reference — better to read these directly than take my word for anything above.</p>
+      <div class="doclinks">
+        <a href="https://docs.prairielearn.com/elements/"><span class="t">Elements reference</span><span class="d">Every question element: pl-drawing, pl-file-editor, pl-multiple-choice…</span></a>
+        <a href="https://docs.prairielearn.com/question/server/"><span class="t">Writing server.py</span><span class="d">generate / prepare / parse / grade lifecycle</span></a>
+        <a href="https://docs.prairielearn.com/externalGrading/"><span class="t">External grading</span><span class="d">Docker images, entrypoints, tests/ folder</span></a>
+        <a href="https://docs.prairielearn.com/sync/"><span class="t">Editing &amp; syncing content</span><span class="d">Git workflow vs. the in-browser editor</span></a>
+        <a href="https://docs.prairielearn.com/installing/"><span class="t">Installing / running locally</span><span class="d">The Docker command reference in full</span></a>
+        <a href="https://docs.prairielearn.com/question/overview/"><span class="t">Question overview</span><span class="d">info.json options, topics, tags, randomization</span></a>
+      </div>
+    </section>
+
+    <footer>
+      <span>pl-uic-cs111 · CS 111 Program Design I · UIC</span>
+      <span>Questions before we meet — text or email me.</span>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>
