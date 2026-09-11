@@ -226,6 +226,8 @@ Here are two examples. Neither one uses a separate variable to remember what it 
 
 ### Checking a wall to the left
 
+![Case 1: there is a wall to the left — Karel turns left, confirms front is blocked, turns back right, and moves. Case 2: there is no wall to the left — Karel turns left, confirms front is clear, turns back right, and does nothing.](images/wall_to_left_cases.png)
+
 ```python
 class WallChecker(Robot):
     def turnRight(self):
@@ -245,6 +247,8 @@ class WallChecker(Robot):
 There's no built-in way to ask "is there a wall to my left?" — so `moveIfWallOnLeft()` turns to face left and uses `frontIsClear()` directly inside the `if` (it's now checking in what used to be Karel's left-hand direction). Whichever branch runs, the very first thing it does is `turnRight()` to restore the original direction: the *then* branch turns back and moves, the *else* branch just turns back. Either way, Karel ends the method facing the direction it started in.
 
 ### Stopping on two beepers
+
+![Before: Karel starts at avenue 2, with single beepers at avenues 3, 5, and 8, and a two-beeper pile at avenue 6. After: Karel has swept forward and stopped sitting on top of the two-beeper pile at avenue 6 — every beeper count in the world is exactly as it was before.](images/stop_if_two_beepers.png)
 
 ```python
 class BeeperChecker(Robot):
