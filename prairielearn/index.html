@@ -324,7 +324,7 @@
     </div>
     <div class="meta">
       From Baker Franke — bfranke@uic.edu<br>
-      Updated 2026-09-05<br>
+      Updated 2026-09-14<br>
       <a href="https://us.prairielearn.com/pl/course_instance/168220/instructor/instance_admin/assessments">Live course →</a>
     </div>
   </div>
@@ -338,8 +338,9 @@
       <a href="#anatomy">04 · Anatomy of a question</a>
       <a href="#flow">05 · Getting a change live</a>
       <a href="#stand">06 · Where things stand</a>
-      <a href="#karel">07 · Open problem: Karel</a>
-      <a href="#docs">08 · Official docs</a>
+      <a href="#karel-system">07 · Karel autograding, start to finish</a>
+      <a href="#karel-interactive">08 · Karel: click/pick questions</a>
+      <a href="#docs">09 · Official docs</a>
     </nav>
   </aside>
 
@@ -481,8 +482,8 @@ pl-uic-cs111/<br>
           <p class="path">questions/graph-start-end/server.py</p>
         </div>
         <div class="card">
-          <div class="top"><span class="name">karel-world-drawing-test</span><span class="pill open">my prototype</span></div>
-          <p>My own earlier attempt at a Karel question — hand-rolled SVG grid and a raw <code class="inline">&lt;canvas&gt;</code> click handler, <em>not</em> using <code class="inline">pl-drawing</code>. Grading is a brittle exact-string match. Likely to be superseded — see §07.</p>
+          <div class="top"><span class="name">karel-world-drawing-test</span><span class="pill open">superseded</span></div>
+          <p>My own earlier attempt at a Karel question — hand-rolled SVG grid and a raw <code class="inline">&lt;canvas&gt;</code> click handler, brittle exact-string grading. §07/§08 below cover what replaced it — leaving this here only as a "don't redo this" reference.</p>
           <p class="path">questions/karel-world-drawing-test</p>
         </div>
         <div class="card">
@@ -492,7 +493,7 @@ pl-uic-cs111/<br>
         </div>
         <div class="card">
           <div class="top"><span class="name">max-of-two, output-1…6</span><span class="pill done">good examples</span></div>
-          <p>Real autograded coding questions pulled in from other course staff (Fa26 content) — each with a working <code class="inline">tests/tests.py</code>. Best examples to copy the pattern from.</p>
+          <p>Real autograded coding questions pulled in from other course staff (Fa26 content) — each with a working <code class="inline">tests/tests.py</code>. Best examples to copy the pattern from for non-Karel coding questions.</p>
           <p class="path">questions/max-of-two</p>
         </div>
         <div class="card">
@@ -500,20 +501,204 @@ pl-uic-cs111/<br>
           <p>The two real course instances for this fall, as distinct from <code class="inline">TemplateCourseInstance</code>, which is just scratch/demo material.</p>
           <p class="path">courseInstances/Fa26*</p>
         </div>
+        <div class="card">
+          <div class="top"><span class="name">baker_karel_uic / delivery*</span><span class="pill done">good examples</span></div>
+          <p>Four Karel coding questions, simplest to most sophisticated (hardcoded → file-based → model-solution-derived → OOP-design checks). Start reading here — see §07.</p>
+          <p class="path">questions/baker_karel_delivery*</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">baker_karel_click_final_state</span><span class="pill done">resolved §08</span></div>
+          <p>The Karel-interaction "open problem" from the previous version of this page, resolved: native <code class="inline">pl-drawing</code> click-to-place + <code class="inline">pl-multiple-choice</code> for facing, no custom canvas/grading code at all.</p>
+          <p class="path">questions/baker_karel_click_final_state</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">baker_karel_pick_final_state</span><span class="pill done">resolved §08</span></div>
+          <p>Same idea, multiple-choice instead of click-to-place: pick the correct rendered "after" picture out of four generated choices (one correct, three mechanically-wrong distractors).</p>
+          <p class="path">questions/baker_karel_pick_final_state</p>
+        </div>
       </div>
     </section>
 
-    <section id="karel">
-      <h2><span class="num">07</span> Open problem: Karel-style questions</h2>
-      <div class="callout warn">
-        <p class="label">⚠ Unsolved — good use of your background here</p>
-        <p>We don't have a settled pattern for Karel-the-Robot questions yet. Two incompatible approaches exist in the repo right now: my own <code class="inline">karel-world-drawing-test</code> (hand-rolled canvas + JS, fragile grading) and the colleague's <code class="inline">pl-drawing</code>-based <code class="inline">graph-start-end</code> (native tolerance-based grading, but wasn't built with Karel's fixed four-direction facing in mind).</p>
-          <p>Given you've managed engineering teams before, this is less "figure out PrairieLearn syntax" and more an actual design decision: pick one direction, or a hybrid, and prototype it. I have some half-formed ideas (representing Karel's facing as one of four preset <code class="inline">pl-vector</code> angles rather than a freehand point) — worth a real conversation before you sink time into it.</p>
+    <section id="karel-system">
+      <h2><span class="num">07</span> Karel autograding, start to finish</h2>
+      <p class="lede">The short version, to repeat to a colleague building something similar: a Karel test file doesn't just pass/fail a submission — it can also report back exactly what the world and robot did, corner by corner and action by action. That one fact is the trick behind everything below: the same replay data renders an animated SVG for grading feedback, <em>and</em> the same test file's starting/ending world and expected robot state can drive the student-facing prompt itself, images included, with nothing hand-typed twice.</p>
+
+      <h3>The three-layer architecture</h3>
+      <table class="gtable">
+        <tr><th>Layer</th><th>File</th><th>Job</th></tr>
+        <tr><td>Renderer</td><td><code class="inline">karel/pl_render.py</code></td><td>Turns a chronological (robot, action) event log into a self-contained animated SVG. Knows nothing about PrairieLearn or grading — portable to anywhere the karel library goes.</td></tr>
+        <tr><td>Adapter</td><td><code class="inline">karel/pl_adapter.py</code></td><td>Bridges the karel library to PrairieLearn: runs a submission headlessly, exposes <code class="inline">check_*</code> functions (position, direction, beepers, world state, "was this method actually called," …), and writes <code class="inline">results.json</code>.</td></tr>
+        <tr><td>Spec</td><td><code class="inline">tests/karel_tester.py</code></td><td>The only file that's actually different per question: the starting world, the expected ending state (or a model solution to derive it from), and which <code class="inline">check_*</code> calls matter for that problem.</td></tr>
+      </table>
+      <p style="font-size:14px; margin-top:10px;">Every question vendors its own full copy of <code class="inline">karel/</code> under <code class="inline">tests/karel/</code> — the external grading container only ever sees that question's own <code class="inline">tests/</code> folder, so nothing can be shared by reference across questions. When you fix a bug in <code class="inline">pl_adapter.py</code>, copy it to every question's vendored copy by hand (or write a script — nobody has yet). The full function-by-function reference lives in <code class="inline">tests/karel/README.md</code> inside any of the questions below.</p>
+
+      <h3>Authoring checklist — what you set vs. what's automatic</h3>
+      <p>Every Karel question's <code class="inline">tests/karel_tester.py</code> answers the same handful of questions; everything else under <code class="inline">karel/</code> is generic and never needs to change per-question.</p>
+      <table class="gtable">
+        <tr><th>You specify…</th><th>As…</th><th>Notes</th></tr>
+        <tr>
+          <td><strong>Starting world</strong> (optional)</td>
+          <td><code class="inline">STARTING_WORLD</code> — embedded <code class="inline">.kwld</code> text, or a file loaded with <code class="inline">read_world_file()</code></td>
+          <td>Fed to <code class="inline">world_setup_from_text()</code>, then <code class="inline">run_student(world_setup=...)</code>. Omit entirely for a blank, default-size world.</td>
+        </tr>
+        <tr>
+          <td><strong>Expected ending state</strong></td>
+          <td>Either a <strong>model solution</strong> (<code class="inline">MODEL_SOLUTION</code> text/file, run once, then <code class="inline">expected_robot_from_run()</code> / <code class="inline">expected_world_from_run()</code>) — <em>or</em> a hand-typed <code class="inline">EXPECTED_ROBOT</code> dict / <code class="inline">ENDING_WORLD</code> text</td>
+          <td>Prefer the model-solution route (<code class="inline">baker_karel_delivery</code>) — the expected answer can never quietly drift out of sync with the world or the solution. Hand-typing it (<code class="inline">baker_karel_delivery_simple</code>) is fine for a first draft or a very simple problem.</td>
+        </tr>
+        <tr>
+          <td><strong>Starting robot</strong></td>
+          <td>Constructor args baked into <code class="inline">STARTER_CODE</code>'s own <code class="inline">UrRobot(street, avenue, direction, beepers)</code> line, and/or a <code class="inline">constructor_args</code> tuple passed to <code class="inline">check_solving_method_alone()</code> / <code class="inline">check_boolean_method()</code> for isolated-method questions</td>
+          <td>There's no separate "starting robot" setting apart from these two — whatever gets constructed there <em>is</em> the starting robot.</td>
+        </tr>
+        <tr>
+          <td><strong>Description</strong></td>
+          <td>Hand-written prose in <code class="inline">question.html</code>, or generated by <code class="inline">server.py</code> straight from the test file's own <code class="inline">BRIEF_DESCRIPTION</code> and world/expected-state data</td>
+          <td>The generated-prompt pattern (item 5 in the progression below) means the prompt can never go stale relative to what's actually being graded — worth graduating to once a question stabilizes.</td>
+        </tr>
+        <tr>
+          <td><strong>Starter code</strong></td>
+          <td><code class="inline">STARTER_CODE</code> — the stub shown to the student, or a class with one method stubbed out (<code class="inline">def someMethod(self): pass</code>) for isolated-method questions</td>
+          <td>Just a string, dropped verbatim into <code class="inline">question.html</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Which <code class="inline">check_*</code> calls matter</strong></td>
+          <td>A short list of function calls in <code class="inline">main()</code>, appended to a <code class="inline">tests</code> list</td>
+          <td>The one genuinely bespoke part of most test files — see the full menu below.</td>
+        </tr>
+      </table>
+
+      <div class="callout good">
+        <p class="label">✓ What takes care of itself — never touch these</p>
+        <p>Everything inside <code class="inline">run_student()</code> and <code class="inline">finalize()</code>: resetting the world/robot singleton to a clean state each run, executing the student's file headlessly via <code class="inline">runpy</code>, recording the full (robot, action) event log the replay animation is built from, deriving world size from <code class="inline">STARTING_WORLD</code>'s own <code class="inline">streets</code>/<code class="inline">avenues</code> lines (<code class="inline">parse_world_size()</code>) instead of a separately-hardcoded constant, summing all the <code class="inline">check_*</code> points into one score, and writing <code class="inline">results.json</code> in the shape PrairieLearn expects. A per-question test file's <code class="inline">main()</code> is normally under 20 lines.</p>
       </div>
+
+      <h3>Reference: the <code class="inline">check_*</code> library</h3>
+      <p>Every condition below is independent and optional — a test file only calls the ones it cares about, in any combination. Full docstrings (exact parameters, edge cases) live in <code class="inline">pl_adapter.py</code> itself and in <code class="inline">tests/karel/README.md</code>; this is the "which one do I want" menu.</p>
+      <table class="gtable">
+        <tr><th>Function</th><th>Checks</th></tr>
+        <tr><td><code class="inline">check_crashed(result)</code></td><td>Did the program crash at all (and where) — call this first and skip the rest of your checks if it did.</td></tr>
+        <tr><td><code class="inline">check_robot_end_state(result, EXPECTED_ROBOT)</code></td><td>Position, direction, and beeper count in one call — the default choice for "did the robot end up right." Returns a list of separate tests, so a student sees exactly which piece (if any) missed.</td></tr>
+        <tr><td><code class="inline">check_position</code> / <code class="inline">check_direction</code> / <code class="inline">check_beepers</code></td><td>The three individual pieces <code class="inline">check_robot_end_state()</code> calls under the hood — reach for one directly only if you want just that one thing checked.</td></tr>
+        <tr><td><code class="inline">check_world(world, EXPECTED_WORLD_TEXT)</code></td><td>The <em>whole</em> world's beeper layout after the run — not just what the robot itself is carrying.</td></tr>
+        <tr><td><code class="inline">check_beeper_at(world, street, avenue)</code></td><td>One specific corner, instead of the whole world.</td></tr>
+        <tr><td><code class="inline">check_action_count(robot, N)</code></td><td>Total number of primitive actions performed — catches a "technically ends in the right place, but took 40 pointless extra moves" solution.</td></tr>
+        <tr><td><code class="inline">check_robot_count(result, N)</code></td><td>How many robot instances were actually constructed (by ID, from the event log) — catches reassigning the same variable name to a fresh robot already sitting at the goal.</td></tr>
+        <tr><td><code class="inline">check_class_exists</code> / <code class="inline">check_methods_defined</code> / <code class="inline">check_method_count</code></td><td>OOP shape: the right class exists (optionally extending a given base), and it defines specific methods — or at least N of its own, name unimportant.</td></tr>
+        <tr><td><code class="inline">check_methods_called(called_methods, [...])</code></td><td>Were those methods actually <em>invoked</em>, not just defined — needs <code class="inline">run_student_tracking_methods()</code> in place of plain <code class="inline">run_student()</code> to populate <code class="inline">called_methods</code>.</td></tr>
+        <tr><td><code class="inline">check_oop_design(result, called_methods, SPEC)</code></td><td>One dict bundling all three OOP checks above (exists / defines / called), <code class="inline">check_robot_end_state()</code>-style.</td></tr>
+        <tr><td><code class="inline">check_solving_method_alone(result, class_name, constructor_args, method_name, ...)</code></td><td>Constructs a <em>fresh</em> instance and calls just that one method, proving it solves the problem by itself rather than being propped up by extra code in <code class="inline">main()</code>. Add <code class="inline">required_calls=[...]</code> to also require specific helper methods get called somewhere during it.</td></tr>
+        <tr><td><code class="inline">check_boolean_method(result, class_name, constructor_args, method_name, expected_return)</code></td><td>An isolated boolean "sensor" method, e.g. <code class="inline">beeperInFront()</code> — checks both the return value <em>and</em> that the call had no side effects on the robot's position/direction/beepers.</td></tr>
+        <tr><td><code class="inline">check_path_vs_model(robot, MODEL_SOLUTION_TEXT)</code></td><td>Compares the student's actual (street, avenue) path against a model solution's own recorded path, ignoring direction/beepers/turn-count. Defined and ready to use — no built question calls it yet.</td></tr>
+      </table>
+
+      <h3>Reference: <code class="inline">render_world_snapshot()</code></h3>
+      <p>The one function doing all the actual drawing behind every before/after picture in this course, including the click/pick questions in §08 — worth knowing cold. It renders <strong>one static, frozen frame</strong> (no animation) of a Karel world, optionally with a robot drawn into it, as a self-contained SVG string — the exact same drawing code the grading replay animation uses (<code class="inline">build_svg_animation()</code>, just fed a one-event log instead of a whole run), so a picture can never quietly drift out of sync with what the world text actually says.</p>
+      <pre><span class="c"># pl_adapter.render_world_snapshot(world_text, robot=None, world_streets=None, world_avenues=None) -> svg_text: str
+#
+# world_text     (str, required) - .kwld-format world text.
+#     world_text = """KarelWorld
+#     streets 4
+#     avenues 4
+#     beepers 2 3 1
+#     """
+#
+# robot          (dict or None, default None) - {"street", "avenue",
+#     "direction", "beepers"}; all four required if given. "direction" is
+#     a string: "East", "North", "West", or "South". None draws the bare
+#     world with no robot in it at all.
+#     robot = {"street": 2, "avenue": 3, "direction": "North", "beepers": 1}
+#
+# world_streets  (int or None, default None) - canvas height, in corners.
+#     None derives it from the `streets N` line inside world_text instead.
+#     world_streets = 4
+#
+# world_avenues  (int or None, default None) - canvas width, in corners.
+#     None derives it from the `avenues N` line inside world_text instead.
+#     world_avenues = 4
+#
+# Returns: svg_text (str) - a complete, self-contained "&lt;svg&gt;...&lt;/svg&gt;"
+# string. Hand it straight back from a PrairieLearn file() hook, or embed
+# it directly into a chunk of HTML - both are equally valid.
+
+<span class="k">svg_text</span> = pl_adapter.render_world_snapshot(
+    world_text=<span class="k">"""KarelWorld
+streets 4
+avenues 4
+beepers 2 3 1
+"""</span>,
+    robot={<span class="k">"street"</span>: 2, <span class="k">"avenue"</span>: 3, <span class="k">"direction"</span>: <span class="k">"North"</span>, <span class="k">"beepers"</span>: 1},
+    world_streets=4,
+    world_avenues=4,
+)</pre>
+      <p style="font-size:14px; margin-top:10px;">See <code class="inline">questions/baker_karel_pick_final_state_simple/server.py</code> for this exact call wired up against real (non-hardcoded) data, with the same documentation reproduced right above the call site.</p>
+
+      <h3>Example progression — simple to fully automated</h3>
+      <p>All seven of these solve some version of "packy picks up a package, carries it around a wall, drops it off" or a short trace-by-hand program. Read them in this order; each adds exactly one new idea on top of the last.</p>
+      <div class="cards">
+        <div class="card">
+          <div class="top"><span class="name">1 · baker_karel_uic</span><span class="pill done">simplest</span></div>
+          <p>Everything hardcoded in <code class="inline">karel_tester.py</code>: a fixed starting robot, a fixed expected ending position. Hand-written <code class="inline">question.html</code>.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">2 · delivery_simple</span></div>
+          <p>Adds a real starting/ending <em>world</em> (walls, beepers) as embedded <code class="inline">.kwld</code> text, checked with <code class="inline">check_world()</code>/<code class="inline">check_robot_end_state()</code>.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">3 · delivery</span></div>
+          <p>Same problem, but the world loads from a file on disk, and the expected ending state is <em>derived</em> by actually running a model solution — never hand-typed.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">4 · delivery_objects_and_methods</span></div>
+          <p>Adds OOP-design checks: does the right class/methods exist, were they <em>actually called</em> (not just defined), does one "solving method" solve the whole problem alone.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">5 · same three, + server.py</span><span class="pill working">automated</span></div>
+          <p>The delivery questions' <code class="inline">question.html</code> is now a thin Mustache template — <code class="inline">server.py</code> reads <code class="inline">karel_tester.py</code> live and generates the prose <em>and</em> the before/after pictures on every variant. Edit the test file; the prompt follows automatically, no build step.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">6 · click_final_state</span><span class="pill done">new interaction</span></div>
+          <p>Not a coding question at all: trace a short program by hand, click the grid, pick the facing. See §08.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">7 · pick_final_state</span><span class="pill done">new interaction</span></div>
+          <p>Same trace-by-hand idea, multiple-choice instead of click-to-place. See §08.</p>
+        </div>
+        <div class="card">
+          <div class="top"><span class="name">7b · pick_final_state_simple</span><span class="pill done">read this first</span></div>
+          <p>The exact same question as #7, but every fact is a hardcoded constant in one file and the distractors are typed-out dicts instead of a rotation formula — start here if #7's helper functions are hard to trace, then "graduate" to #7 once hardcoding everything feels tedious.</p>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <p class="label">✓ One-paragraph pitch, if you're describing this to someone else</p>
+        <p>Our Karel test files don't just grade a submission — they report back exactly what the world and robot did, which is enough to render an animated SVG replay for feedback. We took that one step further: the same test file (starting world, expected ending state, OOP requirements) also contains everything needed to generate the <em>question prompt itself</em> — the before/after pictures and the English description of the goal — so a question author writes the grading logic once and gets a correct, never-stale prompt for free.</p>
+      </div>
+    </section>
+
+    <section id="karel-interactive">
+      <h2><span class="num">08</span> Karel: click/pick questions (the old "open problem")</h2>
+      <p>The previous version of this page flagged Karel's four-direction facing as an unsolved design question between two incompatible prototypes. Resolved: use <code class="inline">pl-drawing</code> natively (no custom canvas/JS, no custom <code class="inline">parse()</code>/<code class="inline">grade()</code>) for position, and a plain <code class="inline">pl-multiple-choice</code> for facing — Karel only ever faces exactly one of 4 cardinal directions, so there's no "close enough" angle to reason about, which makes <code class="inline">pl-vector</code>'s angle-tolerance machinery more trouble than it's worth here.</p>
+
+      <h3>baker_karel_click_final_state</h3>
+      <p>Shows a short program (<code class="inline">pl-code</code>) and the starting world drawn with <code class="inline">pl-drawing</code>'s own primitives (<code class="inline">pl-line</code>/<code class="inline">pl-circle</code>/<code class="inline">pl-rectangle</code> — not the SVG renderer from §07, since <code class="inline">pl-drawing</code> needs objects placed in its own pixel space to grade against). The student clicks "Add point," drags it onto the corner where the robot ends up, and separately picks its facing from 4 radio buttons. No external grading container anywhere — both parts grade natively inside PrairieLearn's own server process.</p>
+      <p>The correct answer is never hand-typed: <code class="inline">server.py</code> actually runs the displayed code through the real karel library headlessly (same trick as a model solution in §07) to get the true final state.</p>
+
+      <h3>baker_karel_pick_final_state</h3>
+      <p>Same scenario, multiple-choice instead of click-to-place: four rendered "after" pictures (via the same <code class="inline">render_world_snapshot()</code> from §07, so these <em>do</em> look like the delivery questions' pictures), one correct and three mechanically-generated distractors — wrong facing, one step short, one step too far. <code class="inline">pl-multiple-choice</code> handles shuffling and grading on its own.</p>
+
+      <div class="callout warn">
+        <p class="label">⚠ One gotcha that cost real debugging time</p>
+        <p><code class="inline">pl-drawing</code> color attributes only accept real CSS colors (<code class="inline">"gold"</code>, <code class="inline">"black"</code>) or PrairieLearn's own named palette (<code class="inline">"gray1"</code>, <code class="inline">"blue2"</code>, …) — <em>not</em> a palette name that doesn't exist, like <code class="inline">"gold1"</code> or <code class="inline">"white1"</code>. Sync doesn't catch this at all; it only throws (<code class="inline">ValueError: Attribute "color" must be a CSS-style RGB string</code>) the first time a variant actually tries to render. If a <code class="inline">pl-drawing</code> question won't load, check colors first.</p>
+        <p>Second gotcha: a <code class="inline">pl-drawing-button</code> doesn't place a point where you click — clicking it drops a new point at a fixed default corner, which the student then has to <em>drag</em> onto the right spot. Say this explicitly in the question prompt, or students will click uselessly and never find the drag.</p>
+      </div>
+
+      <h3>Not built yet: sketch the whole path</h3>
+      <p style="font-size:14px;">Asked for but not attempted: instead of just the final corner, have the student click out the <em>entire</em> sequence of corners the robot visits. <code class="inline">pl-drawing</code> has no multi-point "path" object, but one native approach should work — give the student N copies of the <code class="inline">pl-point</code> button (one per expected corner in the model's real recorded path) and grade each independently via <code class="inline">pl-drawing-answer</code>, same mechanism as above just repeated. The real limitation: it only works for a path of a length you already know, so a student who (wrongly) thinks the path is longer or shorter than the model's has nowhere to put the extra/missing clicks. Comparing an arbitrary-length submitted path against the model's actual path (à la <code class="inline">kareltestutils.describePathDivergence</code>, already used in §07's <code class="inline">check_path_vs_model</code>) would need a custom <code class="inline">parse()</code>/<code class="inline">grade()</code> in <code class="inline">server.py</code> instead of native grading — a bigger lift, not yet prototyped.</p>
     </section>
 
     <section id="docs">
-      <h2><span class="num">08</span> Official docs</h2>
+      <h2><span class="num">09</span> Official docs</h2>
       <p>The canonical reference — better to read these directly than take my word for anything above.</p>
       <div class="doclinks">
         <a href="https://docs.prairielearn.com/elements/"><span class="t">Elements reference</span><span class="d">Every question element: pl-drawing, pl-file-editor, pl-multiple-choice…</span></a>
@@ -522,6 +707,8 @@ pl-uic-cs111/<br>
         <a href="https://docs.prairielearn.com/sync/"><span class="t">Editing &amp; syncing content</span><span class="d">Git workflow vs. the in-browser editor</span></a>
         <a href="https://docs.prairielearn.com/installing/"><span class="t">Installing / running locally</span><span class="d">The Docker command reference in full</span></a>
         <a href="https://docs.prairielearn.com/question/overview/"><span class="t">Question overview</span><span class="d">info.json options, topics, tags, randomization</span></a>
+        <a href="https://docs.prairielearn.com/pl-drawing/"><span class="t">pl-drawing reference</span><span class="d">Every drawing primitive and button type — used by §08</span></a>
+        <a href="https://docs.prairielearn.com/clientServerFiles/"><span class="t">Client &amp; server files</span><span class="d">serverFilesCourse auto-path, clientFilesQuestion, dynamic files</span></a>
       </div>
     </section>
 
