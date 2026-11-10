@@ -1,0 +1,1486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markov Chain Lab</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --sunken: #eff1f3;
+  --ink: #1b1f24;
+  --ink-2: #4c5560;
+  --ink-3: #66707c;
+  --line: #d9dde2;
+  --accent: #1f5fbf;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2ecfa;
+  --bar: #84909f;
+  --mark: #fdf0c2;
+  --mark-ink: #1b1f24;
+  --code-bg: #f7f8fa;
+  --code-kw: #8a2f9f;
+  --code-str: #1c7043;
+  --code-com: #66707c;
+  --code-fn: #1f5fbf;
+  --danger: #a4262c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #14171b;
+    --surface: #1c2025;
+    --sunken: #252a30;
+    --ink: #eceff2;
+    --ink-2: #b6bec7;
+    --ink-3: #98a2ad;
+    --line: #363c44;
+    --accent: #7fb0f7;
+    --accent-ink: #10151b;
+    --accent-soft: #24344b;
+    --bar: #6f7b88;
+    --mark: #5c4c14;
+    --mark-ink: #fff6d6;
+    --code-bg: #171a1f;
+    --code-kw: #d59be6;
+    --code-str: #7fcfa0;
+    --code-com: #98a2ad;
+    --code-fn: #7fb0f7;
+    --danger: #ff9a9e;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex; flex-direction: column; min-height: 100vh;
+}
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+button, input, select { font: inherit; color: inherit; }
+button {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 6px;
+  padding: 6px 14px; cursor: pointer; min-height: 36px;
+}
+button:hover:not(:disabled) { background: var(--sunken); }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
+input, select {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 6px;
+  padding: 6px 10px; min-height: 36px;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+label.field { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 14px; }
+label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+
+header {
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+}
+h1 { font-size: 18px; margin: 0; font-weight: 700; }
+.spacer { flex: 1; }
+.order { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.order button { border: 0; border-radius: 0; background: var(--surface); padding: 6px 12px; }
+.order button + button { border-left: 1px solid var(--line); }
+.order button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+#add-row { padding: 0 20px; background: var(--surface); }
+#add-panel { display: flex; flex-wrap: wrap; gap: 16px 40px; padding: 12px 0 14px; border-bottom: 1px solid var(--line); }
+#add-panel[hidden] { display: none; }
+.add-option { display: flex; flex-direction: column; gap: 6px; max-width: 440px; font-size: 14px; }
+.add-option strong { font-size: 15px; }
+#busy { font-size: 14px; color: var(--accent); padding-left: 12px; }
+#add-status:not(:empty) { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+#add-status button { min-height: 30px; padding: 2px 10px; margin: 4px 6px 0 0; }
+progress { width: 240px; vertical-align: middle; margin-left: 8px; accent-color: var(--accent); }
+
+nav {
+  display: flex; gap: 4px; padding: 0 20px; background: var(--surface);
+  border-bottom: 1px solid var(--line); align-items: center; flex-wrap: wrap;
+}
+nav [role="tab"] {
+  border: 0; background: none; border-radius: 0; padding: 10px 14px;
+  border-bottom: 3px solid transparent; color: var(--ink-2); min-height: 44px;
+}
+nav [role="tab"]:hover:not(:disabled) { background: none; color: var(--ink); }
+nav [role="tab"][aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+#stats { font-size: 14px; color: var(--ink-3); padding: 8px 0 8px 12px; }
+
+#workspace { flex: 1; min-height: 0; display: flex; }
+main { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.tab-panel { flex: 1; min-height: 0; display: none; padding: 16px 20px; }
+.tab-panel.active { display: flex; flex-direction: column; gap: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.hint { color: var(--ink-3); font-size: 14px; margin: 0; }
+.error { color: var(--danger); font-size: 14px; margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+
+/* Lyrics */
+#panel-lyrics.active { flex-direction: row; }
+#song-side { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+#song-filter { width: 100%; }
+#song-list { flex: 1; overflow-y: auto; padding: 4px; min-height: 0; }
+#song-list button {
+  display: flex; justify-content: space-between; gap: 8px; width: 100%; text-align: left;
+  border: 0; background: none; padding: 5px 8px; min-height: 0; font-size: 14px;
+}
+.tag { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+#song-list button.repeat .song-name { color: var(--ink-3); }
+#lyrics-text { flex: 1; overflow-y: auto; padding: 8px 24px 24px; min-width: 0; }
+#lyrics-text h2 { font-size: 18px; margin: 20px 0 2px; }
+#lyrics-text .sub { font-size: 13px; color: var(--ink-3); margin: 0 0 10px; }
+#lyrics-text pre { font: inherit; white-space: pre-wrap; margin: 0; overflow-wrap: anywhere; }
+
+/* Chain */
+#chain-scroll { flex: 1; overflow: auto; min-height: 0; }
+table { border-collapse: collapse; width: 100%; }
+th {
+  position: sticky; top: 0; background: var(--surface); text-align: left; z-index: 1;
+  font-size: 13px; font-weight: 600; color: var(--ink-2); padding: 8px 12px; border-bottom: 1px solid var(--line);
+}
+td { padding: 7px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.key { font-weight: 600; white-space: nowrap; }
+td.seen { color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+th.seen { text-align: right; }
+tr.hit td { background: var(--accent-soft); }
+.chip {
+  display: inline-flex; gap: 6px; align-items: baseline; min-height: 0; padding: 1px 8px;
+  margin: 2px 4px 2px 0; border-radius: 12px; background: var(--sunken); border-color: transparent;
+}
+.chip b { font-weight: 400; color: var(--ink-3); font-size: 13px; font-variant-numeric: tabular-nums; }
+.more { color: var(--ink-3); font-size: 13px; white-space: nowrap; }
+
+/* Generate */
+#output {
+  padding: 14px 16px; min-height: 110px; max-height: 38vh; overflow-y: auto; font-size: 18px; line-height: 1.7;
+}
+#output .w { border-radius: 3px; padding: 1px 2px; }
+#output .w.context { background: var(--mark); color: var(--mark-ink); }
+#output .w.new { background: var(--accent); color: var(--accent-ink); }
+#stages { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; font-size: 14px; }
+#stages li { padding: 3px 10px; border-radius: 12px; background: var(--sunken); color: var(--ink-2); }
+#stages li.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+#step-panel { padding: 12px 16px; flex: 1; min-height: 160px; overflow-y: auto; }
+#step-title { margin: 0 0 10px; font-size: 15px; }
+#step-title .mono { font-weight: 700; }
+.bar-row {
+  display: grid; grid-template-columns: minmax(70px, 150px) 1fr 150px; gap: 10px;
+  align-items: center; padding: 2px 4px; border-radius: 4px; font-size: 15px;
+}
+.bar-row .word { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-row .track { height: 14px; }
+.bar-row .bar { height: 100%; min-width: 2px; background: var(--bar); border-radius: 0 4px 4px 0; }
+.bar-row .val { color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar-row:hover { background: var(--sunken); }
+.bar-row.picked .bar { background: var(--accent); }
+.bar-row.picked .word { font-weight: 700; }
+.bar-row.picked .val { color: var(--ink); font-weight: 600; }
+#bars { max-width: 860px; }
+#step-panel { position: relative; }
+#step-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 10px; }
+#step-head #step-title { margin: 0; }
+.view-toggle { flex-shrink: 0; }
+.view-toggle button { min-height: 32px; padding: 3px 12px; font-size: 14px; }
+.tile {
+  display: inline-block; padding: 0 5px; margin: 1px 2px; border-radius: 4px;
+  background: var(--sunken); font-size: 14px; line-height: 1.6;
+}
+.tile.same { background: var(--mark); color: var(--mark-ink); }
+.tile.scan { outline: 2px solid var(--accent); outline-offset: -1px; }
+.tile.picked { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+#pile-readout { min-height: 21px; margin: 0 0 6px; }
+.pile-cell .tile { cursor: pointer; }
+.show-all { min-height: 0; padding: 0 8px; font-size: 13px; margin-left: 4px; }
+.others { color: var(--ink-3); font-size: 13px; margin: 6px 0 0; }
+
+/* Code */
+#code-panel {
+  width: min(46%, 640px); flex-shrink: 0; border-left: 1px solid var(--line);
+  background: var(--code-bg); display: flex; flex-direction: column; min-height: 0;
+  position: relative;
+}
+#code-resizer {
+  position: absolute; left: -5px; top: 0; bottom: 0; width: 10px; z-index: 2;
+  cursor: col-resize; touch-action: none;
+}
+#code-resizer::after {
+  content: ""; position: absolute; left: 4px; top: 0; bottom: 0; width: 2px; background: transparent;
+}
+#code-resizer:hover::after, #code-resizer.dragging::after, #code-resizer:focus-visible::after { background: var(--accent); }
+#code-resizer:focus-visible { outline: none; }
+body.resizing { cursor: col-resize; user-select: none; }
+#output .w.nl { color: var(--ink-3); font-size: 0.8em; padding: 0 1px; }
+#temp-val { display: inline-block; width: 2.4em; }
+#code-panel[hidden] { display: none; }
+#code-head { padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+#code { flex: 1; overflow: auto; padding: 8px 0; font-size: 14px; line-height: 1.55; }
+.line { display: flex; white-space: pre; padding-right: 16px; min-width: max-content; }
+.line .no { width: 40px; flex-shrink: 0; padding-right: 12px; text-align: right; color: var(--ink-3); user-select: none; }
+.line.on { background: var(--mark); color: var(--mark-ink); }
+.line.on span { color: inherit; }
+.kw { color: var(--code-kw); font-weight: 600; }
+.str { color: var(--code-str); }
+.com { color: var(--code-com); font-style: italic; }
+.fn { color: var(--code-fn); }
+
+@media (max-width: 900px) {
+  body { height: auto; }
+  #workspace { flex-direction: column; }
+  #code-panel { width: 100% !important; border-left: 0; border-top: 1px solid var(--line); max-height: 70vh; }
+  #code-resizer { display: none; }
+  #panel-lyrics.active { flex-direction: column; }
+  #song-side { width: 100%; }
+  #song-list { max-height: 200px; }
+  #lyrics-text { max-height: 70vh; }
+  #chain-scroll { max-height: 70vh; }
+}
+@media (min-width: 901px) { body { height: 100vh; overflow: hidden; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Markov Chain Lab</h1>
+  <label class="field">Source <select id="artist"></select></label>
+  <button id="add-toggle" aria-expanded="false" aria-controls="add-panel">+ Add source</button>
+  <span class="spacer"></span>
+  <span class="field" style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2)" id="order-label">Context
+    <span class="order" role="group" aria-labelledby="order-label">
+      <button data-order="1" aria-pressed="true">1 word</button><button data-order="2" aria-pressed="false">2</button><button data-order="3" aria-pressed="false">3</button>
+    </span>
+  </span>
+  <label class="check"><input type="checkbox" id="skip"> Skip repeat songs</label>
+  <label class="check" title="Off: the chain only learns words. On: periods, commas, question marks and line breaks are tokens too.">
+    <input type="checkbox" id="punct" checked> Learn punctuation
+  </label>
+  <label class="check"><input type="checkbox" id="filter" checked> Hide explicit words</label>
+  <button id="code-toggle" aria-pressed="false">Show Python</button>
+</header>
+<div id="add-row">
+  <div id="add-panel" hidden>
+    <div class="add-option">
+      <strong>Upload a file</strong>
+      <span class="hint">An artist file (a .csv with a "lyrics" column, like the ones this app makes) or any plain text file (.txt).</span>
+      <input type="file" id="upload-file" accept=".csv,.txt,text/plain,text/csv">
+      <span class="hint" id="upload-note"></span>
+    </div>
+    <div class="add-option">
+      <strong>Pull an artist from the Genius dataset</strong>
+      <form id="add-form" class="toolbar" style="gap:6px">
+        <input id="add-name" placeholder="Artist name" aria-label="Artist name" size="20">
+        <button id="add-btn">Add</button>
+      </form>
+      <span class="hint" id="extract-off" hidden>Not available here. This needs the 3 GB Genius lyrics file, which only the
+        local version of this app can read. If you have an artist file, upload it instead.</span>
+    </div>
+  </div>
+  <div id="add-status" aria-live="polite"></div>
+</div>
+
+<nav role="tablist">
+  <button role="tab" data-tab="lyrics" aria-selected="false">1. Text</button>
+  <button role="tab" data-tab="chain" aria-selected="false">2. Chain</button>
+  <button role="tab" data-tab="generate" aria-selected="false">3. Generate</button>
+  <span id="stats"></span>
+  <span id="busy" hidden>Working…</span>
+</nav>
+
+<div id="workspace">
+  <main>
+    <section class="tab-panel" id="panel-lyrics" role="tabpanel">
+      <div id="song-side">
+        <input id="song-filter" placeholder="Filter titles" aria-label="Filter titles">
+        <div id="song-list" class="card"></div>
+      </div>
+      <div id="lyrics-text" class="card" tabindex="0"></div>
+    </section>
+
+    <section class="tab-panel" id="panel-chain" role="tabpanel">
+      <div class="toolbar">
+        <label class="field">Rows <input id="rows" type="number" min="1" max="500" value="50" style="width:84px"></label>
+        <label class="field">Sort
+          <select id="sort">
+            <option value="common">Most common</option>
+            <option value="least">Least common</option>
+            <option value="first">First seen in lyrics</option>
+          </select>
+        </label>
+        <label class="field">Find <input id="find" placeholder="a word" size="16"></label>
+        <span class="order view-toggle" role="group" aria-label="How to show the following words">
+          <button data-view="counts" aria-pressed="true">Counts</button><button data-view="pile" aria-pressed="false">Word pile</button>
+        </span>
+      </div>
+      <p class="hint" id="chain-hint"></p>
+      <p class="error" id="chain-error" hidden></p>
+      <div id="chain-scroll" class="card">
+        <table>
+          <thead><tr><th id="key-head">Word</th><th class="seen">Seen</th><th id="follow-head">Words that came next (click one to go to it)</th></tr></thead>
+          <tbody id="chain-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-generate" role="tabpanel">
+      <form id="gen-form" class="toolbar">
+        <label class="field" title="A token is a word, a punctuation mark, or a line break (⏎)">Tokens <input id="n" type="number" min="1" max="2000" value="60" style="width:84px"></label>
+        <label class="field">Start with <input id="start" placeholder="random" size="14"></label>
+        <button class="primary" id="gen-btn">Generate</button>
+        <button type="button" id="step-btn">Step</button>
+        <button type="button" id="play-btn">Play</button>
+        <button type="button" id="clear-btn">Clear</button>
+        <label class="field" title="Below 1: common tokens win more often. Above 1: the odds even out.">Temperature
+          <input id="temp" type="range" min="0.2" max="2" step="0.1" value="1" style="width:130px">
+          <output id="temp-val" class="mono" for="temp">1.0</output>
+        </label>
+      </form>
+      <p class="error" id="gen-error" hidden></p>
+      <p class="hint" id="temp-note" hidden>A word pile has no temperature: every tile is equally likely, which is the same as temperature 1. Switch to Counts to use the slider in Step mode.</p>
+      <div id="output" class="card" aria-live="off"></div>
+      <ol id="stages">
+        <li data-stage="read">Read the last tokens</li>
+        <li data-stage="lookup">Look them up in the chain</li>
+        <li data-stage="pick">Pick one at random, weighted by count</li>
+        <li data-stage="append">Add it to the text</li>
+      </ol>
+      <div id="step-panel" class="card">
+        <div id="step-head">
+          <p id="step-title" class="hint">Press Step to watch one word get chosen.</p>
+          <span class="order view-toggle" role="group" aria-label="How to show the following words">
+            <button data-view="counts" aria-pressed="true">Counts</button><button data-view="pile" aria-pressed="false">Word pile</button>
+          </span>
+        </div>
+        <div id="bars"></div>
+        <p class="others" id="others" hidden></p>
+        <div id="pile-wrap" hidden>
+          <p class="hint" id="pile-readout"></p>
+          <div id="pile"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="code-panel" hidden aria-label="Python source">
+    <div id="code-resizer" role="separator" aria-orientation="vertical" aria-label="Resize the code panel" tabindex="0" title="Drag to resize. Double-click to reset."></div>
+    <div id="code-head"><span class="mono">markov.py</span>: the code running behind this page</div>
+    <div id="code" class="mono" tabindex="0"></div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+
+const state = {
+  artist: null,
+  order: 1,
+  skip: false,
+  filter: true,
+  tab: "lyrics",
+  view: "counts",    // "counts" or "pile"
+  stage: null,       // which of the four generate stages is showing
+  lastStep: null,    // the word choice currently on screen
+  pileStep: null,    // the step whose tiles are currently drawn
+  pileTiles: [],
+  text: [],          // the generated words
+  punct: true,       // learn punctuation and line breaks as tokens
+  temperature: 1,
+  context: 0,        // how many trailing words to highlight as context
+  newWord: false,    // highlight the last word as just added
+  playing: false,
+  stepping: false,
+  run: 0,            // bumped on any reset, so stale async work can tell it's stale
+  chainRun: 0,
+  lyricsRun: 0,
+  lyricsLoaded: null,
+  songs: [],
+  songSources: new Set(),  // names in the dropdown that are artists (counted in songs)
+  textFiles: null,         // web version: which public domain texts are downloaded
+};
+
+// ---------- Talking to Python ----------
+// Local version: Flask (app.py) answers. Web version: there's no server, so the
+// same engine.py runs right here in the browser, using Pyodide.
+
+let MODE = "local";
+let py = null;           // Pyodide, in the web version
+let handleJson = null;   // engine.handle_json, in the web version
+const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+const EXTRACT_OFF = "Pulling artists from the Genius dataset only works in the local version.";
+const SLOW_ROUTES = new Set(["lyrics", "chain", "generate", "upload"]);
+
+async function api(url, body) {
+  if (MODE === "web") return callPython(url, body);
+  const options = body === undefined ? {} : {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  };
+  const response = await fetch(url, options);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `The server had a problem (${response.status}).`);
+  return data;
+}
+
+async function detectMode() {
+  try {
+    const response = await fetch("api/mode");
+    if (response.ok && (await response.json()).mode === "local") return "local";
+  } catch (error) { /* no server: this is the web version */ }
+  return "web";
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("Couldn't load Python. Check your internet connection and reload."));
+    document.head.append(script);
+  });
+}
+
+async function fetchText(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Couldn't load ${url} (${response.status}).`);
+  return response.text();
+}
+
+async function startPython() {
+  $("stats").textContent = "Loading Python into your browser. The first visit takes a few seconds…";
+  await loadScript(PYODIDE_URL + "pyodide.js");
+  py = await loadPyodide({ indexURL: PYODIDE_URL });
+  py.FS.mkdirTree("/app/texts");
+  const files = ["markov.py", "engine.py", "find_repeats.py", "filter_words.txt"];
+  const [texts, ...contents] = await Promise.all([
+    fetch("texts/index.json").then((r) => r.json()),
+    ...files.map(fetchText),
+  ]);
+  files.forEach((file, i) => py.FS.writeFile("/app/" + file, contents[i]));
+  py.runPython('import sys\nsys.path.insert(0, "/app")\nimport engine');
+  const engine = py.pyimport("engine");
+  engine.add_text_folder("/app/texts", py.toPy(texts));
+  handleJson = engine.handle_json;
+  state.textFiles = new Map(texts.map((name) => [name, false]));  // name -> downloaded yet?
+}
+
+// Texts download the first time they're used, so visitors only fetch what they look at.
+async function ensureText(name) {
+  if (!state.textFiles || state.textFiles.get(name) !== false) return;
+  $("stats").textContent = `Downloading ${name}…`;
+  py.FS.writeFile(`/app/texts/${name}.csv`, await fetchText(`texts/${encodeURIComponent(name)}.csv`));
+  state.textFiles.set(name, true);
+}
+
+async function callPython(url, body) {
+  const [path, queryString] = url.split("?");
+  const route = path.replace(/^\/api\//, "");
+  if (route.startsWith("extract")) throw new Error(EXTRACT_OFF);
+  const params = { ...Object.fromEntries(new URLSearchParams(queryString || "")), ...(body || {}) };
+  if (params.artist) await ensureText(params.artist);
+
+  const slow = SLOW_ROUTES.has(route);
+  if (slow) {
+    // Python runs on the page's own thread, so let "Working…" appear before it starts.
+    $("busy").hidden = false;
+    await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  }
+  try {
+    const data = JSON.parse(handleJson(route, JSON.stringify(params)));
+    if (data.error) throw new Error(data.error);
+    return data;
+  } catch (error) {
+    throw new Error(error.message.split("\n").filter(Boolean).pop() || "Python had a problem.");
+  } finally {
+    if (slow) $("busy").hidden = true;
+  }
+}
+
+function settings() {
+  return { artist: state.artist, order: state.order, skip: state.skip ? 1 : 0, punct: state.punct ? 1 : 0 };
+}
+
+function query(extra = {}) {
+  return new URLSearchParams({ ...settings(), ...extra }).toString();
+}
+
+function showError(id, message) {
+  const el = $(id);
+  el.textContent = message || "";
+  el.hidden = !message;
+}
+
+// ---------- Explicit word filter ----------
+
+let exactBlock = new Set();
+let prefixBlock = [];
+let containsBlock = [];
+
+function isBlocked(word) {
+  const w = word.toLowerCase().replace(/’/g, "'").replace(/^'+|'+$/g, "");
+  const base = w.replace(/'s$/, "");
+  return exactBlock.has(w) || exactBlock.has(base) ||
+    prefixBlock.some((p) => w.startsWith(p)) || containsBlock.some((c) => w.includes(c));
+}
+
+function clean(text) {
+  if (!state.filter) return text;
+  return text.replace(/[\p{L}\p{N}'’]+/gu, (w) => (isBlocked(w) ? w[0] + "*".repeat(w.length - 1) : w));
+}
+
+// ---------- Small DOM helper: never builds HTML from data ----------
+
+function el(tag, props = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(props)) {
+    if (key === "class") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else if (key.startsWith("data-") || key === "title") node.setAttribute(key, value);
+    else node[key] = value;
+  }
+  node.append(...children);
+  return node;
+}
+
+// ---------- Artists ----------
+
+async function loadArtists(select) {
+  const { artists, uploads, texts } = await api("/api/artists");
+  state.songSources = new Set(artists);
+  const box = $("artist");
+  const group = (label, names) =>
+    el("optgroup", { label }, ...names.map((name) => el("option", { value: name, text: name })));
+  const groups = [["Song lyrics", artists], ["Your uploads", uploads], ["Public domain texts", texts]];
+  box.replaceChildren(...groups.filter(([, names]) => names.length).map(([label, names]) => group(label, names)));
+  const all = artists.concat(uploads, texts);
+  const fallback = ["Sabrina Carpenter", "Alice in Wonderland"].find((name) => all.includes(name)) || all[0];
+  if (select && all.includes(select)) box.value = select;
+  else if (state.artist && all.includes(state.artist)) box.value = state.artist;
+  else box.value = fallback;
+  state.artist = box.value || null;
+}
+
+function settingsChanged({ artist = false } = {}) {
+  resetGenerate();
+  if (artist) { state.lyricsLoaded = null; $("find").value = ""; $("song-filter").value = ""; }
+  refreshTab();
+}
+
+function refreshTab() {
+  if (!state.artist) {
+    $("stats").textContent = "Add a source to begin.";
+    return;
+  }
+  loadStats();
+  if (state.tab === "lyrics") loadLyrics();
+  if (state.tab === "chain") loadChain();
+}
+
+async function loadStats() {
+  const run = ++state.statsRun;
+  try {
+    const data = await api("/api/chain?" + query({ limit: 1 }));
+    if (run !== state.statsRun) return;
+    $("stats").textContent =
+      `${data.songs.toLocaleString()} ${state.songSources.has(state.artist) ? "songs" : "parts"} · ` +
+      `${data.transitions.toLocaleString()} word transitions · ` +
+      `${data.entries.toLocaleString()} chain entries`;
+  } catch (error) {
+    if (run === state.statsRun) $("stats").textContent = error.message;
+  }
+}
+state.statsRun = 0;
+
+async function addArtist(name) {
+  const status = $("add-status");
+  status.textContent = `Checking the artist index for ${name}…`;
+  $("add-btn").disabled = true;
+  let keepDisabled = false;
+  try {
+    const data = await api("/api/extract", { artist: name });
+    if (data.status === "not_found") {
+      status.replaceChildren(`${name} isn't in the dataset.`);
+      if (data.suggestions.length) {
+        status.append(" Did you mean:", el("br"));
+        for (const suggestion of data.suggestions) {
+          status.append(el("button", { type: "button", text: suggestion, onclick: () => addArtist(suggestion) }));
+        }
+      }
+    } else if (data.status === "exists") {
+      status.textContent = "";
+      $("add-name").value = "";
+      await selectArtist(data.artist);
+    } else {
+      keepDisabled = true;
+      watchExtraction(data.artist);
+    }
+  } catch (error) {
+    status.textContent = error.message;
+  } finally {
+    if (!keepDisabled) $("add-btn").disabled = false;
+  }
+}
+
+async function selectArtist(name) {
+  await loadArtists(name);
+  settingsChanged({ artist: true });
+}
+
+function watchExtraction(artist) {
+  const status = $("add-status");
+  const bar = el("progress", { max: 100, value: 0 });
+  const label = el("span", { text: `Reading the full dataset for ${artist} (about 80 seconds): 0%` });
+  status.replaceChildren(label, bar);
+  const timer = setInterval(async () => {
+    try {
+      const job = await api("/api/extract/status");
+      bar.value = job.percent;
+      label.textContent = `Reading the full dataset for ${artist} (about 80 seconds): ${job.percent}%`;
+      if (job.state === "running") return;
+      clearInterval(timer);
+      $("add-btn").disabled = false;
+      if (job.state === "done") {
+        status.textContent = "";
+        $("add-name").value = "";
+        await selectArtist(artist);
+      } else {
+        status.textContent = job.error || "The extraction failed.";
+      }
+    } catch (error) {
+      clearInterval(timer);
+      $("add-btn").disabled = false;
+      status.textContent = error.message;
+    }
+  }, 1000);
+}
+
+// ---------- Tab 1: lyrics ----------
+
+async function loadLyrics() {
+  const run = ++state.lyricsRun;
+  const wanted = `${state.artist}|${state.filter}`;
+  if (state.lyricsLoaded === wanted) { applySkipToList(); return; }
+  $("lyrics-text").textContent = "Loading…";
+  try {
+    const { songs } = await api("/api/lyrics?" + query());
+    if (run !== state.lyricsRun) return;
+    state.songs = songs;
+    state.lyricsLoaded = wanted;
+    renderLyrics();
+  } catch (error) {
+    $("lyrics-text").textContent = error.message;
+  }
+}
+
+function renderLyrics() {
+  const list = $("song-list");
+  const text = $("lyrics-text");
+  list.replaceChildren();
+  text.replaceChildren();
+  text.scrollTop = 0;
+  state.songs.forEach((song, i) => {
+    const section = el("section", { id: `song-${i}` },
+      el("h2", { text: clean(song.title) }),
+      el("p", { class: "sub", text: `${song.year}${song.repeat ? " · likely repeat of another song" : ""}` }),
+      el("pre", { text: clean(song.lyrics) }));
+    text.append(section);
+    const item = el("button", {
+      class: song.repeat ? "repeat" : "",
+      "data-title": song.title.toLowerCase(),
+      onclick: () => { text.scrollTop = section.offsetTop - text.offsetTop; },
+    }, el("span", { class: "song-name", text: clean(song.title) }));
+    if (song.repeat) item.append(el("span", { class: "tag", text: "repeat" }));
+    list.append(item);
+  });
+  filterSongs();
+  applySkipToList();
+}
+
+function applySkipToList() {
+  // With "Skip repeat songs" on, repeats stay readable but drop out of the list.
+  for (const item of $("song-list").children) {
+    item.dataset.skipped = state.skip && item.classList.contains("repeat") ? "1" : "";
+  }
+  filterSongs();
+}
+
+function filterSongs() {
+  const q = $("song-filter").value.trim().toLowerCase();
+  for (const item of $("song-list").children) {
+    item.hidden = item.dataset.skipped === "1" || !item.dataset.title.includes(q);
+    item.style.display = item.hidden ? "none" : "";
+  }
+}
+
+// ---------- Tab 2: the chain ----------
+
+async function loadChain() {
+  const run = ++state.chainRun;
+  showError("chain-error", "");
+  try {
+    const data = await api("/api/chain?" + query({
+      limit: $("rows").value || 50, sort: $("sort").value, find: $("find").value, view: state.view,
+    }));
+    if (run !== state.chainRun) return;
+    renderChain(data);
+  } catch (error) {
+    if (run === state.chainRun) showError("chain-error", error.message);
+  }
+}
+
+function renderChain(data) {
+  $("key-head").textContent = state.order === 1 ? "Word" : `Last ${state.order} words`;
+  const body = $("chain-body");
+  const find = $("find").value.trim().toLowerCase();
+  const pileView = state.view === "pile";
+  $("follow-head").textContent = pileView
+    ? "Every word that came next, repeats included, in lyric order (click one to go to it)"
+    : "Words that came next (click one to go to it)";
+  body.replaceChildren(...data.rows.map((row) => {
+    if (pileView) {
+      return el("tr", { class: row.key === find ? "hit" : "" },
+        el("td", { class: "key mono", text: clean(row.key) }),
+        el("td", { class: "seen", text: row.total.toLocaleString() }),
+        pileCell(row));
+    }
+    const chips = row.top.map(({ word, count }) => {
+      const pct = Math.round(count / row.total * 100);
+      return el("button", {
+        class: "chip mono",
+        title: `"${clean(word)}" came next ${count} of ${row.total} times (${pct}%)`,
+        onclick: () => jumpTo(row.key, word),
+      }, clean(word), el("b", { text: count }));
+    });
+    const followers = el("td", {}, ...chips);
+    if (row.other_words) {
+      followers.append(el("span", { class: "more", text: ` +${row.other_words.toLocaleString()} more` }));
+    }
+    return el("tr", { class: row.key === find ? "hit" : "" },
+      el("td", { class: "key mono", text: clean(row.key) }),
+      el("td", { class: "seen", text: row.total.toLocaleString() }),
+      followers);
+  }));
+  $("chain-scroll").scrollTop = 0;
+
+  const first = data.rows[0];
+  if (!first) {
+    $("chain-hint").textContent = "No entries match that search.";
+  } else {
+    const top = first.top[0];
+    const count = data.matches > data.rows.length
+      ? `Showing ${data.rows.length.toLocaleString()} of ${data.matches.toLocaleString()} entries. `
+      : `${data.matches.toLocaleString()} entries. `;
+    $("chain-hint").textContent = pileView
+      ? `${count}How to read a row: "${clean(first.key)}" appeared ${first.total.toLocaleString()} times, ` +
+        `so its pile holds ${first.total.toLocaleString()} words. Each tile is the word that came next one time.`
+      : `${count}How to read a row: after "${clean(first.key)}", ` +
+        `the word "${clean(top.word)}" came next ${top.count.toLocaleString()} of ${first.total.toLocaleString()} times.`;
+  }
+}
+
+// One tile per word. Tiles are plain spans so piles of thousands stay fast.
+function makeTiles(pile) {
+  const shown = new Map();
+  return pile.map((word) => {
+    if (!shown.has(word)) shown.set(word, clean(word));
+    const tile = document.createElement("span");
+    tile.className = "tile mono";
+    tile.textContent = shown.get(word);
+    tile.dataset.w = word;
+    return tile;
+  });
+}
+
+// Light up every copy of the word under the mouse.
+function watchHover(box, getTiles, onChange) {
+  let current = null;
+  const paint = (word) => {
+    if (word === current) return;
+    current = word;
+    let copies = 0;
+    for (const tile of getTiles()) {
+      const same = tile.dataset.w === word;
+      tile.classList.toggle("same", same);
+      if (same) copies++;
+    }
+    if (onChange) onChange(word, copies);
+  };
+  box.addEventListener("mouseover", (event) => {
+    paint(event.target.classList.contains("tile") ? event.target.dataset.w : null);
+  });
+  box.addEventListener("mouseleave", () => paint(null));
+}
+
+function pileCell(row) {
+  const cell = el("td", { class: "pile-cell" });
+  const tiles = makeTiles(row.pile);
+  cell.append(...tiles);
+
+  const hidden = row.total - row.pile.length;
+  if (hidden > 0) {
+    const button = el("button", {
+      class: "show-all",
+      text: `Show all ${row.total.toLocaleString()}`,
+      onclick: async () => {
+        button.disabled = true;
+        try {
+          const { pile } = await api("/api/pile?" + query({ key: row.key }));
+          tiles.splice(0, tiles.length, ...makeTiles(pile));
+          cell.replaceChildren(...tiles);
+        } catch (error) {
+          button.disabled = false;
+          showError("chain-error", error.message);
+        }
+      },
+    });
+    cell.append(el("span", { class: "more", text: ` +${hidden.toLocaleString()} more` }), button);
+  }
+
+  cell.addEventListener("click", (event) => {
+    if (event.target.classList.contains("tile")) jumpTo(row.key, event.target.dataset.w);
+  });
+  watchHover(cell, () => tiles);
+  return cell;
+}
+
+function jumpTo(key, word) {
+  // Move the window one word along: drop the oldest word, add the follower.
+  $("find").value = key.split(" ").concat(word).slice(-state.order).join(" ");
+  loadChain();
+}
+
+// ---------- Tab 3: generating ----------
+
+// For each stage: which function, and the text of the line to light up in it.
+const CODE_MARKS = {
+  counts: {
+    read: ["next_word", 'key = " ".join(text[-order:])'],
+    lookup: ["next_word", "followers = chain.get(key)"],
+    pick: ["next_word", "random.choices("],
+    append: ["generate", "text.append(word)"],
+  },
+  pile: {
+    read: ["next_word_from_pile", 'key = " ".join(text[-order:])'],
+    lookup: ["next_word_from_pile", "pile = piles.get(key)"],
+    pick: ["next_word_from_pile", "random.choice("],
+    append: ["generate", "text.append(word)"],
+  },
+};
+
+const STAGE_LABELS = {
+  counts: "Pick one at random, weighted by count",
+  pile: "Grab any one word from the pile",
+};
+
+const NEWLINE = "⏎";
+const PUNCT = ".,!?;:";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function renderOutput() {
+  const out = $("output");
+  const n = state.text.length;
+  if (!n) {
+    out.replaceChildren(el("span", { class: "hint", text: "Generated text appears here." }));
+    return;
+  }
+  // Lay the tokens out like text. This only changes how they look: punctuation
+  // sits against the word before it, ⏎ starts a new line, and lines and
+  // sentences start with a capital. Every token is still its own span.
+  const nodes = [];
+  state.text.forEach((token, i) => {
+    let cls = "w";
+    if (state.newWord && i === n - 1) cls += " new";
+    else if (i >= n - state.context) cls += " context";
+    const previous = state.text[i - 1];
+    const isPunct = PUNCT.includes(token);
+    if (i > 0 && !isPunct && previous !== NEWLINE) nodes.push(" ");
+    if (token === NEWLINE) {
+      nodes.push(el("span", { class: cls + " nl", text: "⏎" }), el("br"));
+      return;
+    }
+    let shown = token;
+    if (token === "i" || token.startsWith("i'")) shown = "I" + token.slice(1);
+    if (i === 0 || previous === NEWLINE || ".!?".includes(previous)) {
+      shown = shown.charAt(0).toUpperCase() + shown.slice(1);
+    }
+    nodes.push(el("span", { class: cls, text: clean(shown) }));
+  });
+  out.replaceChildren(...nodes);
+  out.scrollTop = out.scrollHeight;
+}
+
+function setStage(stage) {
+  state.stage = stage;
+  for (const li of $("stages").children) {
+    li.classList.toggle("on", li.dataset.stage === stage);
+    if (li.dataset.stage === "pick") li.textContent = STAGE_LABELS[state.view];
+  }
+  highlightCode(stage ? CODE_MARKS[state.view][stage] : null);
+}
+
+// Show the current step in whichever view is selected.
+async function showFollowers() {
+  const step = state.lastStep;
+  const pileView = state.view === "pile";
+  $("bars").hidden = pileView;
+  $("pile-wrap").hidden = !pileView;
+  if (pileView) $("others").hidden = true;
+  if (!step) return;
+
+  if (!pileView) {
+    renderBars(step.key, step.followers, step.picked ? step.word : null);
+    setFollowersTitle(step);
+    return;
+  }
+  if (!step.pile) {
+    try {
+      step.pile = (await api("/api/pile?" + query({ key: step.key }))).pile;
+    } catch (error) {
+      showError("gen-error", error.message);
+      return;
+    }
+    if (state.lastStep !== step || state.view !== "pile") return;
+  }
+  renderPile(step);
+  setFollowersTitle(step);
+}
+
+function setFollowersTitle(step) {
+  const key = el("span", { class: "mono", text: clean(step.key) });
+  const total = step.followers.total.toLocaleString();
+  if (state.view === "counts") {
+    const t = step.temperature;
+    setStepTitle("After ", key, `, these came next (${total} times in total)`,
+      t === 1 ? ":" : `. At temperature ${t.toFixed(1)} the chances change from the counts to:`);
+  } else if (step.picked) {
+    setStepTitle("Landed on tile ", String(step.tile + 1), ` of ${total}: `,
+      el("span", { class: "mono", text: clean(step.word) }));
+  } else if (step.scanning) {
+    setStepTitle(`Grabbing one of the ${total} tiles at random…`);
+  } else {
+    setStepTitle("After ", key, `, this is every word that came next: ${total} tiles, repeats included, in lyric order.`);
+  }
+}
+
+function renderPile(step) {
+  if (state.pileStep !== step) {
+    state.pileStep = step;
+    state.pileTiles = makeTiles(step.pile);
+    $("pile").replaceChildren(...state.pileTiles);
+    $("step-panel").scrollTop = 0;
+    $("pile-readout").textContent = "Hover over a tile to light up every copy of that word.";
+  }
+  if (step.picked) {
+    // Python already picked the word. Any one of its copies is an equally fair
+    // tile to land on, so choose one of them at random once, and remember it.
+    if (step.tile === undefined) {
+      const copies = [];
+      step.pile.forEach((word, i) => { if (word === step.word) copies.push(i); });
+      step.tile = copies[Math.floor(Math.random() * copies.length)];
+    }
+    const tile = state.pileTiles[step.tile];
+    tile.classList.add("picked");
+    const panel = $("step-panel");
+    const offset = tile.offsetTop;
+    if (offset < panel.scrollTop || offset > panel.scrollTop + panel.clientHeight - 40) {
+      panel.scrollTop = offset - panel.clientHeight / 2;
+    }
+  }
+}
+
+// A quick flicker across random tiles, so the pick looks like reaching into a pile.
+async function scanPile(duration, stale) {
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tiles = state.pileTiles;
+  if (calm || !tiles.length) { await sleep(duration); return; }
+  const panel = $("step-panel");
+  const onScreen = tiles.filter((tile) => {
+    const top = tile.offsetTop - panel.scrollTop;
+    return top >= 0 && top < panel.clientHeight;
+  });
+  const pool = onScreen.length ? onScreen : tiles;
+  const end = performance.now() + duration;
+  let last = null;
+  while (performance.now() < end && !stale() && state.view === "pile") {
+    if (last) last.classList.remove("scan");
+    last = pool[Math.floor(Math.random() * pool.length)];
+    last.classList.add("scan");
+    await sleep(70);
+  }
+  if (last) last.classList.remove("scan");
+}
+
+function setStepTitle(...parts) {
+  const title = $("step-title");
+  title.className = "";
+  title.replaceChildren(...parts);
+}
+
+function renderBars(key, followers, picked) {
+  const box = $("bars");
+  const pctText = (fraction) => (fraction < 0.01 ? "<1" : Math.round(fraction * 100)) + "%";
+  // Bars show the real chance of each pick. At temperature 1 that's count / total;
+  // at other temperatures the label shows how the plain share changed.
+  const max = Math.max(...followers.top.map((f) => f.chance));
+  const temperatureChanged = state.lastStep && state.lastStep.temperature !== 1;
+  box.replaceChildren(...followers.top.map(({ word, count, chance }) => {
+    const share = count / followers.total;
+    const isPicked = word === picked;
+    const label = temperatureChanged
+      ? `${count} · ${pctText(share)} → ${pctText(chance)}`
+      : `${count} · ${pctText(chance)}`;
+    return el("div", {
+      class: "bar-row" + (isPicked ? " picked" : ""),
+      title: `"${clean(word)}" came next ${count} of ${followers.total} times`,
+    },
+      el("span", { class: "word mono", text: clean(word) }),
+      el("span", { class: "track" }, Object.assign(el("div", { class: "bar" }), {
+        style: `width:${chance / max * 100}%`,
+      })),
+      el("span", { class: "val", text: `${label}${isPicked ? " picked" : ""}` }));
+  }));
+  const others = $("others");
+  others.hidden = !followers.other_words;
+  others.textContent = followers.other_words
+    ? `+ ${followers.other_words.toLocaleString()} more tokens, ${followers.other_count.toLocaleString()} occurrences in total ` +
+      `(${(followers.other_chance * 100).toFixed(1)}% chance between them)`
+    : "";
+}
+
+function clearBars() {
+  $("bars").replaceChildren();
+  $("others").hidden = true;
+  $("pile").replaceChildren();
+  $("pile-readout").textContent = "";
+  $("pile-wrap").hidden = true;
+  state.lastStep = null;
+  state.pileStep = null;
+  state.pileTiles = [];
+}
+
+function setView(view) {
+  state.view = view;
+  for (const button of document.querySelectorAll("[data-view]")) {
+    button.setAttribute("aria-pressed", button.dataset.view === view);
+  }
+  setStage(state.stage);  // the code panel lights up the matching function
+  updateTempNote();
+  showFollowers();
+  if (state.tab === "chain") loadChain();
+}
+
+function resetGenerate() {
+  state.run++;
+  state.playing = false;
+  state.text = [];
+  state.context = 0;
+  state.newWord = false;
+  state.stepping = false;
+  showError("gen-error", "");
+  setStage(null);
+  clearBars();
+  const title = $("step-title");
+  title.className = "hint";
+  title.textContent = "Press Step to watch one word get chosen.";
+  renderOutput();
+  updateGenButtons();
+}
+
+function updateGenButtons() {
+  $("play-btn").textContent = state.playing ? "Pause" : "Play";
+  $("step-btn").disabled = state.playing || state.stepping;
+  $("gen-btn").disabled = state.playing || state.stepping;
+}
+
+function targetWords() {
+  return Math.min(2000, Math.max(1, parseInt($("n").value, 10) || 50));
+}
+
+async function generateAll() {
+  const run = ++state.run;
+  state.playing = false;
+  showError("gen-error", "");
+  setStage(null);
+  clearBars();
+  try {
+    const { text } = await api("/api/generate", {
+      ...settings(), n: targetWords(), start: $("start").value, temperature: state.temperature,
+    });
+    if (run !== state.run) return;
+    state.text = text;
+    state.context = 0;
+    state.newWord = false;
+    const title = $("step-title");
+    title.className = "hint";
+    title.textContent = `Generated ${text.length} tokens. Press Step to watch the next one get chosen.`;
+    renderOutput();
+  } catch (error) {
+    showError("gen-error", error.message);
+  }
+  updateGenButtons();
+}
+
+async function step(pause) {
+  if (state.stepping) return;
+  state.stepping = true;
+  updateGenButtons();
+  const run = state.run;
+  const stale = () => run !== state.run;
+  showError("gen-error", "");
+  try {
+    const result = await api("/api/step", {
+      ...settings(), tail: state.text.slice(-state.order), start: $("start").value,
+      view: state.view, temperature: state.temperature,
+    });
+    if (stale()) return;
+
+    if (result.kind === "start") {
+      state.text = result.words;
+      state.context = result.words.length;
+      state.newWord = false;
+      setStage(null);
+      clearBars();
+      setStepTitle("Starting from: ", el("span", { class: "mono", text: clean(result.words.join(" ")) }));
+      renderOutput();
+      return;
+    }
+
+    if (result.kind === "dead_end") {
+      setStage("lookup");
+      clearBars();
+      setStepTitle("Dead end: ", el("span", { class: "mono", text: clean(result.key) }),
+        " only appeared at the end of a song, so nothing follows it. Jumping to a random entry: ",
+        el("span", { class: "mono", text: clean(result.words.join(" ")) }));
+      state.text = state.text.concat(result.words);
+      state.context = result.words.length;
+      state.newWord = false;
+      renderOutput();
+      return;
+    }
+
+    // Stage 1: find the context words
+    state.context = state.order;
+    state.newWord = false;
+    setStage("read");
+    setStepTitle("Looking at the last ", String(state.order), state.order === 1 ? " token: " : " tokens: ",
+      el("span", { class: "mono", text: clean(result.key) }));
+    clearBars();
+    renderOutput();
+    await sleep(pause);
+    if (stale()) return;
+
+    // Stage 2: show what can follow
+    setStage("lookup");
+    const current = { ...result, picked: false, scanning: false };
+    state.lastStep = current;
+    await showFollowers();
+    await sleep(pause);
+    if (stale()) return;
+
+    // Stage 3: the random pick (which Python already made on the server)
+    setStage("pick");
+    if (state.view === "pile") {
+      current.scanning = true;
+      setFollowersTitle(current);
+      await scanPile(pause, stale);
+      if (stale()) return;
+      current.scanning = false;
+    }
+    current.picked = true;
+    await showFollowers();
+    await sleep(pause);
+    if (stale()) return;
+
+    // Stage 4: add it to the text
+    setStage("append");
+    state.text = state.text.concat(result.word);
+    state.context = 0;
+    state.newWord = true;
+    renderOutput();
+    await sleep(pause / 2);
+  } catch (error) {
+    if (!stale()) {
+      state.playing = false;
+      showError("gen-error", error.message);
+    }
+  } finally {
+    if (!stale()) {
+      state.stepping = false;
+      updateGenButtons();
+    }
+  }
+}
+
+async function play() {
+  if (state.playing) {
+    state.playing = false;
+    updateGenButtons();
+    return;
+  }
+  const run = state.run;
+  state.playing = true;
+  updateGenButtons();
+  while (state.playing && run === state.run && state.text.length < targetWords()) {
+    await step(400);
+    await sleep(0);
+  }
+  if (run === state.run) {
+    state.playing = false;
+    updateGenButtons();
+  }
+}
+
+// ---------- Python code panel ----------
+
+const PY_TOKEN = /"""[\s\S]*?"""|r?"(?:[^"\\\n]|\\.)*"|#[^\n]*|\b(?:def|return|if|else|for|in|while|not|is|None|import|from|and|or|True|False)\b|\b[A-Za-z_]\w*(?=\()|\n|[^\S\n]+|[\s\S]/g;
+
+function tokenClass(token) {
+  if (token.startsWith("#")) return "com";
+  if (/^(r?"|""")/.test(token)) return "str";
+  if (/^(def|return|if|else|for|in|while|not|is|None|import|from|and|or|True|False)$/.test(token)) return "kw";
+  if (/^[A-Za-z_]\w*$/.test(token)) return "fn";
+  return "";
+}
+
+let codeLines = [];
+
+function renderCode(source) {
+  const lines = [[]];
+  for (const [token] of source.matchAll(PY_TOKEN)) {
+    const cls = token.length > 1 || /\w/.test(token) ? tokenClass(token) : "";
+    token.split("\n").forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part) lines[lines.length - 1].push(cls ? el("span", { class: cls, text: part }) : part);
+    });
+  }
+  if (!lines[lines.length - 1].length) lines.pop();
+  codeLines = lines.map((parts, i) => {
+    const row = el("div", { class: "line" }, el("span", { class: "no", text: i + 1 }), el("span", {}, ...parts));
+    return row;
+  });
+  $("code").replaceChildren(...codeLines);
+}
+
+function highlightCode(mark) {
+  let target = null;
+  if (mark) {
+    const [fn, snippet] = mark;
+    const start = codeLines.findIndex((row) => row.textContent.includes(`def ${fn}(`));
+    if (start >= 0) target = codeLines.slice(start).find((row) => row.textContent.includes(snippet)) || null;
+  }
+  for (const row of codeLines) row.classList.toggle("on", row === target);
+  if (target) {
+    const box = $("code");
+    const top = target.offsetTop - box.offsetTop;
+    if (top < box.scrollTop || top > box.scrollTop + box.clientHeight - target.offsetHeight * 2) {
+      box.scrollTop = top - box.clientHeight / 3;
+    }
+  }
+}
+
+// ---------- Wiring ----------
+
+function selectTab(tab) {
+  state.tab = tab;
+  for (const button of document.querySelectorAll("[role=tab]")) {
+    button.setAttribute("aria-selected", button.dataset.tab === tab);
+  }
+  for (const panel of document.querySelectorAll(".tab-panel")) {
+    panel.classList.toggle("active", panel.id === `panel-${tab}`);
+  }
+  refreshTab();
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+for (const button of document.querySelectorAll("[role=tab]")) {
+  button.addEventListener("click", () => selectTab(button.dataset.tab));
+}
+
+$("artist").addEventListener("change", (event) => {
+  state.artist = event.target.value;
+  settingsChanged({ artist: true });
+});
+
+for (const button of document.querySelectorAll("[data-order]")) {
+  button.addEventListener("click", () => {
+    state.order = Number(button.dataset.order);
+    for (const other of document.querySelectorAll("[data-order]")) {
+      other.setAttribute("aria-pressed", other === button);
+    }
+    $("find").value = "";
+    settingsChanged();
+  });
+}
+
+$("skip").addEventListener("change", (event) => {
+  state.skip = event.target.checked;
+  settingsChanged();
+});
+
+$("filter").addEventListener("change", (event) => {
+  state.filter = event.target.checked;
+  state.lyricsLoaded = null;
+  renderOutput();
+  refreshTab();
+});
+
+$("code-toggle").addEventListener("click", (event) => {
+  const panel = $("code-panel");
+  panel.hidden = !panel.hidden;
+  event.currentTarget.setAttribute("aria-pressed", !panel.hidden);
+  event.currentTarget.textContent = panel.hidden ? "Show Python" : "Hide Python";
+});
+
+$("add-toggle").addEventListener("click", (event) => {
+  const panel = $("add-panel");
+  panel.hidden = !panel.hidden;
+  event.currentTarget.setAttribute("aria-expanded", !panel.hidden);
+});
+
+$("upload-file").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const status = $("add-status");
+  status.textContent = `Reading ${file.name}…`;
+  try {
+    const result = await api("/api/upload", { filename: file.name, content: await file.text() });
+    status.textContent = `Added ${result.name} (${result.parts.toLocaleString()} ${result.parts === 1 ? "part" : "parts"}).`;
+    await selectArtist(result.name);
+  } catch (error) {
+    status.textContent = error.message;
+  }
+  event.target.value = "";
+});
+
+$("add-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = $("add-name").value.trim();
+  if (name && !$("add-btn").disabled) addArtist(name);
+});
+
+for (const button of document.querySelectorAll("[data-view]")) {
+  button.addEventListener("click", () => setView(button.dataset.view));
+}
+
+watchHover($("pile"), () => state.pileTiles, (word, copies) => {
+  const step = state.lastStep;
+  if (!step) return;
+  const total = step.pile ? step.pile.length : 0;
+  $("pile-readout").textContent = word
+    ? `"${clean(word)}" is ${copies.toLocaleString()} of these ${total.toLocaleString()} tiles, so grabbing one at random lands on it ${(copies / total * 100).toFixed(1)}% of the time.`
+    : "Hover over a tile to light up every copy of that word.";
+});
+
+$("punct").addEventListener("change", (event) => {
+  state.punct = event.target.checked;
+  $("find").value = "";
+  settingsChanged();
+});
+
+function updateTempNote() {
+  $("temp-note").hidden = !(state.view === "pile" && state.temperature !== 1);
+}
+
+$("temp").addEventListener("input", (event) => {
+  state.temperature = Number(event.target.value);
+  $("temp-val").textContent = state.temperature.toFixed(1);
+  updateTempNote();
+});
+
+// ---------- Dragging the code panel's left edge to resize it ----------
+
+const CODE_WIDTH_KEY = "markov-lab-code-width";
+
+function setCodeWidth(px) {
+  const panel = $("code-panel");
+  const max = Math.max(320, window.innerWidth * 0.75);
+  const width = Math.round(Math.min(max, Math.max(280, px)));
+  panel.style.width = width + "px";
+  $("code-resizer").setAttribute("aria-valuenow", width);
+  try { localStorage.setItem(CODE_WIDTH_KEY, width); } catch (error) { /* storage blocked: fine */ }
+}
+
+(function setUpResizer() {
+  const handle = $("code-resizer");
+  const panel = $("code-panel");
+  try {
+    const saved = Number(localStorage.getItem(CODE_WIDTH_KEY));
+    if (saved) setCodeWidth(saved);
+  } catch (error) { /* storage blocked: use the default width */ }
+
+  handle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    handle.setPointerCapture(event.pointerId);
+    handle.classList.add("dragging");
+    document.body.classList.add("resizing");
+  });
+  handle.addEventListener("pointermove", (event) => {
+    if (!handle.hasPointerCapture(event.pointerId)) return;
+    setCodeWidth(panel.getBoundingClientRect().right - event.clientX);
+  });
+  const stop = (event) => {
+    if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+    handle.classList.remove("dragging");
+    document.body.classList.remove("resizing");
+  };
+  handle.addEventListener("pointerup", stop);
+  handle.addEventListener("pointercancel", stop);
+  handle.addEventListener("dblclick", () => {
+    panel.style.width = "";
+    try { localStorage.removeItem(CODE_WIDTH_KEY); } catch (error) { /* fine */ }
+  });
+  handle.addEventListener("keydown", (event) => {
+    const step = event.shiftKey ? 80 : 20;
+    if (event.key === "ArrowLeft") setCodeWidth(panel.offsetWidth + step);
+    else if (event.key === "ArrowRight") setCodeWidth(panel.offsetWidth - step);
+    else return;
+    event.preventDefault();
+  });
+})();
+$("song-filter").addEventListener("input", filterSongs);
+$("rows").addEventListener("change", loadChain);
+$("sort").addEventListener("change", loadChain);
+$("find").addEventListener("input", debounce(loadChain, 200));
+
+$("gen-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!$("gen-btn").disabled) generateAll();
+});
+$("step-btn").addEventListener("click", () => step(650));
+$("play-btn").addEventListener("click", play);
+$("clear-btn").addEventListener("click", resetGenerate);
+
+(async function start() {
+  try {
+    MODE = await detectMode();
+    document.body.dataset.mode = MODE;
+    $("upload-note").textContent = MODE === "web"
+      ? "Your file stays in this browser. It isn't uploaded anywhere."
+      : "It stays in the app until you restart it.";
+    $("add-form").hidden = MODE === "web";
+    $("extract-off").hidden = MODE !== "web";
+    if (MODE === "web") await startPython();
+    const [{ words }, { code }] = await Promise.all([api("/api/filter"), api("/api/code")]);
+    exactBlock = new Set(words.filter((w) => !w.includes("*")));
+    prefixBlock = words.filter((w) => !w.startsWith("*") && w.endsWith("*")).map((w) => w.slice(0, -1));
+    containsBlock = words.filter((w) => w.startsWith("*")).map((w) => w.replaceAll("*", ""));
+    renderCode(code);
+    await loadArtists();
+    resetGenerate();
+    selectTab("lyrics");
+  } catch (error) {
+    $("stats").textContent = error.message;
+  }
+})();
+</script>
+</body>
+</html>

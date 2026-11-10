@@ -1,0 +1,40 @@
+# Words hidden when "Hide explicit words" is on. One per line.
+# A trailing * also matches longer words (damn* catches damnit).
+# Stars on both ends match anywhere inside a word (*fuck* catches motherfucker).
+# This is a starting point, not a complete list. Add to it as needed.
+*fuck*
+*shit*
+*bitch*
+biatch*
+*nigg*
+fag*
+cunt*
+pussy*
+puss
+dick
+dicks
+cock
+cocks
+whore*
+hoe
+hoes
+ho
+slut*
+ass
+asses
+asshole*
+damn*
+goddamn*
+tits
+titties
+cum
+blowjob*
+retard*
+tranny
+dyke*
+spic
+spics
+chink*
+kike*
+coon
+coons
