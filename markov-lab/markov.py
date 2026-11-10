@@ -7,7 +7,7 @@ followers get picked more often. That's the whole model.
 A "token" is a word, a punctuation mark, or a line break. Treating punctuation
 and line breaks as tokens lets the chain learn where lines and sentences end.
 
-"order" is how many tokens of context we look at.
+"num_tokens" is how many tokens of context we look at.
 """
 import random
 import re
@@ -42,25 +42,25 @@ def get_tokens(lyrics, punctuation=True):
     return tokens
 
 
-def build_chain(songs, order=1, punctuation=True):
+def build_chain(songs, num_tokens=1, punctuation=True):
     """Build the chain: {tokens: Counter of the tokens that came next}.
 
-    Example with order=1:  {"love": Counter({"me": 12, "you": 9, ",": 4, "⏎": 3})}
+    Example with num_tokens=1:  {"love": Counter({"me": 12, "you": 9, ",": 4, "⏎": 3})}
     Each song is read separately, so no song's ending leads into the next song.
     """
     chain = {}
     for lyrics in songs:
         tokens = get_tokens(lyrics, punctuation)
-        for i in range(len(tokens) - order):
-            key = " ".join(tokens[i : i + order])
-            following = tokens[i + order]
+        for i in range(len(tokens) - num_tokens):
+            key = " ".join(tokens[i : i + num_tokens])
+            following = tokens[i + num_tokens]
             if key not in chain:
                 chain[key] = Counter()
             chain[key][following] += 1
     return chain
 
 
-def next_word(chain, text, order, temperature=1.0):
+def next_word(chain, text, num_tokens, temperature=1.0):
     """Pick the next token for text, or None if this is a dead end.
 
     temperature changes the odds before the pick:
@@ -68,7 +68,7 @@ def next_word(chain, text, order, temperature=1.0):
       < 1  favor common tokens even more (safer, more sensible, more repetitive)
       > 1  even things out (more surprising, more nonsense)
     """
-    key = " ".join(text[-order:])
+    key = " ".join(text[-num_tokens:])
     followers = chain.get(key)
     if followers is None:
         return None  # these tokens only ever appeared at the end of a song
@@ -78,32 +78,32 @@ def next_word(chain, text, order, temperature=1.0):
     return random.choices(words, weights=weights)[0]
 
 
-def build_piles(songs, order=1, punctuation=True):
+def build_piles(songs, num_tokens=1, punctuation=True):
     """The same chain before any counting: {tokens: list of every token that came next}.
 
-    Example with order=1:  {"love": ["me", "you", ",", "me", "⏎", "me", "you", ...]}
+    Example with num_tokens=1:  {"love": ["me", "you", ",", "me", "⏎", "me", "you", ...]}
     Repeats stay in, in the order they appear in the lyrics.
     """
     piles = {}
     for lyrics in songs:
         tokens = get_tokens(lyrics, punctuation)
-        for i in range(len(tokens) - order):
-            key = " ".join(tokens[i : i + order])
-            following = tokens[i + order]
+        for i in range(len(tokens) - num_tokens):
+            key = " ".join(tokens[i : i + num_tokens])
+            following = tokens[i + num_tokens]
             if key not in piles:
                 piles[key] = []
             piles[key].append(following)
     return piles
 
 
-def next_word_from_pile(piles, text, order):
+def next_word_from_pile(piles, text, num_tokens):
     """Same job as next_word, with no probabilities: grab any one token from the pile.
 
     A token that's in the pile 12 times is 12 times as likely to get grabbed,
     which is exactly what the weights in next_word do at temperature 1.
     A pile has no temperature dial: every tile is always equally likely.
     """
-    key = " ".join(text[-order:])
+    key = " ".join(text[-num_tokens:])
     pile = piles.get(key)
     if pile is None:
         return None
@@ -116,11 +116,11 @@ def random_start(chain):
     return random.choice(starts or list(chain)).split()
 
 
-def generate(chain, n, order, start=None, temperature=1.0):
+def generate(chain, n, num_tokens, start=None, temperature=1.0):
     """Generate a list of n tokens, optionally beginning with the start tokens."""
     text = list(start) if start else random_start(chain)
     while len(text) < n:
-        word = next_word(chain, text, order, temperature)
+        word = next_word(chain, text, num_tokens, temperature)
         if word is None:
             text += random_start(chain)  # dead end: jump somewhere new
         else:

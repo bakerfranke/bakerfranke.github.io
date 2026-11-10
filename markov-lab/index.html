@@ -858,13 +858,13 @@ function jumpTo(key, word) {
 // For each stage: which function, and the text of the line to light up in it.
 const CODE_MARKS = {
   counts: {
-    read: ["next_word", 'key = " ".join(text[-order:])'],
+    read: ["next_word", 'key = " ".join(text[-num_tokens:])'],
     lookup: ["next_word", "followers = chain.get(key)"],
     pick: ["next_word", "random.choices("],
     append: ["generate", "text.append(word)"],
   },
   pile: {
-    read: ["next_word_from_pile", 'key = " ".join(text[-order:])'],
+    read: ["next_word_from_pile", 'key = " ".join(text[-num_tokens:])'],
     lookup: ["next_word_from_pile", "pile = piles.get(key)"],
     pick: ["next_word_from_pile", "random.choice("],
     append: ["generate", "text.append(word)"],
