@@ -21,7 +21,7 @@ else:
     print("cold")
 ```
 
-```answer
+```expected output
 nice
 ```
 

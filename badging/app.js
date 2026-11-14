@@ -431,7 +431,7 @@
       <section class="intro">
         <h1>Author check</h1>
         <p>Every card in <code>knowledge-areas/</code>. ${allCards.length} cards, ${nProblems} problem${nProblems === 1 ? "" : "s"} found while reading the files.
-          <strong>Test all cards</strong> runs each code card's <code>solution</code> against its checks and each predict card's code against its <code>answer</code>.
+          <strong>Test all cards</strong> runs each code card's <code>solution</code> against its checks and each predict card's code against its <code>expected output</code>.
           Reload the page after editing a file.</p>
         <div class="btn-row"><button type="button" class="btn primary" id="author-run">Test all cards</button>
           <span class="py-status muted" id="author-status" aria-live="polite"></span></div>
@@ -451,7 +451,7 @@
         const r = await Py.request({ op: "run", code, given: "" }, document.getElementById("author-status"));
         res = r.ok && normOut(r.output) === normOut(card.answer)
           ? { ok: true }
-          : { ok: false, msg: r.ok ? `The answer block doesn't match what the code really prints:\n${normOut(r.output)}` : `The shown code fails: ${r.error}` };
+          : { ok: false, msg: r.ok ? `The expected output doesn't match what the code really prints:\n${normOut(r.output)}` : `The shown code fails: ${r.error}` };
       } else {
         const r = await Py.request({ op: "check", code: card.solution, given: card.given, checks: card.checks }, document.getElementById("author-status"));
         res = r.ok ? { ok: true } : { ok: false, msg: `The solution fails a check${r.label ? ` (with ${r.label})` : ""}:\n${r.error}` };

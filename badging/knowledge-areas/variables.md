@@ -18,7 +18,7 @@ print(x / y)
 print(x // y)
 ```
 
-```answer
+```expected output
 3.5
 3
 ```

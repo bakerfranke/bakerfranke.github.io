@@ -29,7 +29,7 @@ print(a.name, a.tricks)
 print(b.name, b.tricks)
 ```
 
-```answer
+```expected output
 Rex 2
 Fido 1
 ```

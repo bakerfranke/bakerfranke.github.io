@@ -51,10 +51,10 @@ const Loader = (() => {
         } else fence.lines.push(line);
         return;
       }
-      let m = line.match(/^\s*```\s*(\S*)\s*(.*)$/);
+      let m = line.match(/^\s*```(.*)$/);
       if (m) {
-        fence = { lang: m[1].toLowerCase(), lines: [], line: lineNo };
-        if (m[2].trim()) area.problems.push(`Line ${lineNo}: put nothing after \`\`\`${m[1]} on the opening line.`);
+        // Block name, e.g. "python", "tests", "expected output" (also expected-output / expected_output)
+        fence = { lang: m[1].trim().toLowerCase().replace(/[\s_-]+/g, " "), lines: [], line: lineNo };
         if (card) card.headDone = true;
         return;
       }
@@ -108,7 +108,27 @@ const Loader = (() => {
       if (item.fence !== undefined) {
         const t = item.text;
         switch (item.fence) {
-          case "answer": card.answer = t; break;
+          case "expected output": {
+            // Optional setup above a --- line, then the exact output.
+            const ls = t.split("\n");
+            const sep = ls.findIndex((l) => l.trim() === "---");
+            const setup = sep < 0 ? "" : ls.slice(0, sep).join("\n").trim();
+            const expected = sep < 0 ? t : ls.slice(sep + 1).join("\n");
+            if (card.type === "predict") {
+              if (setup) card.problems.push(`Line ${item.line}: on a predict card, put all the code in the \`\`\`python block. Setup above --- is only for code cards.`);
+              if (card.answer != null) card.problems.push(`Line ${item.line}: a predict card has just one \`\`\`expected output block.`);
+              card.answer = expected;
+            } else if (card.type === "code") {
+              card.checks.push({ kind: "output", setup, expected, line: item.line });
+            } else {
+              card.problems.push(`Line ${item.line}: \`\`\`expected output is only for predict and code cards.`);
+            }
+            break;
+          }
+          case "answer":
+          case "output":
+            card.problems.push(`Line ${item.line}: \`\`\`${item.fence} is now called \`\`\`expected output.`);
+            break;
           case "starter": card.starter = t.replace(/\n*$/, "\n"); break;
           case "solution": card.solution = t; break;
           case "tests":
@@ -116,13 +136,6 @@ const Loader = (() => {
               if (l.trim() && !l.trim().startsWith("#")) card.checks.push({ kind: "line", text: l.trim(), line: item.line + k + 1 });
             });
             break;
-          case "output": {
-            const ls = t.split("\n");
-            const sep = ls.findIndex((l) => l.trim() === "---");
-            if (sep < 0) card.problems.push(`Line ${item.line}: an output block needs a --- line between the setup and the expected output.`);
-            else card.checks.push({ kind: "output", setup: ls.slice(0, sep).join("\n").trim(), expected: ls.slice(sep + 1).join("\n"), line: item.line });
-            break;
-          }
           default:
             flush();
             card.shown.push({ code: t });
@@ -139,7 +152,7 @@ const Loader = (() => {
     const where = `Line ${r.line}`;
     if (!TYPES.includes(card.type)) card.problems.push(`${where}: type should be predict, choice, or code (it's "${r.meta.type || "missing"}").`);
     if (card.type === "predict") {
-      if (card.answer == null) card.problems.push(`${where}: a predict card needs an \`\`\`answer block.`);
+      if (card.answer == null) card.problems.push(`${where}: a predict card needs an \`\`\`expected output block.`);
       if (!card.shown.some((s) => s.code)) card.problems.push(`${where}: a predict card needs a \`\`\`python block to show.`);
     }
     if (card.type === "choice") {
@@ -148,7 +161,7 @@ const Loader = (() => {
       if (n !== 1) card.problems.push(`${where}: mark exactly one choice with [x] (found ${n}).`);
     }
     if (card.type === "code") {
-      if (!card.checks.length) card.problems.push(`${where}: a code card needs a \`\`\`tests or \`\`\`output block.`);
+      if (!card.checks.length) card.problems.push(`${where}: a code card needs a \`\`\`tests or \`\`\`expected output block.`);
       if (card.solution == null) card.problems.push(`${where}: add a \`\`\`solution block so the author page can test this card.`);
     }
     return card;

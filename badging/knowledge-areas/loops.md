@@ -18,7 +18,7 @@ for i in range(1, 5):
 print(total)
 ```
 
-```answer
+```expected output
 10
 ```
 
@@ -57,7 +57,7 @@ down to 1, one number per line, then print `Liftoff!`
 
 ```
 
-```output
+```expected output
 start = 5
 ---
 5
@@ -68,7 +68,7 @@ start = 5
 Liftoff!
 ```
 
-```output
+```expected output
 start = 1
 ---
 1

@@ -18,7 +18,7 @@ print(colors[-1])
 print(colors[1:3])
 ```
 
-```answer
+```expected output
 green
 gold
 ['green', 'blue']

@@ -42,7 +42,7 @@ What does this print?                ← 3. what the student sees: text and ```p
 print(2 + 3)
 ```
 
-```answer                            ← 4. how it's checked (depends on the type)
+```expected output                   ← 4. how it's checked (depends on the type)
 5
 ```
 ````
@@ -63,9 +63,11 @@ print(2 + 3)
 
 | Type | The student… | You mark the right answer with… |
 |---|---|---|
-| `predict` | reads code and types what it prints | an ` ```answer ` block |
+| `predict` | reads code and types what it prints | an ` ```expected output ` block |
 | `choice` | picks one option | `[x]` on the right option |
-| `code` | writes Python that runs in the browser | ` ```tests ` and/or ` ```output ` blocks, plus a hidden ` ```solution ` |
+| `code` | writes Python that runs in the browser | ` ```expected output ` and/or ` ```tests ` blocks, plus a hidden ` ```solution ` |
+
+` ```expected output ` works the same way everywhere: the exact output, with optional setup above a `---` line (setup is only for code cards). See [Expected output](#expected-output-what-gets-printed) below.
 
 ---
 
@@ -73,7 +75,7 @@ print(2 + 3)
 
 The student reads code and types exactly what it prints.
 
-**How it's checked:** the ` ```answer ` block holds the exact output. Spaces at the ends of lines and blank lines at the very end don't matter.
+**How it's checked:** the ` ```expected output ` block holds the exact output. Spaces at the ends of lines and blank lines at the very end don't matter. No setup and no `---` here: all the code goes in the ` ```python ` block.
 
 ````markdown
 ## Running total
@@ -90,12 +92,12 @@ for i in range(1, 5):
 print(total)
 ```
 
-```answer
+```expected output
 10
 ```
 ````
 
-**Test all cards** runs the ` ```python ` block and confirms that it really prints your answer.
+**Test all cards** runs the ` ```python ` block and confirms that it really prints the expected output.
 
 ---
 
@@ -133,7 +135,7 @@ Options can use `code` formatting, like `` - [x] `float` ``.
 
 The student writes Python in an editor, then presses **Run** to try it or **Check my code** to grade it.
 
-**How it's checked:** ` ```tests ` blocks (values) and/or ` ```output ` blocks (what gets printed). Every check has to pass.
+**How it's checked:** ` ```expected output ` blocks (what gets printed) and/or ` ```tests ` blocks (values and anything else). Every check has to pass.
 
 ````markdown
 ## Letter grades
@@ -172,8 +174,8 @@ else:
 |---|---|
 | `given:` | Inputs set before the student's code runs. They're shown above the editor as "Set for you" and used by **Run**. Separate several with `;`. Leave it out if the card has no inputs. |
 | ` ```starter ` | What's in the editor when the card opens. Optional. |
+| ` ```expected output ` | A check on printed output, one block per input (below). |
 | ` ```tests ` | Checks on values, one per line (below). |
-| ` ```output ` | A check on printed output (below). |
 | ` ```solution ` | Your model answer. Students never see it. **Test all cards** runs it against the checks. |
 
 ### ` ```tests `: one check per line
@@ -208,12 +210,14 @@ words = ["x", "y"]      ->  not calls("Counter"),  "Build the dict yourself."
 first = "Ada"; last = "Lovelace"  ->  full_name == "Ada Lovelace"
 ```
 
-### ` ```output `: check what gets printed
+### Expected output: what gets printed
 
-Setup on top, then `---`, then the exact expected output. Write one block per input.
+The same block as on predict cards: the exact output the student's code should print.
+On a code card you can **optionally** put setup (inputs) on top, then a `---` line, so one card can
+try several inputs, one block each.
 
 ````markdown
-```output
+```expected output
 start = 3
 ---
 3
@@ -221,10 +225,19 @@ start = 3
 1
 Liftoff!
 ```
+
+```expected output
+start = 1
+---
+1
+Liftoff!
+```
 ````
 
-Spaces at the ends of lines and blank lines at the very end don't matter.
-If the setup is empty (nothing above the `---`), `given:` is used.
+- **No `---`:** the whole block is the expected output, and the card's `given:` is used as the setup.
+- **With `---`:** everything above it is setup (separate statements with `;` or put them on separate lines), and everything below it is the expected output.
+- Spaces at the ends of lines and blank lines at the very end don't matter.
+- If the output itself contains a line that is just `---`, start the block with a `---` line (empty setup), so that the first `---` is the separator.
 
 ---
 

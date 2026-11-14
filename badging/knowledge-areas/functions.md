@@ -20,7 +20,7 @@ x = double(4)
 print(x + 1)
 ```
 
-```answer
+```expected output
 8
 9
 ```

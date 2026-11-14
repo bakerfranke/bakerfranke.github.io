@@ -18,7 +18,7 @@ print(math.floor(3.7))
 print(round(3.7))
 ```
 
-```answer
+```expected output
 7.0
 3
 4

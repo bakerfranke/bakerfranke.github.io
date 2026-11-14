@@ -18,7 +18,7 @@ print(word.count("l"))
 print(word)
 ```
 
-```answer
+```expected output
 BALLOON
 2
 balloon
