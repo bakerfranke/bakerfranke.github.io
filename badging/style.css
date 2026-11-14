@@ -253,3 +253,25 @@ dialog .btn-row { justify-content: flex-end; margin-top: 16px; }
   .medal { width: 52px; height: 52px; font-size: 1.3rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* prompts written in Markdown */
+.card-prompt p { margin: 12px 0; }
+.card-prompt ul { margin: 8px 0 12px; padding-left: 1.3em; }
+.card-prompt li { margin: 2px 0; }
+.card-prompt code, .choice code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.choice { font-family: inherit; }
+.loading { padding: 32px 0; }
+
+/* author check page */
+.status-bad { background: var(--bad); color: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .status-bad { color: #111; } }
+:root[data-theme="dark"] .status-bad { color: #111; }
+.author-area { margin: 20px 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-left: 8px solid var(--skill); border-radius: var(--radius); }
+.author-area h2 { margin: 0 0 8px; font-size: 1.15rem; }
+.author-area h2 .muted { font-size: .85rem; font-weight: 400; }
+.author-list { list-style: none; margin: 0; padding: 0; }
+.author-card { border-top: 1px solid var(--line); padding: 8px 0; }
+.author-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.author-row a { font-weight: 600; }
+.author-row .status { margin-left: auto; }
+.author-issue { background: var(--bad-bg); border-left: 4px solid var(--bad); padding: 6px 10px; border-radius: 6px; }

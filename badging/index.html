@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Python Skill Boxes</title>
-  <meta name="description" content="Mock-up of mastery-based, self-paced Python skill checks in the spirit of SRA reading cards.">
+  <title>Knowledge Area Boxes</title>
+  <meta name="description" content="Mock-up of mastery-based, self-paced Python knowledge area checks in the spirit of SRA reading cards.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,8 +13,8 @@
       <a class="brand" href="#/">
         <span class="brand-mark" aria-hidden="true"></span>
         <span>
-          <span class="brand-title">Python Skill Boxes</span>
-          <span class="brand-sub">Self-paced skill checks &middot; mock-up</span>
+          <span class="brand-title">Knowledge Area Boxes</span>
+          <span class="brand-sub">Python &middot; self-paced checks &middot; mock-up</span>
         </span>
       </a>
       <nav class="header-nav">
@@ -28,7 +28,8 @@
 
   <footer class="wrap site-footer">
     <p>Demo only. Progress is saved in this browser, and the teacher PIN is shown on screen.
-      <button type="button" class="link-btn" id="reset-btn">Reset progress</button></p>
+      <button type="button" class="link-btn" id="reset-btn">Reset progress</button>
+      &middot; <a href="#/author">Author check</a></p>
   </footer>
 
   <dialog id="signoff-dialog">
@@ -39,7 +40,7 @@
         <p class="checkin-label">Quick check-in to ask the student</p>
         <p id="signoff-prompt"></p>
       </div>
-      <label class="field-label" for="signoff-pin">Teacher PIN <span class="muted">(demo PIN: 1234)</span></label>
+      <label class="field-label" for="signoff-pin">Teacher PIN <span class="muted" id="signoff-pin-hint"></span></label>
       <input id="signoff-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
       <p class="feedback bad" id="signoff-error" hidden></p>
       <div class="btn-row">
@@ -49,7 +50,7 @@
     </form>
   </dialog>
 
-  <script src="cards.js"></script>
+  <script src="loader.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
