@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Python Skill Boxes</title>
+  <meta name="description" content="Mock-up of mastery-based, self-paced Python skill checks in the spirit of SRA reading cards.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-row">
+      <a class="brand" href="#/">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <span class="brand-title">Python Skill Boxes</span>
+          <span class="brand-sub">Self-paced skill checks &middot; mock-up</span>
+        </span>
+      </a>
+      <nav class="header-nav">
+        <a href="#/" data-nav="shelf">Shelf</a>
+        <a href="#/board" data-nav="board">Progress</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="wrap" tabindex="-1"></main>
+
+  <footer class="wrap site-footer">
+    <p>Demo only. Progress is saved in this browser, and the teacher PIN is shown on screen.
+      <button type="button" class="link-btn" id="reset-btn">Reset progress</button></p>
+  </footer>
+
+  <dialog id="signoff-dialog">
+    <form method="dialog" id="signoff-form">
+      <h2 id="signoff-title">Teacher sign-off</h2>
+      <p class="muted" id="signoff-skill"></p>
+      <div class="checkin">
+        <p class="checkin-label">Quick check-in to ask the student</p>
+        <p id="signoff-prompt"></p>
+      </div>
+      <label class="field-label" for="signoff-pin">Teacher PIN <span class="muted">(demo PIN: 1234)</span></label>
+      <input id="signoff-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
+      <p class="feedback bad" id="signoff-error" hidden></p>
+      <div class="btn-row">
+        <button type="button" class="btn ghost" id="signoff-cancel">Cancel</button>
+        <button type="submit" class="btn primary" id="signoff-confirm" value="confirm">Sign off badge</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
